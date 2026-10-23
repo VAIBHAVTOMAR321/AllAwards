@@ -246,6 +246,12 @@ const AWARD_LOGIN_ROUTES = {
   anganwadi: "/AnganwadiLogin",
 };
 
+const AWARD_REGISTER_ROUTES = {
+  "baal-veerta": BAAL_VEERTA_ROUTES.register,
+  "telu-rauteli": "/TiluRauteliLogin",
+  anganwadi: "/AnganwadiLogin",
+};
+
 export default function Home({ onSelectAward, awardRoutes = {} }) {
   const { language } = useLanguage();
   const navigate = useNavigate();
@@ -260,7 +266,7 @@ export default function Home({ onSelectAward, awardRoutes = {} }) {
     Boolean(onSelectAward) ||
     Boolean(awardRoutes?.[selectedAward]?.[dialogAction]) ||
     (dialogAction === "login" && Boolean(AWARD_LOGIN_ROUTES[selectedAward])) ||
-    (dialogAction === "register" && selectedAward === "baal-veerta");
+    (dialogAction === "register" && Boolean(AWARD_REGISTER_ROUTES[selectedAward]));
 
   useEffect(() => {
     if (!dialogAction) return undefined;
@@ -312,12 +318,15 @@ export default function Home({ onSelectAward, awardRoutes = {} }) {
       awardRoutes?.[award.id]?.[dialogAction] ||
       (dialogAction === "login"
         ? AWARD_LOGIN_ROUTES[award.id]
-        : award.id === "baal-veerta"
-          ? BAAL_VEERTA_ROUTES[dialogAction]
-          : null);
+        : AWARD_REGISTER_ROUTES[award.id]);
     if (route) {
       closeDialog();
-      navigate(route);
+      navigate(
+        route,
+        dialogAction === "register" && ["telu-rauteli", "anganwadi"].includes(award.id)
+          ? { state: { openRegistration: true } }
+          : undefined,
+      );
     }
   };
 

@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useCallback, useEffect, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   FaArrowRight,
   FaEye,
@@ -38,6 +38,7 @@ export default function AnganwadiLogin() {
   const [registrationError, setRegistrationError] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const location = useLocation();
   const navigate = useNavigate();
   const { login } = useAuth();
 
@@ -54,7 +55,7 @@ export default function AnganwadiLogin() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [showRegistration, registrationLoading]);
 
-  const openRegistration = async () => {
+  const openRegistration = useCallback(async () => {
     setShowRegistration(true);
     setRegistrationStep("details");
     setRegistrationError("");
@@ -73,7 +74,13 @@ export default function AnganwadiLogin() {
     } finally {
       setDistrictsLoading(false);
     }
-  };
+  }, [districts.length, districtsLoading]);
+
+  useEffect(() => {
+    if (!location.state?.openRegistration) return;
+    openRegistration();
+    navigate(location.pathname, { replace: true, state: null });
+  }, [location.pathname, location.state, navigate, openRegistration]);
 
   const closeRegistration = () => {
     if (registrationLoading) return;
