@@ -1,21 +1,124 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { FaEye, FaEyeSlash, FaKey, FaMobileAlt, FaUserShield } from "react-icons/fa";
+import {
+  FaArrowRight,
+  FaEye,
+  FaEyeSlash,
+  FaKey,
+  FaMapMarkerAlt,
+  FaMobileAlt,
+  FaUserShield,
+} from "react-icons/fa";
 import { useAuth } from "../login/AuthContext";
 import womenImage from "../../assets/images/images-11.jpeg";
 import { loginAwardPortal } from "./awardPortalLogin";
+import { sendOtpApi, verifyOtpApi } from "../otpsendverify/api";
 import AwardPasswordRecovery from "./AwardPasswordRecovery";
 import "./TiluRauteliLogin.css";
+
+const DISTRICTS_API =
+  "https://wecdukaward.in/balvirtaawardproject/balvirtaawardproject_backend/api/cdpo-dropdown/";
 
 export default function TiluRauteliLogin() {
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showRecovery, setShowRecovery] = useState(false);
+  const [showRegistration, setShowRegistration] = useState(false);
+  const [registrationStep, setRegistrationStep] = useState("details");
+  const [registration, setRegistration] = useState({
+    phone: "",
+    email: "",
+    district: "",
+  });
+  const [registrationOtp, setRegistrationOtp] = useState("");
+  const [districts, setDistricts] = useState([]);
+  const [districtsLoading, setDistrictsLoading] = useState(false);
+  const [registrationLoading, setRegistrationLoading] = useState(false);
+  const [registrationError, setRegistrationError] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { login } = useAuth();
+
+  useEffect(() => {
+    if (!showRegistration) return undefined;
+
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape" && !registrationLoading) {
+        setShowRegistration(false);
+        setRegistrationError("");
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [showRegistration, registrationLoading]);
+
+  const openRegistration = async () => {
+    setShowRegistration(true);
+    setRegistrationStep("details");
+    setRegistrationError("");
+    if (districts.length || districtsLoading) return;
+
+    setDistrictsLoading(true);
+    try {
+      const response = await fetch(DISTRICTS_API);
+      const result = await response.json();
+      if (!response.ok || result.success === false || !Array.isArray(result.data)) {
+        throw new Error(result.message || "जनपद सूची लोड नहीं हो सकी।");
+      }
+      setDistricts([...new Set(result.data.map((item) => item.district).filter(Boolean))]);
+    } catch (districtError) {
+      setRegistrationError(districtError.message || "जनपद सूची लोड नहीं हो सकी।");
+    } finally {
+      setDistrictsLoading(false);
+    }
+  };
+
+  const closeRegistration = () => {
+    if (registrationLoading) return;
+    setShowRegistration(false);
+    setRegistrationError("");
+  };
+
+  const handleRegistrationSubmit = async (event) => {
+    event.preventDefault();
+    setRegistrationError("");
+    if (!/^[0-9]{10}$/.test(registration.phone)) {
+      setRegistrationError("कृपया 10 अंकों का मोबाइल नंबर दर्ज करें।");
+      return;
+    }
+
+    setRegistrationLoading(true);
+    try {
+      await sendOtpApi(registration.phone);
+      setRegistrationOtp("");
+      setRegistrationStep("otp");
+    } catch (otpError) {
+      setRegistrationError(otpError.message || "OTP भेजने में विफल।");
+    } finally {
+      setRegistrationLoading(false);
+    }
+  };
+
+  const handleRegistrationOtpSubmit = async (event) => {
+    event.preventDefault();
+    setRegistrationError("");
+    if (!/^[0-9]{6}$/.test(registrationOtp)) {
+      setRegistrationError("कृपया 6 अंकों का OTP दर्ज करें।");
+      return;
+    }
+
+    setRegistrationLoading(true);
+    try {
+      await verifyOtpApi(registration.phone, registrationOtp);
+      setRegistrationStep("verified");
+    } catch (otpError) {
+      setRegistrationError(otpError.message || "OTP सत्यापन विफल।");
+    } finally {
+      setRegistrationLoading(false);
+    }
+  };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -111,6 +214,14 @@ export default function TiluRauteliLogin() {
             </button>
             <button
               type="button"
+              className="tilu-register-link"
+              onClick={openRegistration}
+            >
+              नया पंजीकरण करें
+              <FaArrowRight aria-hidden="true" />
+            </button>
+            <button
+              type="button"
               className="tilu-forgot-link"
               onClick={() => setShowRecovery(true)}
             >
@@ -127,6 +238,184 @@ export default function TiluRauteliLogin() {
       {showRecovery && (
         <div className="tilu-recovery-theme">
           <AwardPasswordRecovery onClose={() => setShowRecovery(false)} />
+        </div>
+      )}
+      {showRegistration && (
+        <div
+          className="tilu-registration-overlay"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) closeRegistration();
+          }}
+        >
+          <section
+            className="tilu-registration-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="tilu-registration-title"
+          >
+            <header className="tilu-registration-header">
+              <div>
+                <span>तीलू रौतेली पुरस्कार पोर्टल</span>
+                <h2 id="tilu-registration-title">
+                  {registrationStep === "details"
+                    ? "नया पंजीकरण"
+                    : registrationStep === "otp"
+                      ? "मोबाइल सत्यापन"
+                      : "मोबाइल सत्यापित"}
+                </h2>
+              </div>
+              <button
+                type="button"
+                onClick={closeRegistration}
+                aria-label="पंजीकरण विंडो बंद करें"
+              >
+                ×
+              </button>
+            </header>
+
+            {registrationStep === "details" && (
+              <form onSubmit={handleRegistrationSubmit}>
+                <div className="tilu-registration-body">
+                  <p className="tilu-registration-hint">
+                    कृपया अपना मोबाइल नंबर, ईमेल और जनपद दर्ज करें।
+                  </p>
+                  <label htmlFor="tilu-register-phone">मोबाइल नंबर <span>*</span></label>
+                  <div className="tilu-registration-input">
+                    <FaMobileAlt aria-hidden="true" />
+                    <input
+                      id="tilu-register-phone"
+                      type="tel"
+                      inputMode="numeric"
+                      autoComplete="tel"
+                      maxLength={10}
+                      value={registration.phone}
+                      onChange={(event) =>
+                        setRegistration((current) => ({
+                          ...current,
+                          phone: event.target.value.replace(/\D/g, "").slice(0, 10),
+                        }))
+                      }
+                      placeholder="मोबाइल नंबर दर्ज करें"
+                      required
+                    />
+                  </div>
+
+                  <label htmlFor="tilu-register-email">ईमेल पता <span>*</span></label>
+                  <div className="tilu-registration-input">
+                    <span aria-hidden="true">@</span>
+                    <input
+                      id="tilu-register-email"
+                      type="email"
+                      autoComplete="email"
+                      value={registration.email}
+                      onChange={(event) =>
+                        setRegistration((current) => ({
+                          ...current,
+                          email: event.target.value,
+                        }))
+                      }
+                      placeholder="ईमेल पता दर्ज करें"
+                      required
+                    />
+                  </div>
+
+                  <label htmlFor="tilu-register-district">जनपद <span>*</span></label>
+                  <div className="tilu-registration-input">
+                    <FaMapMarkerAlt aria-hidden="true" />
+                    <select
+                      id="tilu-register-district"
+                      value={registration.district}
+                      onChange={(event) =>
+                        setRegistration((current) => ({
+                          ...current,
+                          district: event.target.value,
+                        }))
+                      }
+                      disabled={districtsLoading}
+                      required
+                    >
+                      <option value="">
+                        {districtsLoading ? "जनपद लोड हो रहे हैं..." : "जनपद चुनें"}
+                      </option>
+                      {districts.map((district) => (
+                        <option value={district} key={district}>{district}</option>
+                      ))}
+                    </select>
+                  </div>
+                  {registrationError && (
+                    <p className="tilu-registration-error" role="alert">
+                      {registrationError}
+                    </p>
+                  )}
+                </div>
+                <footer className="tilu-registration-footer">
+                  <button
+                    type="submit"
+                    disabled={registrationLoading || districtsLoading || !districts.length}
+                  >
+                    {registrationLoading ? "OTP भेज रहे हैं..." : "पंजीकरण जारी रखें"}
+                    <FaArrowRight aria-hidden="true" />
+                  </button>
+                </footer>
+              </form>
+            )}
+
+            {registrationStep === "otp" && (
+              <form onSubmit={handleRegistrationOtpSubmit}>
+                <div className="tilu-registration-body">
+                  <p className="tilu-registration-hint">
+                    <strong>{registration.phone}</strong> पर भेजा गया 6 अंकों का OTP दर्ज करें।
+                  </p>
+                  <label htmlFor="tilu-register-otp">OTP <span>*</span></label>
+                  <div className="tilu-registration-input">
+                    <FaKey aria-hidden="true" />
+                    <input
+                      id="tilu-register-otp"
+                      type="text"
+                      inputMode="numeric"
+                      autoComplete="one-time-code"
+                      maxLength={6}
+                      value={registrationOtp}
+                      onChange={(event) =>
+                        setRegistrationOtp(event.target.value.replace(/\D/g, "").slice(0, 6))
+                      }
+                      placeholder="6 अंकों का OTP दर्ज करें"
+                      required
+                    />
+                  </div>
+                  {registrationError && (
+                    <p className="tilu-registration-error" role="alert">
+                      {registrationError}
+                    </p>
+                  )}
+                </div>
+                <footer className="tilu-registration-footer">
+                  <button type="submit" disabled={registrationLoading}>
+                    {registrationLoading ? "सत्यापन हो रहा है..." : "OTP सत्यापित करें"}
+                    <FaArrowRight aria-hidden="true" />
+                  </button>
+                </footer>
+              </form>
+            )}
+
+            {registrationStep === "verified" && (
+              <div className="tilu-registration-body">
+                <p className="tilu-registration-success" role="status">
+                  मोबाइल नंबर सत्यापित हो गया है।
+                </p>
+                <p className="tilu-registration-hint">
+                  इस परियोजना में पंजीकरण पूरा करने के लिए खाता बनाने की सेवा अभी उपलब्ध नहीं है।
+                </p>
+                <button
+                  type="button"
+                  className="tilu-registration-done"
+                  onClick={closeRegistration}
+                >
+                  बंद करें
+                </button>
+              </div>
+            )}
+          </section>
         </div>
       )}
     </main>

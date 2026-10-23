@@ -131,10 +131,38 @@
 .tilu-submit-button:hover:not(:disabled) { transform: translateY(-1px); background: var(--tilu-rose); }
 .tilu-submit-button:disabled { cursor: wait; opacity: .7; }
 .tilu-submit-button span { margin-left: auto; font-size: 17px; }
+.tilu-register-link { align-self: center; display: inline-flex; align-items: center; justify-content: center; gap: 8px; margin-top: 14px; padding: 6px 0; border: 0; background: transparent; color: var(--tilu-rose); font-size: 12px; font-weight: 700; }
+.tilu-register-link:hover { color: var(--tilu-plum); text-decoration: underline; }
 .tilu-forgot-link { align-self: flex-end; margin-top: 13px; padding: 4px 0; border: 0; background: transparent; color: var(--tilu-rose); font-size: 11px; font-weight: 700; }
 .tilu-forgot-link:hover { color: var(--tilu-plum); text-decoration: underline; }
 .tilu-security-note { display: flex; align-items: center; justify-content: center; gap: 8px; margin: 24px 0 0; color: #978b86; font-size: 9px; line-height: 1.6; text-align: center; }
 .tilu-security-note svg { color: var(--tilu-rose); }
+
+.tilu-registration-overlay { position: fixed; z-index: 1100; inset: 0; display: grid; place-items: center; padding: 18px; background: rgba(42, 27, 34, .58); }
+.tilu-registration-modal { width: min(100%, 590px); overflow: hidden; border: 1px solid rgba(103, 59, 78, .18); border-radius: 8px; background: #fffdf9; box-shadow: 0 24px 70px rgba(42, 27, 34, .32); }
+.tilu-registration-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 16px 22px; background: var(--tilu-plum); color: white; }
+.tilu-registration-header span { color: #f1d4aa; font-size: 9px; font-weight: 700; letter-spacing: .12em; }
+.tilu-registration-header h2 { margin: 4px 0 0; color: white; font-family: "Noto Sans Devanagari", Georgia, serif; font-size: 20px; font-weight: 600; }
+.tilu-registration-header > button { padding: 0 4px; border: 0; background: transparent; color: white; font-size: 27px; line-height: 1; }
+.tilu-registration-body { padding: 20px 22px; }
+.tilu-registration-hint { margin: 0 0 17px; padding: 11px 13px; border: 1px solid #eadce0; border-radius: 4px; background: #fbf2f0; color: #75565d; font-size: 11px; line-height: 1.65; }
+.tilu-registration-body > label { display: block; margin: 0 0 6px; color: #514345; font-size: 11px; font-weight: 700; }
+.tilu-registration-body > label span { color: #a42f39; }
+.tilu-registration-input { min-height: 43px; display: flex; align-items: center; gap: 10px; margin-bottom: 14px; padding: 0 12px; border: 1px solid #e6ddd5; border-radius: 4px; background: white; color: var(--tilu-rose); }
+.tilu-registration-input:focus-within { border-color: var(--tilu-rose); box-shadow: 0 0 0 3px rgba(166, 83, 98, .1); }
+.tilu-registration-input > svg { flex: 0 0 auto; font-size: 13px; }
+.tilu-registration-input input,
+.tilu-registration-input select { width: 100%; min-width: 0; border: 0; outline: 0; background: transparent; color: var(--tilu-ink); font: inherit; font-size: 12px; }
+.tilu-registration-input input::placeholder { color: #a99f9b; }
+.tilu-registration-error { margin: 0; color: #a42f39; font-size: 11px; line-height: 1.6; }
+.tilu-registration-footer { display: flex; justify-content: flex-end; padding: 14px 22px; border-top: 1px solid #eadfe0; }
+.tilu-registration-footer > button,
+.tilu-registration-done { min-height: 44px; display: inline-flex; align-items: center; justify-content: center; gap: 10px; padding: 0 18px; border: 0; border-radius: 4px; background: var(--tilu-plum); color: white; font-size: 12px; font-weight: 700; }
+.tilu-registration-footer > button:hover:not(:disabled),
+.tilu-registration-done:hover { background: var(--tilu-rose); }
+.tilu-registration-footer > button:disabled { cursor: wait; opacity: .65; }
+.tilu-registration-success { margin: 0 0 14px; color: var(--tilu-plum); font-size: 14px; font-weight: 700; }
+.tilu-registration-done { width: 100%; }
 
 @media (max-width: 760px) {
   .tilu-login-page { padding: 16px; }
@@ -151,4 +179,9 @@
   .tilu-story-copy { padding: 25px; }
   .tilu-story-copy h1 { font-size: 30px; }
   .tilu-form-panel { padding: 28px 24px; }
+  .tilu-registration-overlay { padding: 10px; }
+  .tilu-registration-header,
+  .tilu-registration-body { padding-right: 16px; padding-left: 16px; }
+  .tilu-registration-footer { padding: 12px 16px; }
+  .tilu-registration-footer > button { width: 100%; }
 }

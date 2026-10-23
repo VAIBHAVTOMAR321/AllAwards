@@ -113,8 +113,171 @@
 .anganwadi-submit-button:disabled { cursor: wait; opacity: .7; }
 .anganwadi-forgot-link { display: block; margin: 12px 0 0 auto; padding: 4px 0; border: 0; background: transparent; color: var(--anganwadi-green); font-size: 11px; font-weight: 700; }
 .anganwadi-forgot-link:hover { color: var(--anganwadi-ink); text-decoration: underline; }
+.anganwadi-register-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  align-self: center;
+  margin-top: 14px;
+  padding: 6px 0;
+  border: 0;
+  background: transparent;
+  color: var(--anganwadi-green);
+  font-size: 12px;
+  font-weight: 700;
+}
+.anganwadi-register-link:hover { color: var(--anganwadi-ink); text-decoration: underline; }
 .anganwadi-security-note { display: flex; align-items: center; justify-content: center; gap: 7px; margin: 16px 0 0; color: #879387; font-size: 10px; }
 .anganwadi-security-note svg { color: var(--anganwadi-leaf); }
+
+.anganwadi-registration-overlay {
+  position: fixed;
+  z-index: 1100;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+  background: rgba(20, 38, 31, 0.56);
+}
+.anganwadi-registration-modal {
+  width: min(100%, 590px);
+  overflow: hidden;
+  border: 1px solid rgba(49, 94, 76, 0.18);
+  border-radius: 8px;
+  background: #fffef9;
+  box-shadow: 0 24px 70px rgba(17, 38, 29, 0.3);
+}
+.anganwadi-registration-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 22px;
+  background: var(--anganwadi-green);
+  color: white;
+}
+.anganwadi-registration-header span {
+  color: #e7d7ad;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+.anganwadi-registration-header h2 {
+  margin: 4px 0 0;
+  font-family: "Noto Sans Devanagari", Georgia, serif;
+  font-size: 20px;
+  font-weight: 600;
+}
+.anganwadi-registration-header > button {
+  padding: 0 4px;
+  border: 0;
+  background: transparent;
+  color: white;
+  font-size: 27px;
+  line-height: 1;
+}
+.anganwadi-registration-body {
+  padding: 20px 22px;
+}
+.anganwadi-registration-hint {
+  margin: 0 0 17px;
+  padding: 11px 13px;
+  border: 1px solid #d9e5d2;
+  border-radius: 4px;
+  background: #f0f5ed;
+  color: #526b58;
+  font-size: 11px;
+  line-height: 1.65;
+}
+.anganwadi-registration-body > label {
+  display: block;
+  margin: 0 0 6px;
+  color: #42594b;
+  font-size: 11px;
+  font-weight: 700;
+}
+.anganwadi-registration-body > label span {
+  color: #a42f39;
+}
+.anganwadi-registration-input {
+  min-height: 43px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+  padding: 0 12px;
+  border: 1px solid #dbe2d5;
+  border-radius: 4px;
+  background: white;
+  color: var(--anganwadi-leaf);
+}
+.anganwadi-registration-input:focus-within {
+  border-color: var(--anganwadi-leaf);
+  box-shadow: 0 0 0 3px rgba(107, 141, 105, 0.12);
+}
+.anganwadi-registration-input > svg {
+  flex: 0 0 auto;
+  font-size: 13px;
+}
+.anganwadi-registration-input input,
+.anganwadi-registration-input select {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--anganwadi-ink);
+  font: inherit;
+  font-size: 12px;
+}
+.anganwadi-registration-input input::placeholder {
+  color: #a1aaa0;
+}
+.anganwadi-registration-error {
+  margin: 0;
+  color: #a42f39;
+  font-size: 11px;
+  line-height: 1.6;
+}
+.anganwadi-registration-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding: 14px 22px;
+  border-top: 1px solid #e2e5d8;
+}
+.anganwadi-registration-footer > button,
+.anganwadi-registration-done {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 4px;
+  background: var(--anganwadi-green);
+  color: white;
+  font-size: 12px;
+  font-weight: 700;
+}
+.anganwadi-registration-footer > button:hover:not(:disabled),
+.anganwadi-registration-done:hover {
+  background: var(--anganwadi-ink);
+}
+.anganwadi-registration-footer > button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+.anganwadi-registration-success {
+  margin: 0 0 14px;
+  color: var(--anganwadi-green);
+  font-size: 14px;
+  font-weight: 700;
+}
+.anganwadi-registration-done {
+  width: 100%;
+}
 
 .anganwadi-photo-panel {
   position: relative;
@@ -151,4 +314,9 @@
   .anganwadi-form-heading h2 { font-size: 27px; }
   .anganwadi-photo-panel { min-height: 240px; }
   .anganwadi-footer { padding: 14px 18px; font-size: 9px; }
+  .anganwadi-registration-overlay { padding: 10px; }
+  .anganwadi-registration-header,
+  .anganwadi-registration-body { padding-right: 16px; padding-left: 16px; }
+  .anganwadi-registration-footer { padding: 12px 16px; }
+  .anganwadi-registration-footer > button { width: 100%; }
 }
