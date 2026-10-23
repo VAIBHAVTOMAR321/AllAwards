@@ -1,0 +1,113 @@
+/* d:/Reactjs/d_r_c/wecd-puruskar/src/assets/css/admindashboard.css */
+
+.admin-main-content .content-area {
+    padding: 1.5rem;
+    background-color: #f9fafb;
+    min-height: calc(100vh - 65px); /* Adjust based on top nav height */
+}
+
+.stat-card {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    display: flex;
+    align-items: center;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border: 1px solid #e5e7eb;
+}
+
+.stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -2px rgb(0 0 0 / 0.1);
+}
+
+.stat-card-icon {
+    font-size: 2rem;
+    padding: 1rem;
+    border-radius: 50%;
+    margin-right: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+}
+
+.stat-card-icon.bg-primary {
+    background: linear-gradient(135deg, #4f46e5, #6366f1);
+}
+
+.stat-card-icon.bg-warning {
+    background: linear-gradient(135deg, #f59e0b, #fbbf24);
+}
+
+.stat-card-icon.bg-success {
+    background: linear-gradient(135deg, #10b981, #34d399);
+}
+
+.stat-card-icon.bg-danger {
+    background: linear-gradient(135deg, #ef4444, #f87171);
+}
+
+.stat-card-info h5 {
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin-bottom: 0.25rem;
+    font-weight: 500;
+}
+
+.stat-card-info p {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 0;
+}
+
+.queries-table-card {
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+}
+
+.queries-table-card .card-header {
+    background-color: #fff;
+    border-bottom: 1px solid #e5e7eb;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+}
+
+.queries-table {
+    font-size: 0.875rem;
+}
+
+.queries-table th {
+    background-color: #f9fafb;
+    font-weight: 600;
+    color: #374151;
+}
+
+.queries-table .btn-sm {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.6rem;
+}
+
+.badge {
+    font-size: 0.75rem;
+    padding: 0.4em 0.6em;
+    font-weight: 600;
+}
+
+@media (max-width: 767px) {
+    .admin-main-content .content-area {
+        padding: 1rem;
+    }
+
+    .stat-card {
+        padding: 1rem;
+    }
+
+    .stat-card-icon {
+        margin-right: 1rem;
+        font-size: 1.5rem;
+    }
+}

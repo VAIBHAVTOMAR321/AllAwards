@@ -1,0 +1,352 @@
+.otp-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 1rem;
+  animation: otpFadeIn 0.18s ease-out;
+}
+
+.otp-modal {
+  background: #fff;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 380px;
+  border: 1px solid #e6eaf0;
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.14);
+  overflow: hidden;
+  animation: otpSlideUp 0.2s ease-out;
+}
+
+/* ── Header ─────────────────────────────────────────── */
+.otp-modal-header {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid #eef1f5;
+  background: #fbfcfe;
+}
+
+.otp-modal-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  background: #e8f3ef;
+  color: #16715b;
+  flex-shrink: 0;
+}
+
+.otp-modal-header h3 {
+  margin: 0;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #1e293b;
+  letter-spacing: 0.01em;
+  flex: 1;
+  min-width: 0;
+}
+
+.otp-close {
+  background: none;
+  border: none;
+  font-size: 1.15rem;
+  line-height: 1;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 0.15rem 0.35rem;
+  border-radius: 5px;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+
+.otp-close:hover {
+  background: #eef1f5;
+  color: #334155;
+}
+
+/* ── Body ───────────────────────────────────────────── */
+.otp-modal-body {
+  padding: 0.9rem 1rem 0.75rem;
+}
+
+.otp-hint {
+  margin: 0 0 0.75rem;
+  font-size: 0.76rem;
+  color: #64748b;
+  line-height: 1.55;
+}
+
+.otp-hint strong {
+  color: #334155;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+/* ── Role selector (compact, overrides Login.css) ───── */
+.otp-role-selector {
+  margin-bottom: 0.85rem;
+}
+
+.otp-role-label {
+  display: block;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #64748b;
+  margin-bottom: 0.35rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.otp-role-options {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.otp-role-option {
+  flex: 1;
+  min-width: 0;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 0.5rem 0.6rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  background: #f8fafc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+}
+
+.otp-role-option:hover {
+  border-color: #94a3b8;
+  background: #f1f5f9;
+}
+
+.otp-role-option.selected,
+.otp-role-option input:checked + .otp-role-text {
+  border-color: #16715b;
+  background: #fff;
+  box-shadow: 0 0 0 2px rgba(22, 113, 91, 0.12);
+}
+
+.otp-role-option input {
+  display: none;
+}
+
+.otp-role-text {
+  font-weight: 600;
+  color: #475569;
+  font-size: 0.76rem;
+  cursor: pointer;
+  line-height: 1.3;
+}
+
+.otp-role-option.selected .otp-role-text {
+  color: #16715b;
+}
+
+/* Role badge in the header - readable on the light header */
+.otp-role-badge {
+  font-size: 0.66rem;
+  background: #e8f3ef;
+  color: #16715b;
+  border-radius: 20px;
+  padding: 0.15rem 0.5rem;
+  font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* ── Fields ─────────────────────────────────────────── */
+.otp-field {
+  margin-bottom: 0.6rem;
+}
+
+.otp-field label {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #475569;
+  margin-bottom: 0.3rem;
+}
+
+.otp-field input {
+  width: 100%;
+  height: 36px;
+  padding: 0.4rem 0.65rem;
+  border: 1px solid #dde3ea;
+  border-radius: 7px;
+  font-size: 0.82rem;
+  color: #1e293b;
+  background: #fff;
+  outline: none;
+  transition: all 0.15s ease;
+}
+
+.otp-field input::placeholder {
+  color: #a8b2c1;
+  font-size: 0.78rem;
+}
+
+.otp-field input:focus {
+  border-color: #16715b;
+  box-shadow: 0 0 0 3px rgba(22, 113, 91, 0.1);
+}
+
+/* ── Error ──────────────────────────────────────────── */
+.otp-error {
+  background: #fef2f2;
+  color: #b42318;
+  border: 1px solid #fecaca;
+  border-radius: 7px;
+  padding: 0.45rem 0.6rem;
+  font-size: 0.73rem;
+  line-height: 1.45;
+  margin-top: 0.1rem;
+}
+
+/* ── Footer ─────────────────────────────────────────── */
+.otp-modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  padding: 0.35rem 1rem 0.9rem;
+}
+
+.otp-btn-primary {
+  background: #16715b;
+  color: #fff;
+  border: none;
+  border-radius: 7px;
+  padding: 0.45rem 0.9rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.otp-btn-primary:hover:not(:disabled) {
+  background: #125c4a;
+}
+
+.otp-btn-primary:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.otp-btn-secondary {
+  background: #f1f5f9;
+  color: #475569;
+  border: none;
+  border-radius: 7px;
+  padding: 0.45rem 0.9rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.otp-btn-secondary:hover {
+  background: #e6ebf1;
+  color: #1e293b;
+}
+
+/* ── Resend ─────────────────────────────────────────── */
+.otp-resend {
+  text-align: center;
+  padding: 0 1rem 0.85rem;
+  border-top: 1px solid #f1f5f9;
+  padding-top: 0.6rem;
+  margin: 0 1rem 0.85rem;
+  font-size: 0.73rem;
+  color: #64748b;
+}
+
+.otp-resend-btn {
+  background: none;
+  border: none;
+  color: #16715b;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 0.73rem;
+  padding: 0;
+  transition: color 0.15s ease;
+}
+
+.otp-resend-btn:hover:not(:disabled) {
+  color: #125c4a;
+  text-decoration: underline;
+}
+
+.otp-resend-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ── Expiry timer ───────────────────────────────────── */
+.otp-expiry-timer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 0.4rem 0.7rem;
+  margin: 0 0 0.7rem;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 7px;
+  font-size: 0.73rem;
+  font-weight: 600;
+  color: #15803d;
+}
+
+.otp-expiry-timer::before {
+  content: "\23F1";
+  font-size: 0.8rem;
+}
+
+@media (max-width: 480px) {
+  .otp-modal {
+    max-width: 100%;
+  }
+
+  .otp-modal-footer {
+    flex-direction: column-reverse;
+  }
+
+  .otp-btn-primary,
+  .otp-btn-secondary {
+    width: 100%;
+  }
+}
+
+@keyframes otpFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes otpSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
