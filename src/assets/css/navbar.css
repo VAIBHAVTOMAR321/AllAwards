@@ -39,11 +39,15 @@
 /* ---------- Nav Links (White Text) ---------- */
 .drc-navbar .nav-link-custom {
   color: rgba(255, 255, 255, 0.88) !important;
+  border: 0;
+  background: transparent;
+  font-family: inherit;
   font-weight: 500;
   font-size: 12px;
   padding: 0.5rem 1rem !important;
   position: relative;
   transition: color 0.3s ease;
+  cursor: pointer;
 }
 
 /* White underline animation on hover */
@@ -144,5 +148,117 @@
   .drc-navbar .primary-btn {
     width: 100%;
     margin-top: 0.5rem;
+  }
+}
+
+/* The public awards landing page uses a lighter visual theme. */
+.drc-navbar.awards-navbar {
+  background: rgba(251, 248, 241, 0.97);
+  box-shadow: 0 3px 16px rgba(23, 42, 58, 0.08);
+  border-bottom: 1px solid rgba(23, 42, 58, 0.08);
+  backdrop-filter: blur(12px);
+}
+
+.drc-navbar.awards-navbar.navbar-scrolled {
+  background: rgba(251, 248, 241, 0.98);
+  box-shadow: 0 5px 20px rgba(23, 42, 58, 0.1);
+}
+
+.drc-navbar.awards-navbar .navbar-brand {
+  color: #172a3a !important;
+  line-height: 1.3;
+}
+
+.drc-navbar.awards-navbar .nav-link-custom {
+  color: #172a3a !important;
+}
+
+.drc-navbar.awards-navbar .nav-link-custom::after {
+  display: none;
+}
+
+.drc-navbar.awards-navbar .nav-action-register,
+.drc-navbar.awards-navbar .nav-action-login {
+  min-height: 38px;
+  margin-left: 8px;
+  padding: 0.45rem 1.1rem !important;
+  border: 1px solid #102d40;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 700;
+  transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.drc-navbar.awards-navbar .nav-action-register {
+  background: #102d40;
+  color: #fff !important;
+}
+
+.drc-navbar.awards-navbar .nav-action-register:hover {
+  background: #1b5265;
+  border-color: #1b5265;
+  transform: translateY(-1px);
+}
+
+.drc-navbar.awards-navbar .nav-action-login {
+  background: transparent;
+}
+
+.drc-navbar.awards-navbar .nav-action-login:hover {
+  background: #fffdf8;
+}
+
+.navbar-language-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-right: 5px;
+  padding: 8px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  border-radius: 999px;
+  background: transparent;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.navbar-language-toggle span {
+  font-size: 15px;
+}
+
+.drc-navbar.awards-navbar .navbar-language-toggle {
+  border-color: #e5e2d9;
+  color: #172a3a;
+}
+
+.drc-navbar.awards-navbar .navbar-language-toggle:hover {
+  border-color: #e99b43;
+  background: #fffdf8;
+}
+
+@media (max-width: 991.98px) {
+  .drc-navbar.awards-navbar .navbar-collapse,
+  .drc-navbar.awards-navbar.navbar-scrolled .navbar-collapse {
+    background: #fbf8f1;
+    border: 1px solid #e5e2d9;
+    box-shadow: 0 8px 24px rgba(23, 42, 58, 0.12);
+  }
+
+  .drc-navbar.awards-navbar .navbar-language-toggle {
+    margin: 4px 0 10px 8px;
+  }
+
+  .drc-navbar.awards-navbar .nav-action-register,
+  .drc-navbar.awards-navbar .nav-action-login {
+    margin: 4px 0;
+    text-align: left;
+  }
+
+  .drc-navbar.awards-navbar .navbar-toggler {
+    border-color: #8c999b;
+  }
+
+  .drc-navbar.awards-navbar .navbar-toggler-icon {
+    background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3E%3Cpath stroke='%23172a3a' stroke-width='2' stroke-linecap='round' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
   }
 }

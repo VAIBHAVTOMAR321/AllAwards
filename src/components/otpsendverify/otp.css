@@ -350,3 +350,473 @@
     transform: translateY(0) scale(1);
   }
 }
+
+.otp-login-page {
+  min-height: 100svh;
+  display: grid;
+  place-items: center;
+  padding: 34px;
+  color: #172a3a;
+  background:
+    radial-gradient(ellipse at 12% 8%, rgba(233, 155, 67, 0.12), transparent 36%),
+    #f7f4eb;
+  font-family: "DM Sans", "Noto Sans Devanagari", sans-serif;
+}
+
+.otp-login-layout {
+  width: min(1160px, 100%);
+  min-height: min(710px, calc(100svh - 68px));
+  display: grid;
+  grid-template-columns: 0.92fr 1fr;
+  overflow: hidden;
+  background: #fffdf8;
+  border: 1px solid rgba(23, 42, 58, 0.09);
+  border-radius: 10px;
+  box-shadow: 0 28px 80px rgba(23, 42, 58, 0.14);
+}
+
+.otp-login-brand {
+  position: relative;
+  display: flex;
+  align-items: end;
+  min-height: 620px;
+  padding: 54px;
+  overflow: hidden;
+  color: #fff;
+  background: #102d40;
+}
+
+.otp-login-hero-image,
+.otp-login-brand::after {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.otp-login-hero-image {
+  object-fit: cover;
+  object-position: center;
+}
+
+.otp-login-brand::after {
+  content: "";
+  background: linear-gradient(180deg, rgba(13, 39, 54, 0.1), rgba(13, 39, 54, 0.9) 76%);
+}
+
+.otp-login-brand-content {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+}
+
+.otp-login-logo {
+  width: 58px;
+  height: 58px;
+  margin-bottom: 24px;
+  padding: 6px;
+  border-radius: 50%;
+  background: #fff;
+  object-fit: contain;
+}
+
+.otp-login-department,
+.otp-login-department-en,
+.otp-login-award-en,
+.otp-login-copyright {
+  margin: 0;
+}
+
+.otp-login-department {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.otp-login-department-en {
+  margin-top: 5px;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 12px;
+}
+
+.otp-login-rule {
+  display: block;
+  width: 44px;
+  height: 2px;
+  margin: 27px 0;
+  background: #e99b43;
+}
+
+.otp-login-kicker,
+.otp-login-step-label {
+  color: #a96f30;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.otp-login-kicker {
+  margin: 0 0 12px;
+  color: #f0c28b;
+}
+
+.otp-login-brand h1 {
+  max-width: 420px;
+  margin: 0;
+  color: #fff;
+  font-family: "Noto Sans Devanagari", Georgia, serif;
+  font-size: clamp(28px, 3vw, 39px);
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.otp-login-award-en {
+  margin-top: 10px;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 13px;
+  font-style: italic;
+}
+
+.otp-login-brand-role {
+  display: grid;
+  gap: 5px;
+  margin-top: 28px;
+  padding: 12px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.1);
+  font-size: 12px;
+}
+
+.otp-login-brand-role span {
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.otp-login-brand-role strong {
+  font-size: 13px;
+}
+
+.otp-login-copyright {
+  margin-top: 27px;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 10px;
+}
+
+.otp-login-main {
+  display: flex;
+  flex-direction: column;
+  padding: 28px clamp(24px, 5vw, 64px);
+}
+
+.otp-login-home-link {
+  align-self: flex-start;
+  color: #64727a;
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.otp-login-home-link span {
+  margin-right: 7px;
+  color: #b87832;
+  font-size: 16px;
+}
+
+.otp-login-home-link:hover {
+  color: #1b5265;
+}
+
+.otp-login-form-wrap {
+  width: 100%;
+  max-width: 510px;
+  margin: auto;
+}
+
+.otp-login-intro {
+  margin-bottom: 22px;
+}
+
+.otp-login-intro h2 {
+  margin: 8px 0;
+  color: #172a3a;
+  font-family: Georgia, "Noto Sans Devanagari", serif;
+  font-size: 32px;
+  font-weight: 500;
+}
+
+.otp-login-intro p {
+  margin: 0;
+  color: #73808a;
+  font-size: 13px;
+}
+
+.otp-step-card {
+  width: 100%;
+  max-width: none;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  overflow: visible;
+  animation: otpFadeIn 0.2s ease-out;
+}
+
+.otp-step-card .otp-modal-header {
+  gap: 12px;
+  padding: 0 0 16px;
+  border-bottom: 1px solid #e8e5dc;
+  background: transparent;
+}
+
+.otp-step-card .otp-modal-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  color: #9a652b;
+  background: #f6e8d4;
+  font-size: 15px;
+}
+
+.otp-step-card .otp-modal-header h3 {
+  color: #172a3a;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.otp-step-card .otp-role-badge {
+  margin-left: auto;
+  padding: 6px 10px;
+  color: #1b5265;
+  background: #e7efeb;
+  font-size: 10px;
+}
+
+.otp-step-card .otp-modal-body {
+  padding: 18px 0 0;
+}
+
+.otp-step-card .otp-hint {
+  margin-bottom: 20px;
+  color: #64727a;
+  font-size: 13px;
+}
+
+.otp-step-card .otp-role-selector {
+  margin-bottom: 22px;
+}
+
+.otp-step-card .otp-role-label {
+  margin-bottom: 9px;
+  color: #455965;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+}
+
+.otp-step-card .otp-role-options {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.otp-step-card .otp-role-option {
+  position: relative;
+  min-width: 0;
+  min-height: 62px;
+  padding: 10px 7px;
+  border: 1px solid #e5e2d9;
+  border-radius: 5px;
+  background: #fff;
+}
+
+.otp-step-card .otp-role-option input {
+  display: block;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.otp-step-card .otp-role-option:focus-within {
+  outline: 3px solid rgba(27, 82, 101, 0.22);
+  outline-offset: 2px;
+}
+
+.otp-step-card .otp-role-option:hover {
+  border-color: #b8c9c5;
+  background: #fbf8f1;
+}
+
+.otp-step-card .otp-role-option.selected {
+  border-color: #1b5265;
+  background: #f1f5f1;
+  box-shadow: 0 0 0 2px rgba(27, 82, 101, 0.1);
+}
+
+.otp-step-card .otp-role-text {
+  color: #455965;
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.otp-step-card .otp-role-option.selected .otp-role-text {
+  color: #1b5265;
+}
+
+.otp-step-card .otp-field {
+  margin-bottom: 0;
+}
+
+.otp-step-card .otp-field label {
+  margin-bottom: 8px;
+  color: #455965;
+  font-size: 12px;
+}
+
+.otp-step-card .otp-field input {
+  height: 50px;
+  padding: 0 14px;
+  border-color: #d9ded9;
+  border-radius: 4px;
+  font-size: 15px;
+}
+
+.otp-step-card .otp-field input:focus {
+  border-color: #1b5265;
+  box-shadow: 0 0 0 3px rgba(27, 82, 101, 0.12);
+}
+
+.otp-step-card .otp-modal-footer {
+  justify-content: stretch;
+  padding: 20px 0 0;
+}
+
+.otp-step-card .otp-modal-footer .otp-btn-primary {
+  flex: 1;
+  min-height: 48px;
+  border-radius: 4px;
+  background: #102d40;
+  font-size: 13px;
+}
+
+.otp-step-card .otp-modal-footer .otp-btn-primary:hover:not(:disabled) {
+  background: #1b5265;
+}
+
+.otp-step-card .otp-btn-secondary {
+  flex: 1;
+  min-height: 46px;
+  border: 1px solid #d9ded9;
+  border-radius: 4px;
+  background: #fff;
+}
+
+.otp-step-card .otp-resend {
+  margin-top: 15px;
+  text-align: center;
+}
+
+.otp-step-card .otp-resend-btn {
+  color: #1b5265;
+  font-size: 12px;
+}
+
+.otp-login-security-note {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 25px 0 0;
+  color: #78858a;
+  font-size: 10px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.otp-login-security-note svg {
+  flex: 0 0 auto;
+  color: #52766e;
+}
+
+@media (max-width: 800px) {
+  .otp-login-page {
+    padding: 18px;
+  }
+
+  .otp-login-layout {
+    min-height: calc(100svh - 36px);
+    grid-template-columns: 1fr;
+  }
+
+  .otp-login-brand {
+    min-height: 230px;
+    padding: 26px;
+  }
+
+  .otp-login-logo {
+    width: 42px;
+    height: 42px;
+    margin-bottom: 12px;
+  }
+
+  .otp-login-rule {
+    margin: 14px 0;
+  }
+
+  .otp-login-brand h1 {
+    font-size: 25px;
+  }
+
+  .otp-login-brand-role,
+  .otp-login-copyright {
+    display: none;
+  }
+
+  .otp-login-main {
+    padding: 20px 24px 28px;
+  }
+
+  .otp-login-form-wrap {
+    margin: 30px auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .otp-login-page {
+    padding: 0;
+  }
+
+  .otp-login-layout {
+    min-height: 100svh;
+    border: 0;
+    border-radius: 0;
+  }
+
+  .otp-login-brand {
+    min-height: 205px;
+    padding: 22px;
+  }
+
+  .otp-login-brand h1 {
+    font-size: 21px;
+  }
+
+  .otp-login-main {
+    padding: 18px 20px 24px;
+  }
+
+  .otp-login-intro h2 {
+    font-size: 27px;
+  }
+
+  .otp-step-card .otp-role-options {
+    grid-template-columns: 1fr;
+  }
+
+  .otp-step-card .otp-role-option {
+    min-height: 46px;
+  }
+}

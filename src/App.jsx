@@ -5,6 +5,9 @@ import {
   useLocation,
 } from "react-router-dom";
 import Home from "./components/home_layout/Home";
+import LoginPortal from "./components/home_layout/LoginPortal";
+import TiluRauteliLogin from "./components/home_layout/TiluRauteliLogin";
+import AnganwadiLogin from "./components/home_layout/AnganwadiLogin";
 import OTPLogin from "./components/login/OTPLogin";
 import ITCellLogin from "./components/login/ITCellLogin";
 import NavBar from "./components/nav_bar/NavBar";
@@ -41,14 +44,24 @@ const AppContent = () => {
     "/DPODashBoard",
     "/DisDashBoard",
   ].some((route) => location.pathname.startsWith(route));
+  const isHomeRoute = location.pathname === "/";
+  const isLoginRoute = [
+    "/Login",
+    "/LoginPortal",
+    "/TiluRauteliLogin",
+    "/AnganwadiLogin",
+  ].includes(location.pathname);
 
   return (
     <>
-      {!isDisRoute && <NavBar />}
-      <div className={!isDisRoute ? "main-content" : ""}>
+      {!isDisRoute && !isLoginRoute && <NavBar />}
+      <div className={!isDisRoute && !isLoginRoute ? "main-content" : ""}>
         <Routes>
           {/* Public Routes */}
           <Route path="/" element={<Home />} />
+          <Route path="/LoginPortal" element={<LoginPortal />} />
+          <Route path="/TiluRauteliLogin" element={<TiluRauteliLogin />} />
+          <Route path="/AnganwadiLogin" element={<AnganwadiLogin />} />
           <Route path="/StepC" element={<StepC />} />
           <Route path="/StudentRegistration" element={<StudentRegistration />} />
           <Route path="/StepB" element={<StepB />} />
@@ -74,7 +87,7 @@ const AppContent = () => {
           {/* Add other Dis routes from DisLeftNav here as needed */}
         </Routes>
       </div>
-      {!isDisRoute && <Footer />}
+      {!isDisRoute && !isHomeRoute && !isLoginRoute && <Footer />}
     </>
   );
 };

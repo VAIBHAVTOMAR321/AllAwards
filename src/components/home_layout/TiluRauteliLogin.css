@@ -1,0 +1,154 @@
+.tilu-login-page {
+  --recovery-accent: #673b4e;
+  --tilu-ink: #342a2b;
+  --tilu-plum: #673b4e;
+  --tilu-rose: #a65362;
+  --tilu-gold: #d7a968;
+  --tilu-cream: #fbf7f0;
+  min-height: 100vh;
+  padding: 22px clamp(18px, 5vw, 72px) 42px;
+  color: var(--tilu-ink);
+  background:
+    radial-gradient(ellipse at 90% 8%, rgba(215, 169, 104, .16), transparent 34%),
+    var(--tilu-cream);
+  font-family: "DM Sans", "Noto Sans Devanagari", sans-serif;
+  text-align: left;
+}
+
+.tilu-login-topbar {
+  width: min(1120px, 100%);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0 auto 20px;
+}
+
+.tilu-home-link {
+  color: #6f6663;
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.tilu-home-link span {
+  margin-right: 6px;
+  color: var(--tilu-rose);
+  font-size: 16px;
+}
+
+.tilu-home-link:hover { color: var(--tilu-plum); }
+.tilu-government-label { color: #887b73; font-size: 10px; letter-spacing: .08em; }
+
+.tilu-login-layout {
+  width: min(1120px, 100%);
+  min-height: min(690px, calc(100vh - 100px));
+  display: grid;
+  grid-template-columns: 1.1fr .9fr;
+  margin: auto;
+  overflow: hidden;
+  border: 1px solid rgba(103, 59, 78, .12);
+  border-radius: 10px;
+  background: #fffdf9;
+  box-shadow: 0 26px 70px rgba(67, 42, 47, .13);
+}
+
+.tilu-story-panel {
+  position: relative;
+  display: flex;
+  align-items: end;
+  min-height: 600px;
+  overflow: hidden;
+  background: var(--tilu-plum);
+}
+
+.tilu-story-panel > img,
+.tilu-story-shade { position: absolute; inset: 0; width: 100%; height: 100%; }
+.tilu-story-panel > img { object-fit: cover; object-position: center; }
+.tilu-story-shade { background: linear-gradient(180deg, rgba(54, 30, 41, .06) 18%, rgba(54, 30, 41, .9) 100%); }
+
+.tilu-story-copy {
+  position: relative;
+  z-index: 1;
+  max-width: 580px;
+  padding: clamp(28px, 5vw, 64px);
+  color: white;
+}
+
+.tilu-edition {
+  display: inline-block;
+  padding: 7px 12px;
+  border: 1px solid rgba(255,255,255,.5);
+  border-radius: 999px;
+  color: #fff5e9;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .11em;
+}
+
+.tilu-story-copy h1 {
+  margin: 22px 0 12px;
+  color: white;
+  font-family: "Noto Sans Devanagari", Georgia, serif;
+  font-size: clamp(30px, 4vw, 48px);
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.tilu-story-copy p { max-width: 430px; margin: 0; color: rgba(255,255,255,.86); font-size: 14px; line-height: 1.9; }
+.tilu-story-caption { display: block; margin-top: 28px; color: #f1d4aa; font-size: 10px; font-weight: 700; letter-spacing: .18em; }
+
+.tilu-form-panel {
+  align-self: center;
+  padding: clamp(28px, 4.5vw, 58px);
+}
+
+.tilu-award-mark {
+  width: 46px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 22px;
+  border: 1px solid rgba(215,169,104,.6);
+  border-radius: 50%;
+  background: #fbf0df;
+  color: var(--tilu-rose);
+  font-size: 23px;
+}
+
+.tilu-form-eyebrow { margin: 0 0 8px; color: var(--tilu-rose); font-size: 10px; font-weight: 800; letter-spacing: .16em; }
+.tilu-form-panel h2 { margin: 0; color: var(--tilu-ink); font-family: "Noto Sans Devanagari", Georgia, serif; font-size: clamp(23px, 2.6vw, 30px); font-weight: 600; }
+.tilu-form-intro { margin: 9px 0 28px; color: #827674; font-size: 12px; line-height: 1.8; }
+.tilu-login-form { display: flex; flex-direction: column; }
+.tilu-login-form > label { margin: 0 0 8px; color: #514345; font-size: 11px; font-weight: 700; }
+.tilu-input-wrap { display: flex; align-items: center; gap: 10px; min-height: 49px; margin-bottom: 20px; padding: 0 13px; border: 1px solid #e6ddd5; border-radius: 4px; background: #fff; color: var(--tilu-rose); }
+.tilu-input-wrap:focus-within { border-color: var(--tilu-rose); box-shadow: 0 0 0 3px rgba(166,83,98,.1); }
+.tilu-input-wrap > svg { flex: 0 0 auto; font-size: 13px; }
+.tilu-input-wrap input { width: 100%; min-width: 0; border: 0; outline: 0; background: transparent; color: var(--tilu-ink); font: inherit; font-size: 12px; }
+.tilu-input-wrap input::placeholder { color: #a99f9b; }
+.tilu-password-toggle { display: grid; place-items: center; padding: 6px; border: 0; background: transparent; color: #8b7a79; }
+.tilu-login-error { margin: -5px 0 15px; color: #a42f39; font-size: 12px; line-height: 1.6; }
+.tilu-submit-button { display: flex; align-items: center; justify-content: center; gap: 12px; min-height: 49px; margin-top: 2px; border: 0; border-radius: 4px; background: var(--tilu-plum); color: white; font-size: 12px; font-weight: 700; transition: background .2s, transform .2s; }
+.tilu-submit-button:hover:not(:disabled) { transform: translateY(-1px); background: var(--tilu-rose); }
+.tilu-submit-button:disabled { cursor: wait; opacity: .7; }
+.tilu-submit-button span { margin-left: auto; font-size: 17px; }
+.tilu-forgot-link { align-self: flex-end; margin-top: 13px; padding: 4px 0; border: 0; background: transparent; color: var(--tilu-rose); font-size: 11px; font-weight: 700; }
+.tilu-forgot-link:hover { color: var(--tilu-plum); text-decoration: underline; }
+.tilu-security-note { display: flex; align-items: center; justify-content: center; gap: 8px; margin: 24px 0 0; color: #978b86; font-size: 9px; line-height: 1.6; text-align: center; }
+.tilu-security-note svg { color: var(--tilu-rose); }
+
+@media (max-width: 760px) {
+  .tilu-login-page { padding: 16px; }
+  .tilu-login-layout { grid-template-columns: 1fr; }
+  .tilu-story-panel { min-height: 310px; }
+  .tilu-form-panel { width: min(100%, 540px); justify-self: center; }
+}
+
+@media (max-width: 480px) {
+  .tilu-login-page { padding: 12px; }
+  .tilu-login-topbar { margin-bottom: 14px; }
+  .tilu-government-label { max-width: 140px; text-align: right; }
+  .tilu-story-panel { min-height: 270px; }
+  .tilu-story-copy { padding: 25px; }
+  .tilu-story-copy h1 { font-size: 30px; }
+  .tilu-form-panel { padding: 28px 24px; }
+}

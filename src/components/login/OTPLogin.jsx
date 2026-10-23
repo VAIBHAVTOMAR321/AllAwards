@@ -1,12 +1,10 @@
 import React, { useState, useCallback, useEffect } from "react";
-import { Container, Row, Col, Button } from "react-bootstrap";
-import { createPortal } from "react-dom";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "./AuthContext";
 import { sendOtpLoginApi, verifyOtpLoginApi } from "../otpsendverify/api";
 import { FaMobileAlt, FaShieldAlt } from "react-icons/fa";
 import ukLogo from "../../assets/images/uk_logo.jpeg";
-import "./Login.css";
+import loginImage from "../../assets/images/images-9.jpeg";
 import "../otpsendverify/otp.css";
 
 const roleConfig = {
@@ -22,11 +20,16 @@ const roleConfig = {
     subtitle: "जिला कार्यक्रम अधिकारी के रूप में लॉगिन करें",
     path: "/DPODashBoard",
   },
+  cdpo: {
+    title: "CDPO Login",
+    hindi: "बाल विकास परियोजना अधिकारी लॉगिन",
+    subtitle: "बाल विकास परियोजना अधिकारी के रूप में लॉगिन करें",
+    path: "/CDPODashBoard",
+  },
 };
 
-const SendOTPModal = ({
+const SendOTPForm = ({
   show,
-  onClose,
   onSent,
   selectedRole,
   phone,
@@ -63,89 +66,76 @@ const SendOTPModal = ({
 
   if (!show) return null;
 
-  return createPortal(
-    <div className="otp-modal-overlay" onClick={onClose}>
-      <div className="otp-modal" onClick={(e) => e.stopPropagation()}>
-        <div className="otp-modal-header">
-          <span className="otp-modal-icon" aria-hidden="true">
-            <FaMobileAlt />
-          </span>
-          <h3>OTP भेजें</h3>
-          <span className="otp-role-badge">{roleConfig[selectedRole]?.hindi}</span>
+  return (
+    <section className="otp-modal otp-step-card" aria-labelledby="otp-send-title">
+      <div className="otp-modal-header">
+        <span className="otp-modal-icon" aria-hidden="true">
+          <FaMobileAlt />
+        </span>
+        <h3 id="otp-send-title">OTP भेजें</h3>
+        <span className="otp-role-badge">{roleConfig[selectedRole]?.hindi}</span>
+      </div>
+      <form onSubmit={handleSubmit}>
+        <div className="otp-modal-body">
+          <p className="otp-hint">
+            अपने मोबाइल नंबर पर OTP प्राप्त करने के लिए नीचे दर्शाएं।
+          </p>
+
+          <div className="otp-role-selector">
+            <label className="otp-role-label">लॉगिन के रूप में</label>
+            <div className="otp-role-options">
+              {Object.entries(roleConfig).map(([key, config]) => (
+                <label
+                  key={key}
+                  className={`otp-role-option ${
+                    selectedRole === key ? "selected" : ""
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="role"
+                    value={key}
+                    checked={selectedRole === key}
+                    onChange={() => onRoleChange(key)}
+                  />
+                  <span className="otp-role-text">{config.title}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+
+          <div className="otp-field">
+            <label htmlFor="otp-login-mobile">मोबाइल नंबर</label>
+            <input
+              id="otp-login-mobile"
+              type="tel"
+              maxLength={10}
+              placeholder="10 अंकों का मोबाइल नंबर"
+              value={phone}
+              onChange={(e) =>
+                onPhoneChange(e.target.value.replace(/\D/g, ""))
+              }
+              autoFocus
+            />
+          </div>
+          {error && <div className="otp-error" role="alert">{error}</div>}
+        </div>
+        <div className="otp-modal-footer">
           <button
-            className="otp-close"
-            onClick={onClose}
-            aria-label="Close"
-            type="button"
+            type="submit"
+            className="otp-btn-primary"
+            disabled={sending}
           >
-            ×
+            {sending ? "भेज रहे हैं..." : "OTP भेजें"}
           </button>
         </div>
-        <form onSubmit={handleSubmit}>
-          <div className="otp-modal-body">
-            <p className="otp-hint">
-              अपने मोबाइल नंबर पर OTP प्राप्त करने के लिए नीचे दर्शाएं।
-            </p>
-
-            <div className="otp-role-selector">
-              <label className="otp-role-label">लॉगिन के रूप में</label>
-              <div className="otp-role-options">
-                {Object.entries(roleConfig).map(([key, config]) => (
-                  <label
-                    key={key}
-                    className={`otp-role-option ${
-                      selectedRole === key ? "selected" : ""
-                    }`}
-                  >
-                    <input
-                      type="radio"
-                      name="role"
-                      value={key}
-                      checked={selectedRole === key}
-                      onChange={() => onRoleChange(key)}
-                    />
-                    <span className="otp-role-text">{config.title}</span>
-                  </label>
-                ))}
-              </div>
-            </div>
-
-            <div className="otp-field">
-              <label htmlFor="otp-login-mobile">मोबाइल नंबर</label>
-              <input
-                id="otp-login-mobile"
-                type="tel"
-                maxLength={10}
-                placeholder="10 अंकों का मोबाइल नंबर"
-                value={phone}
-                onChange={(e) =>
-                  onPhoneChange(e.target.value.replace(/\D/g, ""))
-                }
-                autoFocus
-              />
-            </div>
-
-            {error && <div className="otp-error" role="alert">{error}</div>}
-          </div>
-          <div className="otp-modal-footer">
-            <button
-              type="submit"
-              className="otp-btn-primary"
-              disabled={sending}
-            >
-              {sending ? "भेज रहे हैं..." : "OTP भेजें"}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>,
-    document.body
+      </form>
+    </section>
   );
 };
 
-const VerifyOTPModal = ({
+const VerifyOTPForm = ({
   show,
-  onClose,
   onBack,
   onVerified,
   onResend,
@@ -199,72 +189,61 @@ const VerifyOTPModal = ({
 
   if (!show) return null;
 
-  return createPortal(
-    <div className="otp-modal-overlay" onClick={onClose}>
-      <div className="otp-modal" onClick={(e) => e.stopPropagation()}>
-        <div className="otp-modal-header">
-          <span className="otp-modal-icon" aria-hidden="true">
-            <FaShieldAlt />
-          </span>
-          <h3>OTP सत्यापन</h3>
+  return (
+    <section className="otp-modal otp-step-card" aria-labelledby="otp-verify-title">
+      <div className="otp-modal-header">
+        <span className="otp-modal-icon" aria-hidden="true">
+          <FaShieldAlt />
+        </span>
+        <h3 id="otp-verify-title">OTP सत्यापन</h3>
+      </div>
+      <form onSubmit={handleSubmit}>
+        <div className="otp-modal-body">
+          <p className="otp-hint">
+            <strong>{phone}</strong> पर भेजा गया OTP दर्शाएं।
+          </p>
+          <div className="otp-field">
+            <label htmlFor="otp-login-code">OTP</label>
+            <input
+              id="otp-login-code"
+              type="text"
+              maxLength={6}
+              placeholder="6 अंकों का OTP दर्शाएं"
+              value={otp}
+              onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
+              autoFocus
+            />
+          </div>
+          {error && <div className="otp-error" role="alert">{error}</div>}
+        </div>
+        <div className="otp-modal-footer">
           <button
-            className="otp-close"
-            onClick={onClose}
-            aria-label="Close"
             type="button"
+            className="otp-btn-secondary"
+            onClick={onBack}
           >
-            ×
+            वापस
+          </button>
+          <button
+            type="submit"
+            className="otp-btn-primary"
+            disabled={verifying}
+          >
+            {verifying ? "सत्यापित कर रहे हैं..." : "सत्यापित करें"}
           </button>
         </div>
-        <form onSubmit={handleSubmit}>
-          <div className="otp-modal-body">
-            <p className="otp-hint">
-              <strong>{phone}</strong> पर भेजा गया OTP दर्शाएं।
-            </p>
-            <div className="otp-field">
-              <label htmlFor="otp-login-code">OTP</label>
-              <input
-                id="otp-login-code"
-                type="text"
-                maxLength={6}
-                placeholder="6 अंकों का OTP दर्शाएं"
-                value={otp}
-                onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
-                autoFocus
-              />
-            </div>
-            {error && <div className="otp-error" role="alert">{error}</div>}
-          </div>
-          <div className="otp-modal-footer">
-            <button
-              type="button"
-              className="otp-btn-secondary"
-              onClick={onBack}
-            >
-              वापस
-            </button>
-            <button
-              type="submit"
-              className="otp-btn-primary"
-              disabled={verifying}
-            >
-              {verifying ? "सत्यापित कर रहे हैं..." : "सत्यापित करें"}
-            </button>
-          </div>
-          <div className="otp-resend">
-            <button
-              type="button"
-              className="otp-resend-btn"
-              onClick={handleResend}
-              disabled={resendLoading}
-            >
-              {resendLoading ? "भेज रहे हैं..." : "OTP पुनः भेजें"}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>,
-    document.body
+        <div className="otp-resend">
+          <button
+            type="button"
+            className="otp-resend-btn"
+            onClick={handleResend}
+            disabled={resendLoading}
+          >
+            {resendLoading ? "भेज रहे हैं..." : "OTP पुनः भेजें"}
+          </button>
+        </div>
+      </form>
+    </section>
   );
 };
 
@@ -310,106 +289,74 @@ function OTPLogin() {
   }, [phone, selectedRole]);
 
   return (
-    <div className="login-page">
-      <Container>
-        <Row className="g-0 login-container align-items-stretch">
-          {/* LEFT PANEL — UK LOGO + HEADINGS */}
-          <Col lg={6} className="login-brand-col d-none d-lg-flex">
-            <div className="login-brand-overlay">
-              <div className="login-logo-circle">
-                <img
-                  src={ukLogo}
-                  alt="Uttarakhand Government Logo"
-                  className="login-uk-logo"
-                />
-              </div>
-
-              <h4 className="login-brand-dept">महिला सशक्तिकरण एवं बाल विकास</h4>
-              <p className="login-brand-dept-en">
-                Women Empowerment &amp; Child Development
-              </p>
-
-              <div className="login-brand-divider" />
-
-              <div className="login-brand-scheme">
-                <span className="login-brand-badge">ऑनलाइन नामांकन प्रपत्र</span>
-                <h2 className="login-brand-title">
-                  मुख्यमंत्री राज्य बाल वीरता पुरस्कार
-                </h2>
-                <p className="login-brand-subtitle">
-                  Chief Minister State Child Bravery Award
-                </p>
-              </div>
-
-              <div className="login-brand-role">
-                <span>चुनी गई भूमिका :</span> {currentRole.hindi}
-              </div>
-
-              <p className="login-brand-copy">© 2026 उत्तराखण्ड सरकार</p>
+    <main className="otp-login-page" lang="hi">
+      <div className="otp-login-layout">
+        <aside className="otp-login-brand">
+          <img
+            className="otp-login-hero-image"
+            src={loginImage}
+            alt=""
+            aria-hidden="true"
+          />
+          <div className="otp-login-brand-content">
+            <img className="otp-login-logo" src={ukLogo} alt="उत्तराखंड सरकार" />
+            <p className="otp-login-department">
+              महिला सशक्तिकरण एवं बाल विकास विभाग
+            </p>
+            <p className="otp-login-department-en">
+              Women Empowerment &amp; Child Development
+            </p>
+            <span className="otp-login-rule" />
+            <p className="otp-login-kicker">उत्तराखंड सरकार का आधिकारिक पोर्टल</p>
+            <h1>मुख्यमंत्री राज्य बाल वीरता पुरस्कार</h1>
+            <p className="otp-login-award-en">
+              Chief Minister State Child Bravery Award
+            </p>
+            <div className="otp-login-brand-role">
+              <span>चुनी गई भूमिका</span>
+              <strong>{currentRole.hindi}</strong>
             </div>
-          </Col>
+            <p className="otp-login-copyright">© 2026 उत्तराखण्ड सरकार</p>
+          </div>
+        </aside>
 
-          {/* RIGHT PANEL — OTP Login Info */}
-          <Col
-            lg={6}
-            className="login-form-col d-flex align-items-center justify-content-center p-2"
-          >
-            <div className="login-card border-0 w-100">
-              <div className="p-3">
-                <div className="text-center mb-4 login-dynamic-header">
-                  <h3 className="fw-bold login-role-title">
-                    {currentRole.title}
-                  </h3>
-                  <p className="login-role-hindi">{currentRole.hindi}</p>
-                  <p className="text-muted login-role-subtitle">
-                    {currentRole.subtitle}
-                  </p>
-                </div>
-
-                <div className="text-center mt-4">
-                  <Button
-                    variant="primary"
-                    className="login-submit-btn w-100"
-                    onClick={() => setStep("send")}
-                  >
-                    OTP लॉगिन प्रारंभ करें
-                  </Button>
-                </div>
-
-                <p
-                  className="text-center mt-3"
-                  style={{ fontSize: "0.85rem", color: "#667085" }}
-                >
-                  डायरेक्टर और DPO के लिए OTP आधारित लॉगिन
-                </p>
-              </div>
+        <section className="otp-login-main">
+          <Link className="otp-login-home-link" to="/">
+            <span aria-hidden="true">←</span> पुरस्कार पोर्टल पर वापस जाएँ
+          </Link>
+          <div className="otp-login-form-wrap">
+            <div className="otp-login-intro">
+              <span className="otp-login-step-label">
+                {step === "send" ? "सुरक्षित लॉगिन" : "मोबाइल सत्यापन"}
+              </span>
+              <h2>{currentRole.title}</h2>
+              <p>{currentRole.subtitle}</p>
             </div>
-          </Col>
-        </Row>
-      </Container>
 
-      {/* Send OTP Modal — auto opens when page loads */}
-      <SendOTPModal
-        show={step === "send"}
-        onClose={() => setStep("send")}
-        onSent={handleSent}
-        selectedRole={selectedRole}
-        phone={phone}
-        onRoleChange={setSelectedRole}
-        onPhoneChange={setPhone}
-      />
-
-      {/* Verify OTP Modal */}
-      <VerifyOTPModal
-        show={step === "verify"}
-        onClose={() => setStep("send")}
-        onBack={() => setStep("send")}
-        onVerified={handleVerified}
-        onResend={handleResend}
-        phone={phone}
-        selectedRole={selectedRole}
-      />
-    </div>
+            <SendOTPForm
+              show={step === "send"}
+              onSent={handleSent}
+              selectedRole={selectedRole}
+              phone={phone}
+              onRoleChange={setSelectedRole}
+              onPhoneChange={setPhone}
+            />
+            <VerifyOTPForm
+              show={step === "verify"}
+              onBack={() => setStep("send")}
+              onVerified={handleVerified}
+              onResend={handleResend}
+              phone={phone}
+              selectedRole={selectedRole}
+            />
+            <p className="otp-login-security-note">
+              <FaShieldAlt aria-hidden="true" />
+              आपकी जानकारी सुरक्षित OTP सत्यापन के माध्यम से सुरक्षित रखी जाती है।
+            </p>
+          </div>
+        </section>
+      </div>
+    </main>
   );
 }
 

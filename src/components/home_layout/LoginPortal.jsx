@@ -482,10 +482,13 @@ function LoginPortal() {
   /* ========== RENDER ========== */
 
   return (
-    <div className="home-page">
+    <div className="home-page awards-login-page">
       <div className="home-main-card">
         {/* ── FULL-WIDTH SCHEME TITLE WITH IMAGES ── */}
         <div className="scheme-title-block">
+          <Link to="/" className="login-portal-back-link">
+            <span aria-hidden="true">←</span> पुरस्कार पोर्टल पर वापस जाएँ
+          </Link>
           <div className="scheme-title-wrapper">
             {/* Left Image: CM Pushkar Singh Dhami */}
             <div className="scheme-authority-img">

@@ -1521,3 +1521,380 @@
   font-weight: 600;
   line-height: 1.6;
 }
+
+.awards-login-page {
+  --portal-ink: #172a3a;
+  --portal-navy: #102d40;
+  --portal-teal: #1b5265;
+  --portal-saffron: #e99b43;
+  --portal-cream: #fbf8f1;
+  --portal-line: #e5e2d9;
+  width: 100%;
+  background:
+    radial-gradient(ellipse at 12% 8%, rgba(233, 155, 67, 0.1), transparent 35%),
+    var(--portal-cream);
+  color: var(--portal-ink);
+  font-family: "DM Sans", "Noto Sans Devanagari", sans-serif;
+  text-align: left;
+}
+
+.awards-login-page .home-main-card {
+  max-width: 1440px;
+  background: #fffdf8;
+  border: 1px solid rgba(23, 42, 58, 0.08);
+  border-radius: 10px;
+  box-shadow: 0 24px 70px rgba(23, 42, 58, 0.12);
+}
+
+.awards-login-page .scheme-title-block {
+  padding: 24px clamp(20px, 4vw, 58px);
+  border-bottom: 1px solid var(--portal-line);
+  background: linear-gradient(112deg, #f7f4eb 0%, #fffdf8 70%);
+}
+
+.awards-login-page .login-portal-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 18px;
+  color: #64727a;
+  font-size: 11px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.awards-login-page .login-portal-back-link span {
+  color: #b87832;
+  font-size: 16px;
+}
+
+.awards-login-page .login-portal-back-link:hover {
+  color: var(--portal-teal);
+}
+
+.awards-login-page .scheme-title-wrapper {
+  gap: clamp(16px, 3vw, 42px);
+}
+
+.awards-login-page .authority-photo {
+  width: 76px;
+  height: 76px;
+  border: 2px solid var(--portal-saffron);
+  box-shadow: 0 6px 18px rgba(23, 42, 58, 0.12);
+}
+
+.awards-login-page .authority-name {
+  color: #64727a;
+  font-size: 10px;
+}
+
+.awards-login-page .scheme-badge {
+  border-radius: 999px;
+  background: #f6e8d4;
+  color: #8d5d28;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+}
+
+.awards-login-page .scheme-title {
+  color: var(--portal-ink);
+  font-family: "Noto Sans Devanagari", Georgia, serif;
+  font-size: clamp(20px, 2.2vw, 28px);
+}
+
+.awards-login-page .scheme-name-en {
+  color: #73808a;
+  font-size: 12px;
+}
+
+.awards-login-page .home-row {
+  min-height: 680px;
+}
+
+.awards-login-page .home-left-col {
+  background-color: #f4f0e7;
+  background-image: url("../../assets/images/login-img.jpeg");
+}
+
+.awards-login-page .home-left-col::before {
+  background: rgba(251, 248, 241, 0.93);
+}
+
+.awards-login-page .home-left-content {
+  gap: 1rem;
+  padding: 28px clamp(20px, 3.6vw, 52px) 48px;
+  scrollbar-color: #c5bba9 #f1eee7;
+}
+
+.awards-login-page .home-left-content::-webkit-scrollbar-track {
+  background: #f1eee7;
+}
+
+.awards-login-page .home-left-content::-webkit-scrollbar-thumb {
+  background: #c5bba9;
+}
+
+.awards-login-page .home-left-content::-webkit-scrollbar-thumb:hover {
+  background: var(--portal-teal);
+}
+
+.awards-login-page .left-content-fade {
+  background: linear-gradient(to bottom, rgba(255, 253, 248, 0), rgba(255, 253, 248, 0.98));
+}
+
+.awards-login-page .section-title-sm,
+.awards-login-page .steps-heading,
+.awards-login-page .scheme-documents-heading,
+.awards-login-page .step-title {
+  color: var(--portal-ink);
+}
+
+.awards-login-page .section-title-icon,
+.awards-login-page .steps-heading-icon,
+.awards-login-page .info-section-icon {
+  color: var(--portal-teal);
+}
+
+.awards-login-page .award-card {
+  border-color: var(--portal-line);
+  border-radius: 6px;
+  background: linear-gradient(145deg, #fffdf8, #f3f1e9);
+}
+
+.awards-login-page .award-card:hover {
+  border-color: #d5c9b5;
+  box-shadow: 0 8px 22px rgba(23, 42, 58, 0.09);
+}
+
+.awards-login-page .date-item,
+.awards-login-page .scheme-documents-section {
+  border-color: var(--portal-line);
+  border-radius: 5px;
+  background: #fffdf8;
+}
+
+.awards-login-page .date-item:hover {
+  border-color: #c9d8d2;
+  background: #f2f6f2;
+}
+
+.awards-login-page .date-text,
+.awards-login-page .objectives-list li,
+.awards-login-page .eligibility-list li,
+.awards-login-page .scheme-info-list li,
+.awards-login-page .step-description {
+  color: #586973;
+}
+
+.awards-login-page .nominator-chip {
+  border-color: #d9e4dd;
+  background: #eef3ed;
+  color: var(--portal-ink);
+}
+
+.awards-login-page .nominator-chip:hover {
+  border-color: #b6c9c0;
+  background: #e4ede5;
+}
+
+.awards-login-page .nominator-chip-icon {
+  color: var(--portal-teal);
+}
+
+.awards-login-page .scheme-documents-link,
+.awards-login-page .step-f-pdf-link,
+.awards-login-page .scheme-pdf-link a {
+  border-color: #ead5b7;
+  border-radius: 4px;
+  background: #fbf2e5;
+  color: #8d5d28;
+  animation: none;
+}
+
+.awards-login-page .scheme-documents-link:hover,
+.awards-login-page .step-f-pdf-link:hover,
+.awards-login-page .scheme-pdf-link a:hover {
+  border-color: var(--portal-saffron);
+  background: #f6e8d4;
+}
+
+.awards-login-page .home-right-col {
+  align-items: flex-start;
+  padding: 38px clamp(20px, 3vw, 42px);
+  background: #fffdf8;
+}
+
+.awards-login-page .home-right-col::before {
+  background: linear-gradient(to bottom, transparent, var(--portal-line), transparent);
+}
+
+.awards-login-page .login-wrapper {
+  max-width: 400px;
+  border-radius: 8px;
+  box-shadow: 0 14px 38px rgba(23, 42, 58, 0.1);
+}
+
+.awards-login-page .login-card {
+  border-color: var(--portal-line);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.awards-login-page .login-card-body {
+  padding: clamp(22px, 3vw, 34px);
+}
+
+.awards-login-page .login-header {
+  margin-bottom: 22px;
+}
+
+.awards-login-page .login-logo-circle {
+  width: 54px;
+  height: 54px;
+  border: 1px solid #ecd5b5;
+  border-radius: 50%;
+  background: #f6e8d4;
+  color: #9a652b;
+  box-shadow: none;
+}
+
+.awards-login-page .login-title {
+  color: var(--portal-ink);
+  font-family: "Noto Sans Devanagari", Georgia, serif;
+  font-size: 24px;
+}
+
+.awards-login-page .login-form {
+  border-color: var(--portal-line);
+}
+
+.awards-login-page .login-label {
+  color: #455965;
+  font-size: 13px;
+}
+
+.awards-login-page .login-label-icon {
+  color: var(--portal-teal);
+}
+
+.awards-login-page .login-input {
+  border-color: #d9ded9;
+  border-radius: 4px;
+}
+
+.awards-login-page .login-input:focus {
+  border-color: var(--portal-teal);
+  box-shadow: 0 0 0 3px rgba(27, 82, 101, 0.1);
+}
+
+.awards-login-page .password-toggle:hover {
+  color: var(--portal-teal);
+  background: rgba(27, 82, 101, 0.08);
+}
+
+.awards-login-page .login-submit-btn {
+  min-height: 48px;
+  border-radius: 4px;
+  background: var(--portal-navy);
+  box-shadow: 0 7px 18px rgba(16, 45, 64, 0.15);
+}
+
+.awards-login-page .login-submit-btn:hover {
+  background: var(--portal-teal);
+  box-shadow: 0 9px 22px rgba(16, 45, 64, 0.2);
+}
+
+.awards-login-page .forgot-link,
+.awards-login-page .register-link {
+  color: var(--portal-teal);
+}
+
+.awards-login-page .forgot-link:hover,
+.awards-login-page .register-link:hover {
+  color: var(--portal-navy);
+}
+
+.awards-login-page .divider::before,
+.awards-login-page .divider::after {
+  background: var(--portal-line);
+}
+
+.awards-login-page .scroll-hint {
+  color: var(--portal-teal);
+}
+
+.awards-login-page .info-section,
+.awards-login-page .info-section-header {
+  border-color: var(--portal-line);
+  background: #fffdf8;
+}
+
+.awards-login-page .info-section-header:hover {
+  background: #f3f1e9;
+}
+
+.awards-login-page .info-section-title {
+  color: var(--portal-ink);
+}
+
+.awards-login-page .modal-container {
+  border: 1px solid var(--portal-line);
+  border-radius: 8px;
+  background: #fffdf8;
+}
+
+.awards-login-page .modal-header {
+  border-color: var(--portal-line);
+}
+
+.awards-login-page .modal-header h3,
+.awards-login-page .modal-label {
+  color: var(--portal-ink);
+}
+
+.awards-login-page .modal-step.active {
+  color: var(--portal-teal);
+}
+
+.awards-login-page .modal-step.active .modal-step-num,
+.awards-login-page .modal-submit-btn {
+  background: var(--portal-navy);
+}
+
+.awards-login-page .modal-submit-btn:hover:not(:disabled) {
+  background: var(--portal-teal);
+}
+
+.awards-login-page .modal-input:focus {
+  border-color: var(--portal-teal);
+  box-shadow: 0 0 0 3px rgba(27, 82, 101, 0.1);
+}
+
+@media (max-width: 991.98px) {
+  .awards-login-page .home-main-card {
+    border-radius: 0;
+  }
+
+  .awards-login-page .home-right-col {
+    padding: 30px 22px;
+    background: #f7f4eb;
+  }
+
+  .awards-login-page .login-wrapper {
+    max-width: 500px;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .awards-login-page .scheme-title-block {
+    padding: 20px 16px;
+  }
+
+  .awards-login-page .home-right-col {
+    padding: 22px 16px;
+  }
+
+  .awards-login-page .login-card-body {
+    padding: 22px 18px;
+  }
+}
