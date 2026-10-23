@@ -169,6 +169,11 @@
   line-height: 1.3;
 }
 
+.drc-navbar.awards-navbar .navbar-actions {
+  align-items: center;
+  margin-left: auto;
+}
+
 .drc-navbar.awards-navbar .nav-link-custom {
   color: #172a3a !important;
 }
@@ -245,13 +250,18 @@
   }
 
   .drc-navbar.awards-navbar .navbar-language-toggle {
-    margin: 4px 0 10px 8px;
+    margin: 4px 0 10px;
+  }
+
+  .drc-navbar.awards-navbar .navbar-actions {
+    align-items: flex-end;
+    margin-left: 0;
   }
 
   .drc-navbar.awards-navbar .nav-action-register,
   .drc-navbar.awards-navbar .nav-action-login {
     margin: 4px 0;
-    text-align: left;
+    text-align: right;
   }
 
   .drc-navbar.awards-navbar .navbar-toggler {
