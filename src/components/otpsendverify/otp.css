@@ -820,3 +820,355 @@
     min-height: 46px;
   }
 }
+
+.otp-login-page {
+  position: relative;
+  min-height: calc(100svh - 70px);
+  padding: 34px clamp(18px, 4vw, 56px) 32px;
+  background:
+    radial-gradient(ellipse at 5% 4%, rgba(233, 155, 67, 0.16), transparent 34%),
+    radial-gradient(ellipse at 96% 92%, rgba(27, 82, 101, 0.1), transparent 32%),
+    #f3f5f2;
+}
+
+.otp-login-layout {
+  min-height: min(690px, calc(100svh - 120px));
+  border: 1px solid rgba(16, 45, 64, 0.1);
+  border-radius: 12px;
+  box-shadow: 0 24px 70px rgba(16, 45, 64, 0.13);
+}
+
+.otp-login-brand {
+  min-height: 600px;
+  padding: clamp(30px, 4vw, 58px);
+  background: #102d40;
+}
+
+.otp-login-brand::after {
+  background:
+    linear-gradient(180deg, rgba(13, 39, 54, 0.08) 5%, rgba(13, 39, 54, 0.35) 42%, rgba(13, 39, 54, 0.94) 100%),
+    linear-gradient(90deg, rgba(13, 39, 54, 0.18), transparent);
+}
+
+.otp-login-brand-content {
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.otp-login-logo {
+  width: 64px;
+  height: 64px;
+  margin-bottom: 20px;
+  padding: 7px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+}
+
+.otp-login-kicker {
+  font-size: 9px;
+  letter-spacing: 0.18em;
+}
+
+.otp-login-brand h1 {
+  font-size: clamp(29px, 3.2vw, 42px);
+  line-height: 1.4;
+  text-wrap: pretty;
+}
+
+.otp-login-brand-role {
+  border-color: rgba(240, 194, 139, 0.45);
+  background: rgba(10, 34, 47, 0.45);
+  backdrop-filter: blur(8px);
+}
+
+.otp-login-main {
+  padding: 30px clamp(26px, 5vw, 68px);
+  background:
+    radial-gradient(circle at 100% 0%, rgba(233, 155, 67, 0.08), transparent 36%),
+    #fffdf8;
+}
+
+.otp-login-home-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 8px 11px;
+  border: 1px solid #e5e2d9;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.75);
+}
+
+.otp-login-form-wrap {
+  max-width: 460px;
+}
+
+.otp-login-intro {
+  margin: 0 0 22px;
+}
+
+.otp-login-intro h2 {
+  margin-top: 10px;
+  font-size: clamp(28px, 3vw, 36px);
+  line-height: 1.3;
+  font-weight: 600;
+}
+
+.otp-login-intro p {
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.otp-login-progress {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin: 0 0 24px;
+  padding: 0;
+  list-style: none;
+}
+
+.otp-login-progress li {
+  position: relative;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 12px;
+  border: 1px solid #e5e7e0;
+  border-radius: 6px;
+  background: #f8f8f4;
+}
+
+.otp-login-progress li.active {
+  border-color: rgba(27, 82, 101, 0.36);
+  background: #eff4f1;
+  box-shadow: inset 0 0 0 1px rgba(27, 82, 101, 0.08);
+}
+
+.otp-login-progress li.complete {
+  border-color: rgba(82, 118, 110, 0.3);
+  background: #f1f6f1;
+}
+
+.otp-login-progress li > span {
+  flex: 0 0 29px;
+  width: 29px;
+  height: 29px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #e8e9e2;
+  color: #64727a;
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.otp-login-progress li.active > span,
+.otp-login-progress li.complete > span {
+  background: #1b5265;
+  color: white;
+}
+
+.otp-login-progress li.complete > span {
+  background: #52766e;
+}
+
+.otp-login-progress li div {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.otp-login-progress strong {
+  color: #263f4c;
+  font-size: 10px;
+}
+
+.otp-login-progress small {
+  color: #77837f;
+  font-size: 9px;
+  line-height: 1.35;
+}
+
+.otp-step-card .otp-modal-header {
+  padding-bottom: 14px;
+}
+
+.otp-step-card .otp-modal-header h3 {
+  font-size: 16px;
+}
+
+.otp-step-card .otp-role-selector {
+  margin-bottom: 20px;
+}
+
+.otp-step-card .otp-role-label {
+  display: block;
+  margin-bottom: 10px;
+  font-weight: 700;
+}
+
+.otp-step-card .otp-role-options {
+  gap: 10px;
+}
+
+.otp-step-card .otp-role-option {
+  min-height: 70px;
+  display: flex;
+  align-items: center;
+  padding: 12px 10px;
+  border-radius: 7px;
+  transition: border-color 0.18s ease, background 0.18s ease, transform 0.18s ease;
+}
+
+.otp-step-card .otp-role-option:hover {
+  transform: translateY(-2px);
+}
+
+.otp-step-card .otp-role-option.selected {
+  border-color: #1b5265;
+  background: linear-gradient(145deg, #f2f6f2, #e8f0ed);
+  box-shadow: 0 4px 12px rgba(27, 82, 101, 0.09);
+}
+
+.otp-step-card .otp-role-text {
+  font-size: 11px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.otp-step-card .otp-hint {
+  margin-bottom: 16px;
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.otp-step-card .otp-field label {
+  font-weight: 700;
+}
+
+.otp-step-card .otp-field input {
+  height: 52px;
+  background: #fff;
+  font-size: 15px;
+}
+
+.otp-step-card .otp-modal-footer .otp-btn-primary {
+  min-height: 50px;
+  box-shadow: 0 7px 18px rgba(16, 45, 64, 0.15);
+  font-weight: 700;
+}
+
+.otp-login-security-note {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid #ece9e0;
+}
+
+@media (max-width: 800px) {
+  .otp-login-page {
+    min-height: calc(100svh - 70px);
+    padding: 18px;
+  }
+
+  .otp-login-layout {
+    min-height: auto;
+  }
+
+  .otp-login-brand {
+    min-height: 255px;
+    padding: 28px;
+  }
+
+  .otp-login-brand-content {
+    max-width: none;
+  }
+
+  .otp-login-main {
+    padding: 24px clamp(22px, 6vw, 52px) 30px;
+  }
+}
+
+@media (max-width: 480px) {
+  .otp-login-page {
+    min-height: calc(100svh - 70px);
+    padding: 10px;
+  }
+
+  .otp-login-layout {
+    min-height: calc(100svh - 90px);
+    border-radius: 9px;
+  }
+
+  .otp-login-brand {
+    min-height: 218px;
+    padding: 20px;
+  }
+
+  .otp-login-logo {
+    width: 42px;
+    height: 42px;
+    margin-bottom: 10px;
+  }
+
+  .otp-login-department {
+    font-size: 12px;
+  }
+
+  .otp-login-department-en,
+  .otp-login-award-en {
+    font-size: 10px;
+  }
+
+  .otp-login-rule {
+    margin: 10px 0;
+  }
+
+  .otp-login-kicker {
+    margin-bottom: 7px;
+    font-size: 8px;
+  }
+
+  .otp-login-brand h1 {
+    font-size: 20px;
+  }
+
+  .otp-login-main {
+    padding: 16px 16px 20px;
+  }
+
+  .otp-login-form-wrap {
+    margin: 22px auto;
+  }
+
+  .otp-login-intro {
+    margin-bottom: 16px;
+  }
+
+  .otp-login-intro h2 {
+    font-size: 26px;
+  }
+
+  .otp-login-progress {
+    gap: 7px;
+    margin-bottom: 18px;
+  }
+
+  .otp-login-progress li {
+    gap: 7px;
+    padding: 9px 7px;
+  }
+
+  .otp-login-progress li > span {
+    flex-basis: 25px;
+    width: 25px;
+    height: 25px;
+  }
+
+  .otp-login-progress strong {
+    font-size: 9px;
+  }
+
+  .otp-login-progress small {
+    font-size: 8px;
+  }
+}

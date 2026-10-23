@@ -11,6 +11,15 @@ function NavBar() {
   const location = useLocation();
   const navigate = useNavigate();
   const isHindi = language === "hi";
+  const usesAwardsNavbar = [
+    "/",
+    "/Login",
+    "/LoginPortal",
+    "/StudentRegistration",
+    "/TiluRauteliLogin",
+    "/AnganwadiLogin",
+    "/loginit",
+  ].includes(location.pathname);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -32,7 +41,7 @@ function NavBar() {
   return (
     <Navbar
       expand="lg"
-      className={`drc-navbar ${location.pathname === "/" ? "awards-navbar" : ""} ${scrolled ? "navbar-scrolled" : ""}`}
+      className={`drc-navbar ${usesAwardsNavbar ? "awards-navbar" : ""} ${scrolled ? "navbar-scrolled" : ""}`}
       fixed="top"
     >
       <Container className="main-container-style">

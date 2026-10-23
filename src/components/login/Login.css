@@ -475,3 +475,311 @@
   from { opacity: 0; transform: translateY(-10px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+.itcell-login-page {
+  min-height: calc(100svh - 70px);
+  padding: 30px 18px;
+  background:
+    radial-gradient(ellipse at 8% 5%, rgba(233, 155, 67, 0.14), transparent 34%),
+    radial-gradient(ellipse at 95% 90%, rgba(27, 82, 101, 0.1), transparent 30%),
+    #f3f5f2;
+  font-family: "DM Sans", "Noto Sans Devanagari", sans-serif;
+}
+
+.itcell-login-page > .container {
+  width: min(1120px, 100%);
+  max-width: 1120px;
+}
+
+.itcell-login-page .login-container {
+  min-height: min(690px, calc(100svh - 130px));
+  border: 1px solid rgba(16, 45, 64, 0.1);
+  border-radius: 12px;
+  box-shadow: 0 24px 70px rgba(16, 45, 64, 0.13);
+}
+
+.itcell-login-page .itcell-brand-col {
+  display: flex !important;
+  background: #102d40;
+}
+
+.itcell-login-page .login-brand-overlay {
+  min-height: 620px;
+  padding: clamp(30px, 4vw, 58px);
+  background:
+    radial-gradient(circle at 100% 0%, rgba(233, 155, 67, 0.2), transparent 33%),
+    linear-gradient(145deg, #153d50, #102d40 60%, #0b2433);
+}
+
+.itcell-login-page .login-brand-overlay::before {
+  top: auto;
+  right: -65px;
+  bottom: -90px;
+  width: 270px;
+  height: 270px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.itcell-login-page .login-brand-overlay::after {
+  bottom: auto;
+  top: 28px;
+  left: -80px;
+  width: 190px;
+  height: 190px;
+  border: 1px solid rgba(233, 155, 67, 0.22);
+  background: transparent;
+}
+
+.itcell-login-page .login-logo-circle {
+  width: 68px;
+  height: 68px;
+  border: 3px solid rgba(233, 155, 67, 0.62);
+}
+
+.itcell-login-page .login-brand-dept {
+  font-family: "Noto Sans Devanagari", sans-serif;
+  font-size: clamp(18px, 2vw, 23px);
+}
+
+.itcell-login-page .login-brand-dept-en {
+  font-size: 12px;
+}
+
+.itcell-login-page .login-brand-divider {
+  width: 58px;
+  height: 2px;
+  margin: 22px 0;
+  background: #edb46d;
+}
+
+.itcell-login-page .login-brand-badge {
+  border-color: rgba(237, 180, 109, 0.5);
+  background: rgba(237, 180, 109, 0.13);
+  color: #f6d8a8;
+  font-size: 10px;
+}
+
+.itcell-login-page .login-brand-title {
+  max-width: 400px;
+  font-family: "Noto Sans Devanagari", Georgia, serif;
+  font-size: clamp(24px, 2.7vw, 34px);
+  line-height: 1.45;
+}
+
+.itcell-login-page .login-brand-subtitle {
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 12px;
+}
+
+.itcell-login-page .login-brand-role {
+  margin-top: 22px;
+  padding: 12px 15px;
+  border: 1px solid rgba(237, 180, 109, 0.28);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.07);
+  font-size: 12px;
+}
+
+.itcell-login-page .login-brand-copy {
+  margin-top: 20px;
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 10px;
+}
+
+.itcell-login-page .itcell-form-col {
+  min-width: 0;
+  padding: clamp(20px, 4vw, 52px) !important;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(233, 155, 67, 0.08), transparent 36%),
+    #fffdf8;
+}
+
+.itcell-login-page .itcell-login-card {
+  max-width: 430px;
+  margin: auto;
+  background: transparent;
+}
+
+.itcell-login-card-inner {
+  padding: 14px;
+}
+
+.itcell-login-page .login-dynamic-header {
+  margin-bottom: 28px;
+}
+
+.itcell-login-page .login-header-icon {
+  width: 48px;
+  height: 48px;
+  margin-bottom: 12px;
+  padding: 13px;
+  border: 1px solid #e8e2d5;
+  border-radius: 50%;
+  background: #f6efe2;
+  color: #1b5265;
+}
+
+.itcell-login-kicker {
+  margin: 0 0 7px;
+  color: #9a652b;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+}
+
+.itcell-login-page .login-role-title {
+  margin: 0;
+  color: #172a3a;
+  font-family: "Noto Sans Devanagari", Georgia, serif;
+  font-size: clamp(24px, 2.5vw, 31px);
+}
+
+.itcell-login-page .login-role-hindi {
+  margin: 5px 0;
+  color: #1b5265;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.itcell-login-page .login-role-subtitle {
+  margin: 0;
+  color: #73808a;
+  font-size: 12px;
+}
+
+.itcell-login-page .itcell-form-group {
+  margin-bottom: 19px;
+}
+
+.itcell-login-page .login-form .form-label {
+  margin-bottom: 7px;
+  color: #455965;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.itcell-login-page .login-form .form-label svg {
+  color: #52766e;
+}
+
+.itcell-login-page .login-form .form-control {
+  min-height: 49px;
+  border-color: #d9ded9;
+  border-radius: 5px;
+  color: #172a3a;
+  font-size: 13px;
+}
+
+.itcell-login-page .login-form .form-control:focus {
+  border-color: #1b5265;
+  box-shadow: 0 0 0 3px rgba(27, 82, 101, 0.12);
+}
+
+.itcell-login-page .login-password-wrap {
+  border-radius: 5px;
+}
+
+.itcell-login-page .login-error {
+  padding: 10px 12px;
+  border: 1px solid #efc7c7;
+  border-radius: 5px;
+  background: #fff4f2;
+  color: #9c3035;
+  font-size: 12px;
+}
+
+.itcell-login-page .itcell-submit-wrap {
+  margin-top: 25px;
+}
+
+.itcell-login-page .login-submit-btn {
+  min-height: 49px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border: 0;
+  border-radius: 5px;
+  background: #102d40;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  box-shadow: 0 8px 20px rgba(16, 45, 64, 0.15);
+}
+
+.itcell-login-page .login-submit-btn:hover {
+  background: #1b5265;
+}
+
+.itcell-login-security {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 22px 0 0;
+  padding-top: 16px;
+  border-top: 1px solid #ece9e0;
+  color: #78858a;
+  font-size: 10px;
+  text-align: center;
+}
+
+.itcell-login-security svg {
+  flex: 0 0 auto;
+  color: #52766e;
+}
+
+@media (max-width: 991.98px) {
+  .itcell-login-page {
+    padding: 24px 18px;
+  }
+
+  .itcell-login-page .login-container {
+    min-height: 0;
+  }
+
+  .itcell-login-page .login-brand-overlay {
+    min-height: 300px;
+    padding: 28px;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .itcell-login-page {
+    min-height: calc(100svh - 60px);
+    padding: 12px;
+  }
+
+  .itcell-login-page .login-container {
+    border-radius: 9px;
+  }
+
+  .itcell-login-page .login-brand-overlay {
+    min-height: 260px;
+    padding: 22px;
+  }
+
+  .itcell-login-page .login-logo-circle {
+    width: 48px;
+    height: 48px;
+    margin-bottom: 12px;
+  }
+
+  .itcell-login-page .login-brand-divider {
+    margin: 12px 0;
+  }
+
+  .itcell-login-page .login-brand-role,
+  .itcell-login-page .login-brand-copy {
+    display: none;
+  }
+
+  .itcell-login-card-inner {
+    padding: 8px;
+  }
+
+  .itcell-login-page .itcell-form-col {
+    padding: 24px 20px !important;
+  }
+}

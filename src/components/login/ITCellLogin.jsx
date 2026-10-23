@@ -80,11 +80,10 @@ function ITCellLogin() {
   );
 
   return (
-    <div className="login-page">
+    <main className="login-page itcell-login-page" lang="hi">
       <Container>
         <Row className="g-0 login-container align-items-stretch">
-          {/* LEFT PANEL — UK LOGO + HEADINGS */}
-          <Col lg={6} className="login-brand-col d-none d-lg-flex">
+          <Col lg={6} className="login-brand-col itcell-brand-col">
             <div className="login-brand-overlay">
               <div className="login-logo-circle">
                 <img
@@ -102,76 +101,68 @@ function ITCellLogin() {
               <div className="login-brand-divider" />
 
               <div className="login-brand-scheme">
-                <span className="login-brand-badge">ऑनलाइन नामांकन प्रपत्र</span>
+                <span className="login-brand-badge">साहस · उत्कृष्टता · समर्पित सेवा</span>
                 <h2 className="login-brand-title">
-                  मुख्यमंत्री राज्य बाल वीरता पुरस्कार
+                  उत्तराखंड पुरस्कार एवं सम्मान पोर्टल
                 </h2>
                 <p className="login-brand-subtitle">
-                  Chief Minister State Child Bravery Award
+                  Uttarakhand Awards &amp; Recognition Portal
                 </p>
               </div>
 
               <div className="login-brand-role">
-                <span>चुनी गई भूमिका :</span> {IT_CELL_ROLE.hindi}
+                <span>पोर्टल भूमिका :</span> {IT_CELL_ROLE.hindi}
               </div>
 
               <p className="login-brand-copy">© 2026 उत्तराखण्ड सरकार</p>
             </div>
           </Col>
 
-          {/* RIGHT LOGIN FORM */}
           <Col
             lg={6}
-            className="login-form-col d-flex align-items-center justify-content-center p-2"
+            className="login-form-col itcell-form-col d-flex align-items-center justify-content-center"
           >
-            <div className="login-card border-0 w-100">
-              <div className="p-3">
-                {/* HEADER */}
-                <div className="text-center mb-4 login-dynamic-header">
+            <div className="login-card itcell-login-card border-0 w-100">
+              <div className="itcell-login-card-inner">
+                <div className="text-center login-dynamic-header">
                   <FaDatabase
-                    size={40}
-                    className="text-primary mb-3 login-header-icon"
+                    className="login-header-icon"
+                    aria-hidden="true"
                   />
-
-                  <h3 className="fw-bold login-role-title">
-                    {IT_CELL_ROLE.title}
-                  </h3>
-
+                  <p className="itcell-login-kicker">सुरक्षित कर्मचारी प्रवेश</p>
+                  <h1 className="fw-bold login-role-title">{IT_CELL_ROLE.title}</h1>
                   <p className="login-role-hindi">{IT_CELL_ROLE.hindi}</p>
-
-                  <p className="text-muted login-role-subtitle">
-                    {IT_CELL_ROLE.subtitle}
-                  </p>
+                  <p className="login-role-subtitle">{IT_CELL_ROLE.subtitle}</p>
                 </div>
 
                 <Form className="login-form" onSubmit={handleLogin}>
-                  {/* USERNAME */}
-                  <Form.Group className="mb-3" controlId="formPhone">
+                  <Form.Group className="itcell-form-group" controlId="formPhone">
                     <Form.Label>
                       <FaUserShield className="me-2" />
-                      Username (Phone)
+                      मोबाइल नंबर / Username
                     </Form.Label>
 
                     <Form.Control
                       type="text"
-                      placeholder="Enter phone number"
+                      autoComplete="username"
+                      placeholder="अपना पंजीकृत मोबाइल नंबर दर्ज करें"
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
                       required
                     />
                   </Form.Group>
 
-                  {/* PASSWORD */}
-                  <Form.Group className="mb-3" controlId="formPassword">
+                  <Form.Group className="itcell-form-group" controlId="formPassword">
                     <Form.Label>
                       <FaKey className="me-2" />
-                      Password
+                      पासवर्ड
                     </Form.Label>
 
                     <div className="login-password-wrap">
                       <Form.Control
                         type={showPassword ? "text" : "password"}
-                        placeholder="Enter password"
+                        autoComplete="current-password"
+                        placeholder="अपना पासवर्ड दर्ज करें"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         required
@@ -192,33 +183,37 @@ function ITCellLogin() {
                     </div>
                   </Form.Group>
 
-                  {/* ERROR */}
                   {error && (
                     <div
                       className="login-error text-center"
                       role="alert"
                     >
-                      ⚠️ {error}
+                      {error}
                     </div>
                   )}
 
-                  {/* LOGIN BUTTON */}
-                  <div className="text-center mt-4">
+                  <div className="itcell-submit-wrap">
                     <Button
                       variant="primary"
                       type="submit"
                       className="login-submit-btn w-100"
                     >
-                      Login
+                      <FaUserShield aria-hidden="true" />
+                      सुरक्षित लॉगिन
                     </Button>
                   </div>
                 </Form>
+
+                <p className="itcell-login-security">
+                  <FaUserShield aria-hidden="true" />
+                  केवल अधिकृत आईटी सेल अधिकारियों के लिए
+                </p>
               </div>
             </div>
           </Col>
         </Row>
       </Container>
-    </div>
+    </main>
   );
 }
 

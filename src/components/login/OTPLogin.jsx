@@ -307,13 +307,13 @@ function OTPLogin() {
               Women Empowerment &amp; Child Development
             </p>
             <span className="otp-login-rule" />
-            <p className="otp-login-kicker">उत्तराखंड सरकार का आधिकारिक पोर्टल</p>
-            <h1>मुख्यमंत्री राज्य बाल वीरता पुरस्कार</h1>
+            <p className="otp-login-kicker">उत्तराखंड सरकार का आधिकारिक पुरस्कार पोर्टल</p>
+            <h1>उत्तराखंड पुरस्कार एवं सम्मान पोर्टल</h1>
             <p className="otp-login-award-en">
-              Chief Minister State Child Bravery Award
+              Uttarakhand Awards &amp; Recognition Portal
             </p>
             <div className="otp-login-brand-role">
-              <span>चुनी गई भूमिका</span>
+              <span>पोर्टल भूमिका</span>
               <strong>{currentRole.hindi}</strong>
             </div>
             <p className="otp-login-copyright">© 2026 उत्तराखण्ड सरकार</p>
@@ -332,6 +332,23 @@ function OTPLogin() {
               <h2>{currentRole.title}</h2>
               <p>{currentRole.subtitle}</p>
             </div>
+
+            <ol className="otp-login-progress" aria-label="लॉगिन के चरण">
+              <li className={step === "send" ? "active" : "complete"}>
+                <span>{step === "verify" ? "✓" : "01"}</span>
+                <div>
+                  <strong>मोबाइल नंबर</strong>
+                  <small>OTP प्राप्त करें</small>
+                </div>
+              </li>
+              <li className={step === "verify" ? "active" : ""}>
+                <span>02</span>
+                <div>
+                  <strong>सत्यापन</strong>
+                  <small>सुरक्षित रूप से लॉगिन करें</small>
+                </div>
+              </li>
+            </ol>
 
             <SendOTPForm
               show={step === "send"}

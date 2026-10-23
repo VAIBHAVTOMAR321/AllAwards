@@ -36,6 +36,7 @@ import DPODashboard from "./components/all_dashbords/dis_admin/DPO_cell/DPODashb
 // A wrapper component to conditionally render the NavBar
 const AppContent = () => {
   const location = useLocation();
+  const normalizedPath = location.pathname.replace(/\/+$/, "").toLowerCase() || "/";
   const isDisRoute = [
     "/UserDashBoard",
     "/ITCellDashBoard",
@@ -44,13 +45,15 @@ const AppContent = () => {
     "/DPODashBoard",
     "/DisDashBoard",
   ].some((route) => location.pathname.startsWith(route));
-  const isHomeRoute = location.pathname === "/";
-  const isLoginRoute = [
-    "/Login",
-    "/LoginPortal",
-    "/TiluRauteliLogin",
-    "/AnganwadiLogin",
-  ].includes(location.pathname);
+  const isHomeRoute = normalizedPath === "/";
+  const isLoginRoute = ["/login", "/loginit"].includes(normalizedPath);
+  const isStandaloneLoginRoute = [
+    "/login",
+    "/loginportal",
+    "/tilurautelilogin",
+    "/anganwadilogin",
+    "/loginit",
+  ].includes(normalizedPath);
 
   return (
     <>
@@ -87,7 +90,7 @@ const AppContent = () => {
           {/* Add other Dis routes from DisLeftNav here as needed */}
         </Routes>
       </div>
-      {!isDisRoute && !isHomeRoute && !isLoginRoute && <Footer />}
+      {!isDisRoute && !isHomeRoute && !isStandaloneLoginRoute && <Footer />}
     </>
   );
 };
