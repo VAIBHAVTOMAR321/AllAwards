@@ -2,6 +2,7 @@ import React from "react";
 import {
   Routes,
   Route,
+  Navigate,
   useLocation,
 } from "react-router-dom";
 import Home from "./components/home_layout/Home";
@@ -32,6 +33,25 @@ import ITCellDashBoard from "./components/all_dashbords/dis_admin/IT_celll/ITCel
 import DpoPhoneList from "./components/all_dashbords/dis_admin/IT_celll/DpoPhoneList";
 import ApplicantQueries from "./components/all_dashbords/dis_admin/IT_celll/ApplicantQueries";
 import DPODashboard from "./components/all_dashbords/dis_admin/DPO_cell/DPODashboard";
+import CDPODashboard from "./components/all_dashbords/dis_admin/CDPO_cell/CDPODashboard";
+import { useAuth } from "./components/login/AuthContext";
+
+const roleLoginPath = (role) => (role === "it_cell" ? "/loginit" : "/Login");
+
+const ProtectedRoute = ({ allowedRoles, children }) => {
+  const { user } = useAuth();
+  const normalizedRole = (user?.role || user?.user?.role || "")
+    .toLowerCase()
+    .replace(/-/g, "_");
+
+  if (!user) {
+    return <Navigate to={roleLoginPath(allowedRoles[0])} replace />;
+  }
+  if (!allowedRoles.includes(normalizedRole)) {
+    return <Navigate to={roleLoginPath(normalizedRole)} replace />;
+  }
+  return children;
+};
 
 // A wrapper component to conditionally render the NavBar
 const AppContent = () => {
@@ -43,6 +63,7 @@ const AppContent = () => {
     "/ITCellDpoPhoneList",
     "/ITCellApplicantQueries",
     "/DPODashBoard",
+    "/CDPODashBoard",
     "/DisDashBoard",
   ].some((route) => location.pathname.startsWith(route));
   const isHomeRoute = normalizedPath === "/";
@@ -75,12 +96,62 @@ const AppContent = () => {
           <Route path="/StepD" element={<StepD />} />
           <Route path="/StepE" element={<StepE />} />
           <Route path="/StepF" element={<StepF />} />
-          <Route path="/UserDashBoard" element={<UserDashBoard />} />
-          <Route path="/ITCellDashBoard" element={<ITCellDashBoard />} />
-          <Route path="/ITCellDpoPhoneList" element={<DpoPhoneList />} />
-          <Route path="/ITCellApplicantQueries" element={<ApplicantQueries />} />
-          <Route path="/DPODashBoard" element={<DPODashboard />} />
-          <Route path="/DisDashBoard" element={<DisDashBoard />} />
+          <Route
+            path="/UserDashBoard"
+            element={
+              <ProtectedRoute allowedRoles={["user"]}>
+                <UserDashBoard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/ITCellDashBoard"
+            element={
+              <ProtectedRoute allowedRoles={["it_cell"]}>
+                <ITCellDashBoard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/ITCellDpoPhoneList"
+            element={
+              <ProtectedRoute allowedRoles={["it_cell"]}>
+                <DpoPhoneList />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/ITCellApplicantQueries"
+            element={
+              <ProtectedRoute allowedRoles={["it_cell"]}>
+                <ApplicantQueries />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/DPODashBoard"
+            element={
+              <ProtectedRoute allowedRoles={["dpo"]}>
+                <DPODashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/CDPODashBoard"
+            element={
+              <ProtectedRoute allowedRoles={["cdpo"]}>
+                <CDPODashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/DisDashBoard"
+            element={
+              <ProtectedRoute allowedRoles={["director"]}>
+                <DisDashBoard />
+              </ProtectedRoute>
+            }
+          />
           
 
           {/* Dis Routes */}

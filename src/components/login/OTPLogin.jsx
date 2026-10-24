@@ -9,22 +9,32 @@ import "../otpsendverify/otp.css";
 
 const roleConfig = {
   director: {
+    apiRole: "director",
     title: "State Login",
     hindi: "निदेशक लॉगिन",
     subtitle: "निदेशक के रूप में लॉगिन करें",
     path: "/DisDashBoard",
   },
   dpo: {
+    apiRole: "dpo",
     title: "District Level Login",
     hindi: "जिला कार्यक्रम अधिकारी लॉगिन",
     subtitle: "जिला कार्यक्रम अधिकारी के रूप में लॉगिन करें",
     path: "/DPODashBoard",
   },
   cdpo: {
+    apiRole: "cdpo",
     title: "CDPO Login",
     hindi: "बाल विकास परियोजना अधिकारी लॉगिन",
     subtitle: "बाल विकास परियोजना अधिकारी के रूप में लॉगिन करें",
     path: "/CDPODashBoard",
+  },
+  it_cell: {
+    apiRole: "IT-Cell",
+    title: "IT Cell Login",
+    hindi: "आईटी सेल लॉगिन",
+    subtitle: "आईटी सेल के रूप में लॉगिन करें",
+    path: "/ITCellDashBoard",
   },
 };
 
@@ -32,6 +42,7 @@ const SendOTPForm = ({
   show,
   onSent,
   selectedRole,
+  showRoleSelector,
   phone,
   onRoleChange,
   onPhoneChange,
@@ -55,7 +66,7 @@ const SendOTPForm = ({
 
     setSending(true);
     try {
-      await sendOtpLoginApi(phone, selectedRole);
+      await sendOtpLoginApi(phone, roleConfig[selectedRole].apiRole);
       onSent();
     } catch (err) {
       setError(err.message);
@@ -81,28 +92,30 @@ const SendOTPForm = ({
             अपने मोबाइल नंबर पर OTP प्राप्त करने के लिए नीचे दर्शाएं।
           </p>
 
-          <div className="otp-role-selector">
-            <label className="otp-role-label">लॉगिन के रूप में</label>
-            <div className="otp-role-options">
-              {Object.entries(roleConfig).map(([key, config]) => (
-                <label
-                  key={key}
-                  className={`otp-role-option ${
-                    selectedRole === key ? "selected" : ""
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="role"
-                    value={key}
-                    checked={selectedRole === key}
-                    onChange={() => onRoleChange(key)}
-                  />
-                  <span className="otp-role-text">{config.title}</span>
-                </label>
-              ))}
+          {showRoleSelector && (
+            <div className="otp-role-selector">
+              <label className="otp-role-label">लॉगिन के रूप में</label>
+              <div className="otp-role-options">
+                {Object.entries(roleConfig).map(([key, config]) => (
+                  <label
+                    key={key}
+                    className={`otp-role-option ${
+                      selectedRole === key ? "selected" : ""
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="role"
+                      value={key}
+                      checked={selectedRole === key}
+                      onChange={() => onRoleChange(key)}
+                    />
+                    <span className="otp-role-text">{config.title}</span>
+                  </label>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
           <div className="otp-field">
             <label htmlFor="otp-login-mobile">मोबाइल नंबर</label>
@@ -166,7 +179,11 @@ const VerifyOTPForm = ({
 
     setVerifying(true);
     try {
-      const data = await verifyOtpLoginApi(phone, selectedRole, otp);
+      const data = await verifyOtpLoginApi(
+        phone,
+        roleConfig[selectedRole].apiRole,
+        otp,
+      );
       onVerified(data);
     } catch (err) {
       setError(err.message);
@@ -247,9 +264,9 @@ const VerifyOTPForm = ({
   );
 };
 
-function OTPLogin() {
+function OTPLogin({ fixedRole }) {
   const [phone, setPhone] = useState("");
-  const [selectedRole, setSelectedRole] = useState("director");
+  const [selectedRole, setSelectedRole] = useState(fixedRole || "director");
   const [step, setStep] = useState("send");
 
   const navigate = useNavigate();
@@ -265,12 +282,8 @@ function OTPLogin() {
     async (data) => {
       try {
         const loginData = {
-          access: data.access,
-          refresh: data.refresh,
-          role: data.user?.role || selectedRole,
+          role: data.user?.role || roleConfig[selectedRole].apiRole,
           user: data.user,
-          success: data.success,
-          message: data.message,
         };
         login(loginData);
         navigate(roleConfig[selectedRole].path, { replace: true });
@@ -285,7 +298,7 @@ function OTPLogin() {
     if (!phone || phone.length !== 10) {
       throw new Error("कृपया वैध फ़ोन नंबर दर्शाएं।");
     }
-    await sendOtpLoginApi(phone, selectedRole);
+    await sendOtpLoginApi(phone, roleConfig[selectedRole].apiRole);
   }, [phone, selectedRole]);
 
   return (
@@ -354,6 +367,7 @@ function OTPLogin() {
               show={step === "send"}
               onSent={handleSent}
               selectedRole={selectedRole}
+              showRoleSelector={!fixedRole}
               phone={phone}
               onRoleChange={setSelectedRole}
               onPhoneChange={setPhone}

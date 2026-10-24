@@ -30,6 +30,7 @@ import {
 } from "react-icons/fa";
 import DisTopNav from "./DisTopNav";
 import DisLeftnav from "./DisLeftnav";
+import { cookieFetch } from "../../login/AuthContext";
 import PreviewModal from "../../child_regis/NominationForm/PreviewModal";
 import { exportDashboardExcel, exportDashboardPdf } from "../../../utils/itCellReportExport";
 import { exportDpoTableExcel, exportDpoTablePdf } from "../../../utils/dpoTableExport";
@@ -37,16 +38,16 @@ import { formatSubmissionDateTime, resolveSubmissionTimestampFromSteps } from ".
 import "./DPO_cell/DPODashboard.css";
 
 const BASE_URL =
-  "https://wecdukaward.in/balvirtaawardproject/balvirtaawardproject_backend/api";
+  "https://mahadevaaya.com/wecdallaward/wecdallaward_backend/api";
 const DIRECTOR_RECOMMENDATION_URL = `${BASE_URL}/recommended-application-by-director/`;
 
 const MEDIA_BASE_URL =
-  "https://wecdukaward.in/balvirtaawardproject/balvirtaawardproject_backend";
+  "https://mahadevaaya.com/wecdallaward/wecdallaward_backend";
 
 // Directory the backend stores recommendation uploads in.
 const RECOMMENDATION_MEDIA_DIR = "media/bravery/recommended_application";
 
-const SITE_ORIGIN = "https://wecdukaward.in";
+const SITE_ORIGIN = "https://mahadevaaya.com/wecdallaward";
 
 const joinMediaPath = (path) => {
   const withoutLeadingSlash = path.replace(/^\/+/, "");
@@ -79,7 +80,7 @@ const getFileSrc = (file) => {
   if (/^https?:\/\//i.test(trimmed)) {
     try {
       const url = new URL(trimmed);
-      const isOurSite = url.hostname.toLowerCase() === "wecdukaward.in";
+      const isOurSite = url.hostname.toLowerCase() === "mahadevaaya.com";
       if (
         isOurSite &&
         !url.pathname.replace(/^\/+/, "").startsWith("balvirtaawardproject/")
@@ -466,7 +467,7 @@ const DisDashBoard = () => {
       setLoading(true);
       setError(null);
       const accessToken = localStorage.getItem("accessToken");
-      const response = await fetch(`${BASE_URL}/director-itcell/application/status/`, {
+      const response = await cookieFetch(`${BASE_URL}/director-itcell/application/status/`, {
         headers: {
           "Content-Type": "application/json",
           ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
@@ -513,7 +514,7 @@ const DisDashBoard = () => {
       setRecommendedLoading(true);
       setRecommendedError(null);
       const accessToken = localStorage.getItem("accessToken");
-      const response = await fetch(`${BASE_URL}/recommended-application/`, {
+      const response = await cookieFetch(`${BASE_URL}/recommended-application/`, {
         headers: {
           "Content-Type": "application/json",
           ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
@@ -542,7 +543,7 @@ const DisDashBoard = () => {
     try {
       setDirectorRecommendationsLoading(true);
       const accessToken = localStorage.getItem("accessToken");
-      const response = await fetch(DIRECTOR_RECOMMENDATION_URL, {
+      const response = await cookieFetch(DIRECTOR_RECOMMENDATION_URL, {
         headers: {
           "Content-Type": "application/json",
           ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
@@ -572,7 +573,7 @@ const DisDashBoard = () => {
   const fetchRegisteredApplications = async () => {
     try {
       const accessToken = localStorage.getItem("accessToken");
-      const response = await fetch(`${BASE_URL}/bravery/it-cell/applications/`, {
+      const response = await cookieFetch(`${BASE_URL}/bravery/it-cell/applications/`, {
         headers: {
           "Content-Type": "application/json",
           ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
@@ -685,13 +686,13 @@ const DisDashBoard = () => {
     });
     if (file) formData.append("dir_file", file, file.name);
 
-    let response = await fetch(DIRECTOR_RECOMMENDATION_URL, {
+    let response = await cookieFetch(DIRECTOR_RECOMMENDATION_URL, {
       method,
       headers: authHeaders,
       body: formData,
     });
     if (!response.ok && [400, 415, 422].includes(response.status)) {
-      response = await fetch(DIRECTOR_RECOMMENDATION_URL, {
+      response = await cookieFetch(DIRECTOR_RECOMMENDATION_URL, {
         method,
         headers: { "Content-Type": "application/json", ...authHeaders },
         body: JSON.stringify({ ...payload, dir_file: file?.name || null }),

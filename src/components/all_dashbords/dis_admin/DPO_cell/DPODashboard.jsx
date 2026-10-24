@@ -31,6 +31,7 @@ import {
 } from "react-icons/fa";
 import DPOTopNav from "./DPOTopNav";
 import DPOLeftNav from "./DPOLeftNav";
+import { cookieFetch } from "../../../login/AuthContext";
 import PreviewModal from "../../../child_regis/NominationForm/PreviewModal";
 import {
   exportDpoTableExcel,
@@ -363,9 +364,9 @@ const mapApiToApp = (item) => {
 };
 
 const MEDIA_BASE_URL =
-  "https://wecdukaward.in/balvirtaawardproject/balvirtaawardproject_backend";
+  "https://mahadevaaya.com/wecdallaward/wecdallaward_backend";
 
-const SITE_ORIGIN = "https://wecdukaward.in";
+const SITE_ORIGIN = "https://mahadevaaya.com/wecdallaward";
 
 // Directory the backend stores recommendation uploads in.
 const RECOMMENDATION_MEDIA_DIR = "media/bravery/recommended_application";
@@ -407,7 +408,7 @@ const getFileSrc = (file) => {
   if (/^https?:\/\//i.test(trimmed)) {
     try {
       const url = new URL(trimmed);
-      const isOurSite = url.hostname.toLowerCase() === "wecdukaward.in";
+      const isOurSite = url.hostname.toLowerCase() === "mahadevaaya.com";
       // The API returns site-root absolute URLs that serve the SPA instead of
       // the file, so re-point our own links that lack the backend prefix.
       if (
@@ -510,8 +511,8 @@ const DPODashboard = () => {
       setLoading(true);
       setError(null);
       const accessToken = localStorage.getItem("accessToken");
-      const response = await fetch(
-        "https://wecdukaward.in/balvirtaawardproject/balvirtaawardproject_backend/api/dpo/application/status/",
+      const response = await cookieFetch(
+        "https://mahadevaaya.com/wecdallaward/wecdallaward_backend/api/dpo/application/status/",
         {
           headers: {
             "Content-Type": "application/json",
@@ -565,8 +566,8 @@ const DPODashboard = () => {
       setRecommendedLoading(true);
       setRecommendedError(null);
       const accessToken = localStorage.getItem("accessToken");
-      const response = await fetch(
-        "https://wecdukaward.in/balvirtaawardproject/balvirtaawardproject_backend/api/recommended-application/",
+      const response = await cookieFetch(
+        "https://mahadevaaya.com/wecdallaward/wecdallaward_backend/api/recommended-application/",
         {
           headers: {
             "Content-Type": "application/json",
@@ -599,8 +600,8 @@ const DPODashboard = () => {
   const fetchRegisteredApplications = async () => {
     try {
       const accessToken = localStorage.getItem("accessToken");
-      const response = await fetch(
-        "https://wecdukaward.in/balvirtaawardproject/balvirtaawardproject_backend/api/bravery/it-cell/applications/",
+      const response = await cookieFetch(
+        "https://mahadevaaya.com/wecdallaward/wecdallaward_backend/api/bravery/it-cell/applications/",
         {
           headers: {
             "Content-Type": "application/json",
@@ -626,14 +627,14 @@ const DPODashboard = () => {
   };
 
   const DPO_STATUS_URL =
-    "https://wecdukaward.in/balvirtaawardproject/balvirtaawardproject_backend/api/dpo/application/status/";
+    "https://mahadevaaya.com/wecdallaward/wecdallaward_backend/api/dpo/application/status/";
 
   // Saves only the remark. The status is echoed back unchanged because the
   // endpoint resolves the application from this payload and rejects the request
   // with 404 "Application not found" when it is missing.
   const saveDpoComment = async (applicantId, currentStatus, comment) => {
     const accessToken = localStorage.getItem("accessToken");
-    const response = await fetch(DPO_STATUS_URL, {
+    const response = await cookieFetch(DPO_STATUS_URL, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -661,7 +662,7 @@ const DPODashboard = () => {
   };
 
   const RECOMMENDATION_URL =
-    "https://wecdukaward.in/balvirtaawardproject/balvirtaawardproject_backend/api/recommended-application/";
+    "https://mahadevaaya.com/wecdallaward/wecdallaward_backend/api/recommended-application/";
 
   const readErrorBody = async (response) => {
     const text = await response.text().catch(() => "");
@@ -704,7 +705,7 @@ const DPODashboard = () => {
       formData.append("applicant_file", file, file.name);
     }
 
-    let response = await fetch(RECOMMENDATION_URL, {
+    let response = await cookieFetch(RECOMMENDATION_URL, {
       method,
       headers: { ...authHeaders },
       body: formData,
@@ -714,7 +715,7 @@ const DPODashboard = () => {
     // carried in JSON, so applicant_file is sent as null on that path.
     if (!response.ok && [400, 415, 422].includes(response.status)) {
       const jsonPayload = { ...payload, applicant_file: null };
-      response = await fetch(RECOMMENDATION_URL, {
+      response = await cookieFetch(RECOMMENDATION_URL, {
         method,
         headers: { "Content-Type": "application/json", ...authHeaders },
         body: JSON.stringify(jsonPayload),
@@ -768,7 +769,7 @@ const DPODashboard = () => {
         );
         try {
           const accessToken = localStorage.getItem("accessToken");
-          const response = await fetch(RECOMMENDATION_URL, {
+          const response = await cookieFetch(RECOMMENDATION_URL, {
             method: "PUT",
             headers: {
               "Content-Type": "application/json",

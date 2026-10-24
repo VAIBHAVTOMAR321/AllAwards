@@ -1,5 +1,7 @@
+import { cookieFetch } from "../../../login/AuthContext";
+
 const DISTRICT_DETAILS_URL =
-  "https://wecdukaward.in/balvirtaawardproject/balvirtaawardproject_backend/api/district-details/";
+  "https://mahadevaaya.com/wecdallaward/wecdallaward_backend/api/district-details/";
 
 const getAuthHeaders = () => {
   const accessToken = localStorage.getItem("accessToken");
@@ -11,7 +13,7 @@ const getAuthHeaders = () => {
 
 /** Fetches the district master list with each district's DPO contact. */
 export const fetchDistrictDetails = async () => {
-  const response = await fetch(DISTRICT_DETAILS_URL, {
+  const response = await cookieFetch(DISTRICT_DETAILS_URL, {
     method: "GET",
     headers: getAuthHeaders(),
   });
@@ -35,7 +37,7 @@ export const fetchDistrictDetails = async () => {
  * @param {object} updates     - fields to change, e.g. { phone, full_name }
  */
 export const updateDistrictDetails = async (id, updates) => {
-  const response = await fetch(DISTRICT_DETAILS_URL, {
+  const response = await cookieFetch(DISTRICT_DETAILS_URL, {
     method: "PUT",
     headers: getAuthHeaders(),
     body: JSON.stringify({ id, ...updates }),

@@ -7,14 +7,15 @@ import ITCellLeftNav from "./ITCellLeftNav";
 import PreviewModal from "../../../child_regis/NominationForm/PreviewModal";
 import { exportDashboardExcel, exportDashboardPdf } from "../../../../utils/itCellReportExport";
 import { formatSubmissionDateTime, resolveSubmissionTimestampFromSteps } from "../../../../utils/submissionDate";
+import { cookieFetch } from "../../../login/AuthContext";
 
 const RECOMMENDATION_URL =
-  "https://wecdukaward.in/balvirtaawardproject/balvirtaawardproject_backend/api/recommended-application/";
+  "https://mahadevaaya.com/wecdallaward/wecdallaward_backend/api/recommended-application/";
 
 const MEDIA_BASE_URL =
-  "https://wecdukaward.in/balvirtaawardproject/balvirtaawardproject_backend";
+  "https://mahadevaaya.com/wecdallaward/wecdallaward_backend";
 
-const SITE_ORIGIN = "https://wecdukaward.in";
+const SITE_ORIGIN = "https://mahadevaaya.com/wecdallaward";
 
 // Directory the backend stores recommendation uploads in.
 const RECOMMENDATION_MEDIA_DIR = "media/bravery/recommended_application";
@@ -50,7 +51,7 @@ const getFileSrc = (file) => {
   if (/^https?:\/\//i.test(trimmed)) {
     try {
       const url = new URL(trimmed);
-      const isOurSite = url.hostname.toLowerCase() === "wecdukaward.in";
+      const isOurSite = url.hostname.toLowerCase() === "mahadevaaya.com";
       if (
         isOurSite &&
         !url.pathname.replace(/^\/+/, "").startsWith("balvirtaawardproject/")
@@ -223,7 +224,7 @@ const ITCellDashBoard = () => {
       setLoadingFormStatus(true);
       setFormStatusError(null);
       const accessToken = localStorage.getItem("accessToken");
-      const response = await fetch("https://wecdukaward.in/balvirtaawardproject/balvirtaawardproject_backend/api/director-itcell/application/status/", {
+      const response = await cookieFetch("https://mahadevaaya.com/wecdallaward/wecdallaward_backend/api/director-itcell/application/status/", {
         headers: {
           "Content-Type": "application/json",
           ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
@@ -253,7 +254,7 @@ const ITCellDashBoard = () => {
     try {
       setRecommendedLoading(true);
       const accessToken = localStorage.getItem("accessToken");
-      const response = await fetch(RECOMMENDATION_URL, {
+      const response = await cookieFetch(RECOMMENDATION_URL, {
         headers: {
           "Content-Type": "application/json",
           ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
@@ -284,7 +285,7 @@ const ITCellDashBoard = () => {
         setLoading(true);
         setError(null);
         const accessToken = localStorage.getItem("accessToken");
-        const response = await fetch("https://wecdukaward.in/balvirtaawardproject/balvirtaawardproject_backend/api/bravery/it-cell/applications/", {
+        const response = await cookieFetch("https://mahadevaaya.com/wecdallaward/wecdallaward_backend/api/bravery/it-cell/applications/", {
           headers: {
             "Content-Type": "application/json",
             ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),

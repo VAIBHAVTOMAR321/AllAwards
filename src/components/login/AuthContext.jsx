@@ -1,131 +1,338 @@
-import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+import { useNavigate } from "react-router-dom";
 
+const API_BASE =
+  "https://mahadevaaya.com/wecdallaward/wecdallaward_backend/api";
+const REFRESH_URL = `${API_BASE}/refresh-token/`;
+const LOGOUT_URL = `${API_BASE}/logout/`;
+const LEGACY_REFRESH_URL =
+  "https://wecdukaward.in/balvirtaawardproject/balvirtaawardproject_backend/api/refresh-token/";
 const AuthContext = createContext(null);
+let cookieRefreshPromise = null;
+
+const isCookieAuthEndpoint = (url) =>
+  [
+    "/send-otp-login-api/",
+    "/verify-otp-login-api/",
+    "/refresh-token/",
+    "/logout/",
+  ].some((path) => url.includes(path));
+
+const isRefreshSessionExpired = (data) =>
+  /refresh.{0,20}(expired|invalid)|token.{0,20}(expired|invalid)/i.test(
+    `${data?.detail || ""} ${data?.message || ""}`,
+  );
+
+const getUserRole = (userData) =>
+  (userData?.role || userData?.user?.role || "").toLowerCase().replace(/-/g, "_");
+
+const usesCookieSession = (userData) =>
+  ["director", "dpo", "cdpo", "it_cell"].includes(getUserRole(userData));
 
 export const useAuth = () => useContext(AuthContext);
 
-export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(() => {
-    const storedUser = localStorage.getItem('user');
-    return storedUser ? JSON.parse(storedUser) : null;
+export const getCsrfToken = () => {
+  if (typeof document === "undefined") return "";
+  const csrfCookie = document.cookie
+    .split(";")
+    .map((cookie) => cookie.trim())
+    .find((cookie) => cookie.startsWith("csrftoken="));
+
+  if (!csrfCookie) return "";
+  try {
+    return decodeURIComponent(csrfCookie.slice("csrftoken=".length));
+  } catch (error) {
+    console.error("Unable to decode the CSRF cookie:", error);
+    return csrfCookie.slice("csrftoken=".length);
+  }
+};
+
+const rawCookieFetch = (url, options = {}) => {
+  const { requireCsrf = false, ...fetchOptions } = options;
+  const headers = new Headers(options.headers || {});
+  const csrfToken = getCsrfToken();
+  const requestUrl =
+    typeof window !== "undefined" &&
+    ["localhost", "127.0.0.1"].includes(window.location.hostname) &&
+    url.startsWith(API_BASE)
+      ? `/api${url.slice(API_BASE.length)}`
+      : url;
+
+  headers.delete("Authorization");
+  if (requireCsrf && !csrfToken) {
+    const error = new Error(
+      "The backend did not set a readable csrftoken cookie. Refresh and logout are blocked until the backend issues one.",
+    );
+    error.code = "CSRF_COOKIE_MISSING";
+    throw error;
+  }
+  if (csrfToken) headers.set("X-CSRFToken", csrfToken);
+  if (
+    fetchOptions.body &&
+    !(fetchOptions.body instanceof FormData) &&
+    !headers.has("Content-Type")
+  ) {
+    headers.set("Content-Type", "application/json");
+  }
+
+  return fetch(requestUrl, {
+    ...fetchOptions,
+    credentials: "include",
+    headers,
   });
-  const navigate = useNavigate();
-  const refreshTimerRef = useRef(null);
-  const isRefreshingRef = useRef(false);
+};
 
-  const refreshAccessToken = async () => {
-    const refreshToken = localStorage.getItem('refreshToken');
-    if (!refreshToken) return null;
-
-    if (isRefreshingRef.current) return null;
-    isRefreshingRef.current = true;
-
-    try {
-      const refreshResponse = await fetch('https://wecdukaward.in/balvirtaawardproject/balvirtaawardproject_backend/api/refresh-token/', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ refresh: refreshToken }),
+const refreshCookieSession = async () => {
+  if (!cookieRefreshPromise) {
+    cookieRefreshPromise = rawCookieFetch(REFRESH_URL, {
+      method: "POST",
+      requireCsrf: true,
+    })
+      .then(async (response) => {
+        if (response.ok) return true;
+        const data = await response.clone().json().catch(() => ({}));
+        if (response.status === 401) {
+          if (isRefreshSessionExpired(data)) {
+            window.dispatchEvent(new Event("cookie-session-expired"));
+          }
+          console.error(
+            "Cookie refresh was unauthorized:",
+            data.detail || data.message || `HTTP ${response.status}`,
+          );
+          return false;
+        }
+        if (response.status === 403) {
+          const detail = data.detail || data.message;
+          if (/csrf/i.test(`${detail || ""}`)) {
+            throw new Error(
+              "Session refresh was rejected because the CSRF token is missing or invalid. The login is preserved; check the csrftoken cookie and X-CSRFToken header.",
+            );
+          }
+        }
+        throw new Error(
+          data.detail ||
+            data.message ||
+            `Session refresh failed with HTTP ${response.status}.`,
+        );
+      })
+      .finally(() => {
+        cookieRefreshPromise = null;
       });
+  }
+  return cookieRefreshPromise;
+};
 
-      if (!refreshResponse.ok) {
-        throw new Error('Failed to refresh token.');
-      }
+export const cookieFetch = async (url, options = {}) => {
+  const response = await rawCookieFetch(url, options);
+  if (response.status !== 401 || isCookieAuthEndpoint(url)) return response;
 
-      const { access } = await refreshResponse.json();
-      localStorage.setItem('accessToken', access);
-      return access;
-    } catch (error) {
-      logout();
-      return null;
-    } finally {
-      isRefreshingRef.current = false;
+  const refreshed = await refreshCookieSession();
+  if (!refreshed) return response;
+
+  const retriedResponse = await rawCookieFetch(url, options);
+  return retriedResponse;
+};
+
+const readStoredUser = () => {
+  try {
+    const storedUser = localStorage.getItem("user");
+    if (!storedUser) return null;
+
+    const parsedUser = JSON.parse(storedUser);
+    if (!usesCookieSession(parsedUser)) return parsedUser;
+
+    const { access, refresh, ...safeUserData } = parsedUser;
+    if (access || refresh) {
+      localStorage.setItem("user", JSON.stringify(safeUserData));
     }
-  };
+    return safeUserData;
+  } catch (error) {
+    console.error("Unable to read the saved user session:", error);
+    localStorage.removeItem("user");
+    return null;
+  }
+};
 
-  useEffect(() => {
-    const storedRefreshToken = localStorage.getItem('refreshToken');
-    if (storedRefreshToken) {
-      refreshAccessToken();
-    }
-  }, []);
+export const AuthProvider = ({ children }) => {
+  const [user, setUser] = useState(readStoredUser);
+  const navigate = useNavigate();
+  const refreshPromiseRef = useRef(null);
 
-  useEffect(() => {
-    refreshTimerRef.current = setInterval(() => {
-      const storedRefreshToken = localStorage.getItem('refreshToken');
-      if (storedRefreshToken && !isRefreshingRef.current) {
-        refreshAccessToken();
-      }
-    }, 60000);
-
-    return () => {
-      if (refreshTimerRef.current) {
-        clearInterval(refreshTimerRef.current);
-      }
-    };
-  }, []);
-
-  const login = (userData) => {
-    localStorage.setItem('user', JSON.stringify(userData));
-    localStorage.setItem('accessToken', userData.access);
-    localStorage.setItem('refreshToken', userData.refresh);
-    setUser(userData);
-  };
-
-  const logout = () => {
-    const storedUser = localStorage.getItem('user');
-    let role = null;
-    if (storedUser) {
-      const parsedUser = JSON.parse(storedUser);
-      role = parsedUser.role || parsedUser.user?.role;
-    }
-
-    localStorage.removeItem('user');
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
+  const clearCookieSession = useCallback(() => {
+    const role = user?.role || user?.user?.role;
+    localStorage.removeItem("user");
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
     setUser(null);
 
-    const normalizedRole = (role || '').toLowerCase().replace(/-/g, '_');
-    if (normalizedRole === 'it_cell') {
-      navigate('/loginit', { replace: true });
-    } else if (normalizedRole === 'user') {
-      navigate('/', { replace: true });
+    const normalizedRole = (role || "").toLowerCase().replace(/-/g, "_");
+    navigate(normalizedRole === "it_cell" ? "/loginit" : "/Login", {
+      replace: true,
+    });
+  }, [navigate, user]);
+
+  useEffect(() => {
+    window.addEventListener("cookie-session-expired", clearCookieSession);
+    return () =>
+      window.removeEventListener("cookie-session-expired", clearCookieSession);
+  }, [clearCookieSession]);
+
+  useEffect(() => {
+    if (usesCookieSession(user)) {
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
+    }
+  }, [user]);
+
+  const logout = useCallback(async () => {
+    const role = user?.role || user?.user?.role;
+    if (usesCookieSession(user)) {
+      try {
+        const response = await rawCookieFetch(LOGOUT_URL, {
+          method: "POST",
+          requireCsrf: true,
+        });
+        if (!response.ok) {
+          const data = await response.clone().json().catch(() => ({}));
+          throw new Error(
+            data.detail ||
+              data.message ||
+              `Logout failed with HTTP ${response.status}.`,
+          );
+        }
+      } catch (error) {
+        console.error("Backend logout failed:", error);
+      }
+    }
+
+    localStorage.removeItem("user");
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
+    setUser(null);
+
+    const normalizedRole = (role || "").toLowerCase().replace(/-/g, "_");
+    if (normalizedRole === "it_cell") {
+      navigate("/loginit", { replace: true });
+    } else if (normalizedRole === "user") {
+      navigate("/", { replace: true });
     } else {
-      navigate('/Login', { replace: true });
+      navigate("/Login", { replace: true });
     }
-  };
+  }, [navigate, user]);
 
-  const authFetch = async (url, options = {}) => {
-    let accessToken = localStorage.getItem('accessToken');
+  const refreshAccessToken = useCallback(async () => {
+    if (refreshPromiseRef.current) return refreshPromiseRef.current;
 
-    const headers = {
-      ...options.headers,
-      Authorization: `Bearer ${accessToken}`,
-    };
+    const refreshRequest = usesCookieSession(user)
+      ? cookieFetch(REFRESH_URL, {
+          method: "POST",
+          requireCsrf: true,
+        })
+      : (() => {
+          const refreshToken = localStorage.getItem("refreshToken");
+          if (!refreshToken) return Promise.resolve(null);
+          return fetch(LEGACY_REFRESH_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ refresh: refreshToken }),
+          });
+        })();
 
-    if (!(options.body instanceof FormData)) {
-      headers['Content-Type'] = 'application/json';
+    refreshPromiseRef.current = refreshRequest
+      .then(async (response) => {
+        if (!response) return false;
+        if (!response.ok) {
+          if (response.status === 401) {
+            window.dispatchEvent(new Event("cookie-session-expired"));
+            return false;
+          }
+          if (response.status === 403) {
+            const data = await response.clone().json().catch(() => ({}));
+            if (/csrf/i.test(`${data.detail || ""} ${data.message || ""}`)) {
+              throw new Error(
+                "Session refresh was rejected because the CSRF token is missing or invalid.",
+              );
+            }
+          }
+          throw new Error(`Session refresh failed with HTTP ${response.status}.`);
+        }
+        if (!usesCookieSession(user)) {
+          return response.json().then(({ access }) => {
+            localStorage.setItem("accessToken", access);
+            return access;
+          });
+        }
+        return true;
+      })
+      .catch((error) => {
+        console.error("Session refresh failed:", error);
+        throw error;
+      })
+      .finally(() => {
+        refreshPromiseRef.current = null;
+      });
+
+    return refreshPromiseRef.current;
+  }, [user]);
+
+  const login = useCallback((userData) => {
+    if (usesCookieSession(userData)) {
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
+    } else {
+      if (userData.access) {
+        localStorage.setItem("accessToken", userData.access);
+      }
+      if (userData.refresh) {
+        localStorage.setItem("refreshToken", userData.refresh);
+      }
     }
+    localStorage.setItem("user", JSON.stringify(userData));
+    setUser(userData);
+  }, []);
 
-    const authOptions = {
-      ...options,
-      headers,
-    };
+  const authFetch = useCallback(
+    async (url, options = {}) => {
+      const cookieSession = usesCookieSession(user);
+      if (cookieSession) return cookieFetch(url, options);
 
-    let response = await fetch(url, authOptions);
+      const request = (requestUrl, requestOptions) => {
+        const headers = new Headers(requestOptions.headers || {});
+        const accessToken = localStorage.getItem("accessToken");
+        if (accessToken) {
+          headers.set("Authorization", `Bearer ${accessToken}`);
+        }
+        if (
+          requestOptions.body &&
+          !(requestOptions.body instanceof FormData) &&
+          !headers.has("Content-Type")
+        ) {
+          headers.set("Content-Type", "application/json");
+        }
+        return fetch(requestUrl, { ...requestOptions, headers });
+      };
 
-    if (response.status === 401 && !url.includes('/api/refresh-token/')) {
-      const newAccessToken = await refreshAccessToken();
-      if (!newAccessToken) {
-        throw new Error('Session expired. Please log in again.');
+      let response = await request(url, options);
+
+      if (response.status === 401 && !url.includes("/refresh-token/")) {
+        const refreshed = await refreshAccessToken();
+        if (!refreshed) {
+          throw new Error("Session expired. Please log in again.");
+        }
+        response = await request(url, options);
       }
 
-      authOptions.headers.Authorization = `Bearer ${newAccessToken}`;
-      response = await fetch(url, authOptions);
-    }
-
-    return response;
-  };
+      return response;
+    },
+    [refreshAccessToken, user],
+  );
 
   const value = {
     user,
@@ -135,11 +342,7 @@ export const AuthProvider = ({ children }) => {
     authFetch,
   };
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
 export default AuthContext;

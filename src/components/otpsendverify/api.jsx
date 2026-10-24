@@ -1,4 +1,9 @@
-const API_BASE = "https://wecdukaward.in/balvirtaawardproject/balvirtaawardproject_backend/api";
+import { cookieFetch } from "../login/AuthContext";
+
+const API_BASE =
+  "https://wecdukaward.in/balvirtaawardproject/balvirtaawardproject_backend/api";
+const LOGIN_API_BASE =
+  "https://mahadevaaya.com/wecdallaward/wecdallaward_backend/api";
 
 const maskMobile = (mobile) => {
   const value = String(mobile || "");
@@ -89,7 +94,7 @@ export const submitNominatorPart1 = async (data, token) => {
 export const sendOtpLoginApi = async (mobile, role) => {
   console.info("[OTP-LOGIN][send] request", { mobile: maskMobile(mobile), role });
   try {
-    const res = await fetch(`${API_BASE}/send-otp-login-api/`, {
+    const res = await cookieFetch(`${LOGIN_API_BASE}/send-otp-login-api/`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ phone: mobile, role }),
@@ -112,7 +117,7 @@ export const sendOtpLoginApi = async (mobile, role) => {
 export const verifyOtpLoginApi = async (mobile, role, otp) => {
   console.info("[OTP-LOGIN][verify] request", { mobile: maskMobile(mobile), role });
   try {
-    const res = await fetch(`${API_BASE}/verify-otp-login-api/`, {
+    const res = await cookieFetch(`${LOGIN_API_BASE}/verify-otp-login-api/`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ phone: mobile, role, otp }),

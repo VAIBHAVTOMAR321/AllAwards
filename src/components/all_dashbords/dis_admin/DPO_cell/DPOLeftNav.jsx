@@ -10,11 +10,11 @@ import {
   FaUserCircle,
 } from "react-icons/fa";
 import { Link, useLocation } from "react-router-dom";
-import { useAuth } from "../../../login/AuthContext";
+import { cookieFetch, useAuth } from "../../../login/AuthContext";
 import "../../../../assets/css/dpoleftnav.css";
 
 const DISTRICT_PROFILE_URL =
-  "https://wecdukaward.in/balvirtaawardproject/balvirtaawardproject_backend/api/district-profile/";
+  "https://mahadevaaya.com/wecdallaward/wecdallaward_backend/api/district-profile/";
 
 const DPOLeftNav = ({ sidebarOpen, setSidebarOpen, isMobile, isTablet, onNavClick }) => {
   const { logout, authFetch } = useAuth();
@@ -39,7 +39,7 @@ const DPOLeftNav = ({ sidebarOpen, setSidebarOpen, isMobile, isTablet, onNavClic
       try {
         const request = authFetchRef.current
           ? authFetchRef.current(DISTRICT_PROFILE_URL)
-          : fetch(DISTRICT_PROFILE_URL, {
+          : cookieFetch(DISTRICT_PROFILE_URL, {
               headers: {
                 "Content-Type": "application/json",
                 ...(localStorage.getItem("accessToken")

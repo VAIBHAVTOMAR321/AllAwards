@@ -1,5 +1,7 @@
+import { cookieFetch } from "../../../login/AuthContext";
+
 const APPLICANT_REQUESTS_URL =
-  "https://wecdukaward.in/balvirtaawardproject/balvirtaawardproject_backend/api/applicant-requests/it-cell/";
+  "https://mahadevaaya.com/wecdallaward/wecdallaward_backend/api/applicant-requests/it-cell/";
 
 const getAuthHeaders = () => {
   const accessToken = localStorage.getItem("accessToken");
@@ -11,7 +13,7 @@ const getAuthHeaders = () => {
 
 /** Fetches the applicant queries raised by users (IT Cell inbox). */
 export const fetchApplicantRequests = async () => {
-  const response = await fetch(APPLICANT_REQUESTS_URL, {
+  const response = await cookieFetch(APPLICANT_REQUESTS_URL, {
     method: "GET",
     headers: getAuthHeaders(),
   });
