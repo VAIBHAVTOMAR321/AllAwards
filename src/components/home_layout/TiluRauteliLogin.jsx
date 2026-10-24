@@ -11,13 +11,15 @@ import {
 } from "react-icons/fa";
 import { useAuth } from "../login/AuthContext";
 import womenImage from "../../assets/images/images-11.jpeg";
-import { loginAwardPortal } from "./awardPortalLogin";
-import { sendOtpApi, verifyOtpApi } from "../otpsendverify/api";
+import {
+  fetchDistrictList,
+  loginTiluUser,
+  registerTiluUser,
+  sendTiluRegistrationOtp,
+  verifyTiluRegistrationOtp,
+} from "./awardPortalLogin";
 import AwardPasswordRecovery from "./AwardPasswordRecovery";
 import "./TiluRauteliLogin.css";
-
-const DISTRICTS_API =
-  "https://wecdukaward.in/balvirtaawardproject/balvirtaawardproject_backend/api/cdpo-dropdown/";
 
 export default function TiluRauteliLogin() {
   const [phone, setPhone] = useState("");
@@ -32,6 +34,9 @@ export default function TiluRauteliLogin() {
     district: "",
   });
   const [registrationOtp, setRegistrationOtp] = useState("");
+  const [registrationPassword, setRegistrationPassword] = useState("");
+  const [registrationConfirmPassword, setRegistrationConfirmPassword] =
+    useState("");
   const [districts, setDistricts] = useState([]);
   const [districtsLoading, setDistrictsLoading] = useState(false);
   const [registrationLoading, setRegistrationLoading] = useState(false);
@@ -59,16 +64,13 @@ export default function TiluRauteliLogin() {
     setShowRegistration(true);
     setRegistrationStep("details");
     setRegistrationError("");
+    setRegistrationPassword("");
+    setRegistrationConfirmPassword("");
     if (districts.length || districtsLoading) return;
 
     setDistrictsLoading(true);
     try {
-      const response = await fetch(DISTRICTS_API);
-      const result = await response.json();
-      if (!response.ok || result.success === false || !Array.isArray(result.data)) {
-        throw new Error(result.message || "जनपद सूची लोड नहीं हो सकी।");
-      }
-      setDistricts([...new Set(result.data.map((item) => item.district).filter(Boolean))]);
+      setDistricts(await fetchDistrictList());
     } catch (districtError) {
       setRegistrationError(districtError.message || "जनपद सूची लोड नहीं हो सकी।");
     } finally {
@@ -98,7 +100,7 @@ export default function TiluRauteliLogin() {
 
     setRegistrationLoading(true);
     try {
-      await sendOtpApi(registration.phone);
+      await sendTiluRegistrationOtp(registration.phone);
       setRegistrationOtp("");
       setRegistrationStep("otp");
     } catch (otpError) {
@@ -118,10 +120,44 @@ export default function TiluRauteliLogin() {
 
     setRegistrationLoading(true);
     try {
-      await verifyOtpApi(registration.phone, registrationOtp);
+      await verifyTiluRegistrationOtp(registration.phone, registrationOtp);
       setRegistrationStep("verified");
     } catch (otpError) {
       setRegistrationError(otpError.message || "OTP सत्यापन विफल।");
+    } finally {
+      setRegistrationLoading(false);
+    }
+  };
+
+  const handleTiluRegistration = async (event) => {
+    event.preventDefault();
+    setRegistrationError("");
+    if (registrationPassword !== registrationConfirmPassword) {
+      setRegistrationError("दोनों पासवर्ड मेल नहीं खाते।");
+      return;
+    }
+
+    setRegistrationLoading(true);
+    try {
+      await registerTiluUser({
+        ...registration,
+        password: registrationPassword,
+      });
+      const loginData = await loginTiluUser(
+        registration.phone,
+        registrationPassword,
+      );
+      const account = loginData.user || loginData;
+      login({
+        role: account.role || "telu-rautli-user",
+        user: account,
+      });
+      setShowRegistration(false);
+      navigate("/TiluRauteliUserDashboard", { replace: true });
+    } catch (registrationSubmitError) {
+      setRegistrationError(
+        registrationSubmitError.message || "पंजीकरण पूरा नहीं हो सका।",
+      );
     } finally {
       setRegistrationLoading(false);
     }
@@ -133,8 +169,13 @@ export default function TiluRauteliLogin() {
     setLoading(true);
 
     try {
-      await loginAwardPortal(phone.trim(), password, login);
-      navigate("/UserDashBoard");
+      const loginData = await loginTiluUser(phone.trim(), password);
+      const account = loginData.user || loginData;
+      login({
+        role: account.role || "telu-rautli-user",
+        user: account,
+      });
+      navigate("/TiluRauteliUserDashboard", { replace: true });
     } catch (loginError) {
       setError(loginError.message);
     } finally {
@@ -268,7 +309,9 @@ export default function TiluRauteliLogin() {
                     ? "नया पंजीकरण"
                     : registrationStep === "otp"
                       ? "मोबाइल सत्यापन"
-                      : "मोबाइल सत्यापित"}
+                      : registrationStep === "verified"
+                        ? "पासवर्ड बनाएं"
+                        : "पंजीकरण पूरा"}
                 </h2>
               </div>
               <button
@@ -406,21 +449,58 @@ export default function TiluRauteliLogin() {
             )}
 
             {registrationStep === "verified" && (
-              <div className="tilu-registration-body">
-                <p className="tilu-registration-success" role="status">
-                  मोबाइल नंबर सत्यापित हो गया है।
-                </p>
-                <p className="tilu-registration-hint">
-                  इस परियोजना में पंजीकरण पूरा करने के लिए खाता बनाने की सेवा अभी उपलब्ध नहीं है।
-                </p>
-                <button
-                  type="button"
-                  className="tilu-registration-done"
-                  onClick={closeRegistration}
-                >
-                  बंद करें
-                </button>
-              </div>
+              <form onSubmit={handleTiluRegistration}>
+                <div className="tilu-registration-body">
+                  <p className="tilu-registration-success" role="status">
+                    मोबाइल नंबर सत्यापित हो गया है। अब अपना पासवर्ड बनाएं।
+                  </p>
+                  <label htmlFor="tilu-register-password">पासवर्ड <span>*</span></label>
+                  <div className="tilu-registration-input">
+                    <FaKey aria-hidden="true" />
+                    <input
+                      id="tilu-register-password"
+                      type="password"
+                      autoComplete="new-password"
+                      value={registrationPassword}
+                      onChange={(event) =>
+                        setRegistrationPassword(event.target.value)
+                      }
+                      placeholder="पासवर्ड दर्ज करें"
+                      required
+                    />
+                  </div>
+                  <label htmlFor="tilu-register-confirm-password">
+                    पासवर्ड की पुष्टि करें <span>*</span>
+                  </label>
+                  <div className="tilu-registration-input">
+                    <FaKey aria-hidden="true" />
+                    <input
+                      id="tilu-register-confirm-password"
+                      type="password"
+                      autoComplete="new-password"
+                      value={registrationConfirmPassword}
+                      onChange={(event) =>
+                        setRegistrationConfirmPassword(event.target.value)
+                      }
+                      placeholder="पासवर्ड दोबारा दर्ज करें"
+                      required
+                    />
+                  </div>
+                  {registrationError && (
+                    <p className="tilu-registration-error" role="alert">
+                      {registrationError}
+                    </p>
+                  )}
+                </div>
+                <footer className="tilu-registration-footer">
+                  <button type="submit" disabled={registrationLoading}>
+                    {registrationLoading
+                      ? "पंजीकरण हो रहा है..."
+                      : "पंजीकरण पूरा करें"}
+                    <FaArrowRight aria-hidden="true" />
+                  </button>
+                </footer>
+              </form>
             )}
           </section>
         </div>

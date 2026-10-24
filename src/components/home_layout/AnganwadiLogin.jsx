@@ -11,13 +11,10 @@ import {
 } from "react-icons/fa";
 import { useAuth } from "../login/AuthContext";
 import anganwadiImage from "../../assets/images/images-5.jpeg";
-import { loginAwardPortal } from "./awardPortalLogin";
+import { fetchDistrictList, loginAwardPortal } from "./awardPortalLogin";
 import { sendOtpApi, verifyOtpApi } from "../otpsendverify/api";
 import AwardPasswordRecovery from "./AwardPasswordRecovery";
 import "./AnganwadiLogin.css";
-
-const DISTRICTS_API =
-  "https://wecdukaward.in/balvirtaawardproject/balvirtaawardproject_backend/api/cdpo-dropdown/";
 
 export default function AnganwadiLogin() {
   const [phone, setPhone] = useState("");
@@ -63,12 +60,7 @@ export default function AnganwadiLogin() {
 
     setDistrictsLoading(true);
     try {
-      const response = await fetch(DISTRICTS_API);
-      const result = await response.json();
-      if (!response.ok || result.success === false || !Array.isArray(result.data)) {
-        throw new Error(result.message || "जनपद सूची लोड नहीं हो सकी।");
-      }
-      setDistricts([...new Set(result.data.map((item) => item.district).filter(Boolean))]);
+      setDistricts(await fetchDistrictList());
     } catch (districtError) {
       setRegistrationError(districtError.message || "जनपद सूची लोड नहीं हो सकी।");
     } finally {
@@ -133,8 +125,8 @@ export default function AnganwadiLogin() {
     setLoading(true);
 
     try {
-      await loginAwardPortal(phone.trim(), password, login);
-      navigate("/UserDashBoard");
+      await loginAwardPortal(phone.trim(), password, login, "anganwadi");
+      navigate("/AnganwadiUserDashboard");
     } catch (loginError) {
       setError(loginError.message);
     } finally {

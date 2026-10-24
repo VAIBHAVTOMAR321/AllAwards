@@ -1,5 +1,55 @@
+import { cookieFetch } from "../login/AuthContext";
+
 const API_BASE =
   "https://wecdukaward.in/balvirtaawardproject/balvirtaawardproject_backend/api";
+const TELU_API_BASE =
+  "https://mahadevaaya.com/wecdallaward/wecdallaward_backend/api/telu-roteli";
+const DISTRICTS_API =
+  "https://mahadevaaya.com/wecdallaward/wecdallaward_backend/api/districts/list/";
+
+export async function fetchDistrictList() {
+  const response = await fetch(DISTRICTS_API, { credentials: "include" });
+  const data = await response.json().catch(() => ({}));
+
+  if (!response.ok || data.success === false || !Array.isArray(data.districts)) {
+    throw new Error(data.message || "जनपद सूची लोड नहीं हो सकी।");
+  }
+
+  return [...new Set(data.districts.map(({ district }) => district).filter(Boolean))];
+}
+
+const postTiluApi = async (path, body, fallbackMessage) => {
+  const response = await cookieFetch(`${TELU_API_BASE}/${path}/`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok || data.success === false) {
+    throw new Error(data.detail || data.message || fallbackMessage);
+  }
+  return data;
+};
+
+export const sendTiluRegistrationOtp = (phone) =>
+  postTiluApi("send-otp", { phone }, "OTP भेजने में विफल।");
+
+export const verifyTiluRegistrationOtp = (phone, otp) =>
+  postTiluApi("verify-otp", { phone, otp }, "OTP सत्यापन विफल।");
+
+export const registerTiluUser = ({ district, email, phone, password }) =>
+  postTiluApi(
+    "register",
+    { district, email, phone, password },
+    "पंजीकरण पूरा नहीं हो सका।",
+  );
+
+export const loginTiluUser = (phone, password) =>
+  postTiluApi(
+    "login",
+    { phone, password, role: "telu-rautli-user" },
+    "लॉगिन विफल। कृपया मोबाइल नंबर और पासवर्ड जांचें।",
+  );
 
 async function postAwardPortalApi(path, body, fallbackMessage) {
   const response = await fetch(`${API_BASE}${path}`, {
@@ -18,13 +68,13 @@ async function postAwardPortalApi(path, body, fallbackMessage) {
   return data;
 }
 
-export async function loginAwardPortal(phone, password, login) {
+export async function loginAwardPortal(phone, password, login, portal) {
   const data = await postAwardPortalApi(
     "/login/",
     { phone, password, role: "user" },
     "लॉगिन विफल। कृपया क्रेडेंशियल जांचें।",
   );
-  login(data);
+  login(portal ? { ...data, portal } : data);
 }
 
 export async function sendAwardPasswordOtp(phone) {

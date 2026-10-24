@@ -30,8 +30,24 @@ export default defineConfig({
               );
             }
           });
-          proxy.on("proxyRes", (proxyResponse) => {
+          proxy.on("proxyRes", (proxyResponse, proxyRequest) => {
             const setCookies = proxyResponse.headers["set-cookie"];
+            const requestUrl = proxyRequest.url || "";
+            if (/\/refresh-token\/?$/.test(requestUrl)) {
+              const cookieNames = Array.isArray(setCookies)
+                ? setCookies.map((cookie) =>
+                    cookie.slice(0, cookie.indexOf("=")),
+                  )
+                : [];
+              const refreshedBothTokens =
+                cookieNames.includes("access_token") &&
+                cookieNames.includes("refresh_token");
+              proxyResponse.headers["x-auth-cookies-refreshed"] =
+                refreshedBothTokens ? "true" : "false";
+              console.info(
+                `[Vite API proxy] Refresh response updated access and refresh cookies: ${refreshedBothTokens}`,
+              );
+            }
             if (!Array.isArray(setCookies)) {
               console.info(
                 `[Vite API proxy] ${proxyResponse.statusCode} response has no Set-Cookie header`,

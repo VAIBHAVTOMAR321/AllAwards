@@ -21,20 +21,25 @@ const isCookieAuthEndpoint = (url) =>
   [
     "/send-otp-login-api/",
     "/verify-otp-login-api/",
+    "/telu-roteli/send-otp/",
+    "/telu-roteli/verify-otp/",
+    "/telu-roteli/register/",
+    "/telu-roteli/login/",
     "/refresh-token/",
     "/logout/",
   ].some((path) => url.includes(path));
-
-const isRefreshSessionExpired = (data) =>
-  /refresh.{0,20}(expired|invalid)|token.{0,20}(expired|invalid)/i.test(
-    `${data?.detail || ""} ${data?.message || ""}`,
-  );
 
 const getUserRole = (userData) =>
   (userData?.role || userData?.user?.role || "").toLowerCase().replace(/-/g, "_");
 
 const usesCookieSession = (userData) =>
-  ["director", "dpo", "cdpo", "it_cell"].includes(getUserRole(userData));
+  [
+    "director",
+    "dpo",
+    "cdpo",
+    "it_cell",
+    "telu_rautli_user",
+  ].includes(getUserRole(userData));
 
 export const useAuth = () => useContext(AuthContext);
 
@@ -89,6 +94,21 @@ const rawCookieFetch = (url, options = {}) => {
   });
 };
 
+const expireCookieSession = async (reason) => {
+  console.error("Cookie session expired:", reason);
+  try {
+    const response = await rawCookieFetch(LOGOUT_URL, { method: "POST" });
+    if (!response.ok) {
+      console.error(
+        `Backend could not clear expired auth cookies (HTTP ${response.status}).`,
+      );
+    }
+  } catch (error) {
+    console.error("Unable to request expired cookie cleanup:", error);
+  }
+  window.dispatchEvent(new Event("cookie-session-expired"));
+};
+
 const refreshCookieSession = async () => {
   if (!cookieRefreshPromise) {
     cookieRefreshPromise = rawCookieFetch(REFRESH_URL, {
@@ -96,15 +116,25 @@ const refreshCookieSession = async () => {
       requireCsrf: true,
     })
       .then(async (response) => {
-        if (response.ok) return true;
         const data = await response.clone().json().catch(() => ({}));
-        if (response.status === 401) {
-          if (isRefreshSessionExpired(data)) {
-            window.dispatchEvent(new Event("cookie-session-expired"));
+        if (response.ok) {
+          if (data.success === false) {
+            await expireCookieSession(
+              data.detail || data.message || "Refresh response reported an expired session.",
+            );
+            return false;
           }
-          console.error(
-            "Cookie refresh was unauthorized:",
-            data.detail || data.message || `HTTP ${response.status}`,
+          if (response.headers.get("x-auth-cookies-refreshed") === "false") {
+            await expireCookieSession(
+              "The refresh response did not set both access_token and refresh_token cookies.",
+            );
+            return false;
+          }
+          return true;
+        }
+        if ([400, 401].includes(response.status)) {
+          await expireCookieSession(
+            data.detail || data.message || `Refresh rejected (HTTP ${response.status}).`,
           );
           return false;
         }
@@ -115,6 +145,10 @@ const refreshCookieSession = async () => {
               "Session refresh was rejected because the CSRF token is missing or invalid. The login is preserved; check the csrftoken cookie and X-CSRFToken header.",
             );
           }
+          await expireCookieSession(
+            detail || "Refresh was forbidden; the session can no longer be renewed.",
+          );
+          return false;
         }
         throw new Error(
           data.detail ||
@@ -162,6 +196,7 @@ const readStoredUser = () => {
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(readStoredUser);
+  const initialUserRef = useRef(user);
   const navigate = useNavigate();
   const refreshPromiseRef = useRef(null);
 
@@ -173,9 +208,13 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
 
     const normalizedRole = (role || "").toLowerCase().replace(/-/g, "_");
-    navigate(normalizedRole === "it_cell" ? "/loginit" : "/Login", {
-      replace: true,
-    });
+    const loginPath =
+      normalizedRole === "it_cell"
+        ? "/loginit"
+        : normalizedRole === "telu_rautli_user"
+          ? "/TiluRauteliLogin"
+          : "/Login";
+    navigate(loginPath, { replace: true });
   }, [navigate, user]);
 
   useEffect(() => {
@@ -183,6 +222,26 @@ export const AuthProvider = ({ children }) => {
     return () =>
       window.removeEventListener("cookie-session-expired", clearCookieSession);
   }, [clearCookieSession]);
+
+  useEffect(() => {
+    if (!usesCookieSession(initialUserRef.current)) return;
+
+    refreshCookieSession().catch((error) => {
+      console.error("Initial cookie session refresh failed:", error);
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!usesCookieSession(user)) return undefined;
+
+    const intervalId = window.setInterval(() => {
+      refreshCookieSession().catch((error) => {
+        console.error("Periodic cookie session refresh failed:", error);
+      });
+    }, 60_000);
+
+    return () => window.clearInterval(intervalId);
+  }, [user]);
 
   useEffect(() => {
     if (usesCookieSession(user)) {
@@ -220,6 +279,10 @@ export const AuthProvider = ({ children }) => {
     const normalizedRole = (role || "").toLowerCase().replace(/-/g, "_");
     if (normalizedRole === "it_cell") {
       navigate("/loginit", { replace: true });
+    } else if (normalizedRole === "telu_rautli_user") {
+      navigate("/TiluRauteliLogin", { replace: true });
+    } else if (normalizedRole === "user" && user?.portal === "anganwadi") {
+      navigate("/AnganwadiLogin", { replace: true });
     } else if (normalizedRole === "user") {
       navigate("/", { replace: true });
     } else {

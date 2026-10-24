@@ -34,21 +34,38 @@ import DpoPhoneList from "./components/all_dashbords/dis_admin/IT_celll/DpoPhone
 import ApplicantQueries from "./components/all_dashbords/dis_admin/IT_celll/ApplicantQueries";
 import DPODashboard from "./components/all_dashbords/dis_admin/DPO_cell/DPODashboard";
 import CDPODashboard from "./components/all_dashbords/dis_admin/CDPO_cell/CDPODashboard";
+import TiluRauteliUserDashboard from "./components/all_dashbords/dis_admin/TiluRauteli_user_dashboard/TiluRauteliUserDashboard";
+import AnganwadiUserDashboard from "./components/all_dashbords/dis_admin/Anganwadi_user_dashboard/AnganwadiUserDashboard";
 import { useAuth } from "./components/login/AuthContext";
 
-const roleLoginPath = (role) => (role === "it_cell" ? "/loginit" : "/Login");
+const roleLoginPath = (role, portal) => {
+  if (portal === "anganwadi") return "/AnganwadiLogin";
+  if (role === "it_cell") return "/loginit";
+  if (role === "telu_rautli_user") return "/TiluRauteliLogin";
+  return "/Login";
+};
 
-const ProtectedRoute = ({ allowedRoles, children }) => {
+const ProtectedRoute = ({ allowedRoles, children, loginPath }) => {
   const { user } = useAuth();
   const normalizedRole = (user?.role || user?.user?.role || "")
     .toLowerCase()
     .replace(/-/g, "_");
 
   if (!user) {
-    return <Navigate to={roleLoginPath(allowedRoles[0])} replace />;
+    return (
+      <Navigate
+        to={loginPath || roleLoginPath(allowedRoles[0])}
+        replace
+      />
+    );
   }
   if (!allowedRoles.includes(normalizedRole)) {
-    return <Navigate to={roleLoginPath(normalizedRole)} replace />;
+    return (
+      <Navigate
+        to={roleLoginPath(normalizedRole, user.portal)}
+        replace
+      />
+    );
   }
   return children;
 };
@@ -64,6 +81,8 @@ const AppContent = () => {
     "/ITCellApplicantQueries",
     "/DPODashBoard",
     "/CDPODashBoard",
+    "/TiluRauteliUserDashboard",
+    "/AnganwadiUserDashboard",
     "/DisDashBoard",
   ].some((route) => location.pathname.startsWith(route));
   const isHomeRoute = normalizedPath === "/";
@@ -101,6 +120,25 @@ const AppContent = () => {
             element={
               <ProtectedRoute allowedRoles={["user"]}>
                 <UserDashBoard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/AnganwadiUserDashboard"
+            element={
+              <ProtectedRoute
+                allowedRoles={["user"]}
+                loginPath="/AnganwadiLogin"
+              >
+                <AnganwadiUserDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/TiluRauteliUserDashboard"
+            element={
+              <ProtectedRoute allowedRoles={["telu_rautli_user"]}>
+                <TiluRauteliUserDashboard />
               </ProtectedRoute>
             }
           />
