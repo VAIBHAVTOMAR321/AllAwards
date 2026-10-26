@@ -4,18 +4,40 @@ const API_BASE =
   "https://wecdukaward.in/balvirtaawardproject/balvirtaawardproject_backend/api";
 const TELU_API_BASE =
   "https://mahadevaaya.com/wecdallaward/wecdallaward_backend/api/telu-roteli";
-const DISTRICTS_API =
-  "https://mahadevaaya.com/wecdallaward/wecdallaward_backend/api/districts/list/";
+const TILU_DISTRICTS_API =
+  "https://mahadevaaya.com/wecdallaward/wecdallaward_backend/api/cdpo-dropdown/";
 
 export async function fetchDistrictList() {
-  const response = await fetch(DISTRICTS_API, { credentials: "include" });
+  const response = await fetch(TILU_DISTRICTS_API, {
+    credentials: "omit",
+  });
   const data = await response.json().catch(() => ({}));
 
-  if (!response.ok || data.success === false || !Array.isArray(data.districts)) {
-    throw new Error(data.message || "जनपद सूची लोड नहीं हो सकी।");
+  if (!response.ok || data.success === false || !Array.isArray(data.data)) {
+    throw new Error(data.message || data.detail || "जनपद सूची लोड नहीं हो सकी।");
   }
 
-  return [...new Set(data.districts.map(({ district }) => district).filter(Boolean))];
+  return [
+    ...new Set(data.data.map(({ district }) => district).filter(Boolean)),
+  ];
+}
+
+export async function fetchTiluBlockList(district) {
+  if (!district) return [];
+
+  const response = await fetch(
+    `${TILU_DISTRICTS_API}?district=${encodeURIComponent(district)}`,
+    { credentials: "omit" },
+  );
+  const data = await response.json().catch(() => ({}));
+
+  if (!response.ok || data.success === false || !Array.isArray(data.data)) {
+    throw new Error(data.message || data.detail || "ब्लॉक सूची लोड नहीं हो सकी।");
+  }
+
+  return [
+    ...new Set(data.data.map(({ project_name }) => project_name).filter(Boolean)),
+  ];
 }
 
 const postTiluApi = async (path, body, fallbackMessage) => {
@@ -37,10 +59,18 @@ export const sendTiluRegistrationOtp = (phone) =>
 export const verifyTiluRegistrationOtp = (phone, otp) =>
   postTiluApi("verify-otp", { phone, otp }, "OTP सत्यापन विफल।");
 
-export const registerTiluUser = ({ district, email, phone, password }) =>
+export const registerTiluUser = ({
+  email,
+  phone,
+  password,
+  name,
+  adhar_no,
+  district,
+  project,
+}) =>
   postTiluApi(
     "register",
-    { district, email, phone, password },
+    { district, email, phone, password, name, adhar_no, project },
     "पंजीकरण पूरा नहीं हो सका।",
   );
 

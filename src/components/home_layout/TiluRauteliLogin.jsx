@@ -1,18 +1,22 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
+  FaAddressCard,
   FaArrowRight,
+  FaEnvelope,
   FaEye,
   FaEyeSlash,
   FaKey,
   FaMapMarkerAlt,
   FaMobileAlt,
+  FaUser,
   FaUserShield,
 } from "react-icons/fa";
 import { useAuth } from "../login/AuthContext";
 import womenImage from "../../assets/images/images-11.jpeg";
 import {
   fetchDistrictList,
+  fetchTiluBlockList,
   loginTiluUser,
   registerTiluUser,
   sendTiluRegistrationOtp,
@@ -29,16 +33,21 @@ export default function TiluRauteliLogin() {
   const [showRegistration, setShowRegistration] = useState(false);
   const [registrationStep, setRegistrationStep] = useState("details");
   const [registration, setRegistration] = useState({
-    phone: "",
     email: "",
+    phone: "",
+    name: "",
+    adhar_no: "",
     district: "",
+    block: "",
   });
   const [registrationOtp, setRegistrationOtp] = useState("");
   const [registrationPassword, setRegistrationPassword] = useState("");
   const [registrationConfirmPassword, setRegistrationConfirmPassword] =
     useState("");
   const [districts, setDistricts] = useState([]);
+  const [blocks, setBlocks] = useState([]);
   const [districtsLoading, setDistrictsLoading] = useState(false);
+  const [blocksLoading, setBlocksLoading] = useState(false);
   const [registrationLoading, setRegistrationLoading] = useState(false);
   const [registrationError, setRegistrationError] = useState("");
   const [error, setError] = useState("");
@@ -78,6 +87,22 @@ export default function TiluRauteliLogin() {
     }
   }, [districts.length, districtsLoading]);
 
+  const handleDistrictChange = async (district) => {
+    setRegistration((current) => ({ ...current, district, block: "" }));
+    setBlocks([]);
+    setRegistrationError("");
+    if (!district) return;
+
+    setBlocksLoading(true);
+    try {
+      setBlocks(await fetchTiluBlockList(district));
+    } catch (blockError) {
+      setRegistrationError(blockError.message || "ब्लॉक सूची लोड नहीं हो सकी।");
+    } finally {
+      setBlocksLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (!location.state?.openRegistration) return;
     openRegistration();
@@ -95,6 +120,14 @@ export default function TiluRauteliLogin() {
     setRegistrationError("");
     if (!/^[0-9]{10}$/.test(registration.phone)) {
       setRegistrationError("कृपया 10 अंकों का मोबाइल नंबर दर्ज करें।");
+      return;
+    }
+    if (!registration.name.trim() || !/^[0-9]{12}$/.test(registration.adhar_no)) {
+      setRegistrationError("कृपया उम्मीदवार का नाम और 12 अंकों का आधार नंबर दर्ज करें।");
+      return;
+    }
+    if (!registration.district || !registration.block) {
+      setRegistrationError("कृपया जनपद और ब्लॉक/परियोजना चुनें।");
       return;
     }
 
@@ -140,8 +173,13 @@ export default function TiluRauteliLogin() {
     setRegistrationLoading(true);
     try {
       await registerTiluUser({
-        ...registration,
+        email: registration.email.trim(),
+        phone: registration.phone,
         password: registrationPassword,
+        name: registration.name.trim(),
+        adhar_no: registration.adhar_no,
+        district: registration.district,
+        project: registration.block,
       });
       const loginData = await loginTiluUser(
         registration.phone,
@@ -327,8 +365,46 @@ export default function TiluRauteliLogin() {
               <form onSubmit={handleRegistrationSubmit}>
                 <div className="tilu-registration-body">
                   <p className="tilu-registration-hint">
-                    कृपया अपना मोबाइल नंबर, ईमेल और जनपद दर्ज करें।
+                    कृपया उम्मीदवार की जानकारी और पंजीकृत मोबाइल नंबर भरें।
                   </p>
+                  <label htmlFor="tilu-register-name">उम्मीदवार का नाम <span>*</span></label>
+                  <div className="tilu-registration-input">
+                    <FaUser aria-hidden="true" />
+                    <input
+                      id="tilu-register-name"
+                      type="text"
+                      autoComplete="name"
+                      value={registration.name}
+                      onChange={(event) =>
+                        setRegistration((current) => ({
+                          ...current,
+                          name: event.target.value,
+                        }))
+                      }
+                      placeholder="उम्मीदवार का नाम दर्ज करें"
+                      required
+                    />
+                  </div>
+
+                  <label htmlFor="tilu-register-email">ईमेल <span>*</span></label>
+                  <div className="tilu-registration-input">
+                    <FaEnvelope aria-hidden="true" />
+                    <input
+                      id="tilu-register-email"
+                      type="email"
+                      autoComplete="email"
+                      value={registration.email}
+                      onChange={(event) =>
+                        setRegistration((current) => ({
+                          ...current,
+                          email: event.target.value,
+                        }))
+                      }
+                      placeholder="ईमेल पता दर्ज करें"
+                      required
+                    />
+                  </div>
+
                   <label htmlFor="tilu-register-phone">मोबाइल नंबर <span>*</span></label>
                   <div className="tilu-registration-input">
                     <FaMobileAlt aria-hidden="true" />
@@ -350,21 +426,23 @@ export default function TiluRauteliLogin() {
                     />
                   </div>
 
-                  <label htmlFor="tilu-register-email">ईमेल पता <span>*</span></label>
+                  <label htmlFor="tilu-register-adhar">आधार नंबर <span>*</span></label>
                   <div className="tilu-registration-input">
-                    <span aria-hidden="true">@</span>
+                    <FaAddressCard aria-hidden="true" />
                     <input
-                      id="tilu-register-email"
-                      type="email"
-                      autoComplete="email"
-                      value={registration.email}
+                      id="tilu-register-adhar"
+                      type="text"
+                      inputMode="numeric"
+                      autoComplete="off"
+                      maxLength={12}
+                      value={registration.adhar_no}
                       onChange={(event) =>
                         setRegistration((current) => ({
                           ...current,
-                          email: event.target.value,
+                          adhar_no: event.target.value.replace(/\D/g, "").slice(0, 12),
                         }))
                       }
-                      placeholder="ईमेल पता दर्ज करें"
+                      placeholder="12 अंकों का आधार नंबर"
                       required
                     />
                   </div>
@@ -376,10 +454,7 @@ export default function TiluRauteliLogin() {
                       id="tilu-register-district"
                       value={registration.district}
                       onChange={(event) =>
-                        setRegistration((current) => ({
-                          ...current,
-                          district: event.target.value,
-                        }))
+                        handleDistrictChange(event.target.value)
                       }
                       disabled={districtsLoading}
                       required
@@ -392,6 +467,32 @@ export default function TiluRauteliLogin() {
                       ))}
                     </select>
                   </div>
+
+                  <label htmlFor="tilu-register-block">ब्लॉक/परियोजना <span>*</span></label>
+                  <div className="tilu-registration-input">
+                    <FaMapMarkerAlt aria-hidden="true" />
+                    <select
+                      id="tilu-register-block"
+                      value={registration.block}
+                      onChange={(event) =>
+                        setRegistration((current) => ({
+                          ...current,
+                          block: event.target.value,
+                        }))
+                      }
+                      disabled={!registration.district || blocksLoading}
+                      required
+                    >
+                      <option value="">
+                        {blocksLoading
+                          ? "ब्लॉक लोड हो रहे हैं..."
+                          : "ब्लॉक/परियोजना चुनें"}
+                      </option>
+                      {blocks.map((block) => (
+                        <option value={block} key={block}>{block}</option>
+                      ))}
+                    </select>
+                  </div>
                   {registrationError && (
                     <p className="tilu-registration-error" role="alert">
                       {registrationError}
@@ -401,7 +502,13 @@ export default function TiluRauteliLogin() {
                 <footer className="tilu-registration-footer">
                   <button
                     type="submit"
-                    disabled={registrationLoading || districtsLoading || !districts.length}
+                    disabled={
+                      registrationLoading ||
+                      districtsLoading ||
+                      blocksLoading ||
+                      !districts.length ||
+                      !blocks.length
+                    }
                   >
                     {registrationLoading ? "OTP भेज रहे हैं..." : "पंजीकरण जारी रखें"}
                     <FaArrowRight aria-hidden="true" />
@@ -454,6 +561,31 @@ export default function TiluRauteliLogin() {
                   <p className="tilu-registration-success" role="status">
                     मोबाइल नंबर सत्यापित हो गया है। अब अपना पासवर्ड बनाएं।
                   </p>
+                  <label htmlFor="tilu-verified-name">उम्मीदवार का नाम</label>
+                  <div className="tilu-registration-input">
+                    <FaUser aria-hidden="true" />
+                    <input id="tilu-verified-name" value={registration.name} readOnly />
+                  </div>
+                  <label htmlFor="tilu-verified-phone">मोबाइल नंबर</label>
+                  <div className="tilu-registration-input">
+                    <FaMobileAlt aria-hidden="true" />
+                    <input id="tilu-verified-phone" value={registration.phone} readOnly />
+                  </div>
+                  <label htmlFor="tilu-verified-adhar">आधार नंबर</label>
+                  <div className="tilu-registration-input">
+                    <FaAddressCard aria-hidden="true" />
+                    <input id="tilu-verified-adhar" value={registration.adhar_no} readOnly />
+                  </div>
+                  <label htmlFor="tilu-verified-district">जनपद</label>
+                  <div className="tilu-registration-input">
+                    <FaMapMarkerAlt aria-hidden="true" />
+                    <input id="tilu-verified-district" value={registration.district} readOnly />
+                  </div>
+                  <label htmlFor="tilu-verified-block">ब्लॉक/परियोजना</label>
+                  <div className="tilu-registration-input">
+                    <FaMapMarkerAlt aria-hidden="true" />
+                    <input id="tilu-verified-block" value={registration.block} readOnly />
+                  </div>
                   <label htmlFor="tilu-register-password">पासवर्ड <span>*</span></label>
                   <div className="tilu-registration-input">
                     <FaKey aria-hidden="true" />
