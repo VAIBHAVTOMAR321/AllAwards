@@ -142,20 +142,13 @@ export default function AnganwadiLogin() {
       </header>
 
       <section className="anganwadi-login-shell">
-        <div className="anganwadi-heading">
-          <span className="anganwadi-heading-icon" aria-hidden="true">❖</span>
-          <div>
-            <p>राज्य स्तरीय सम्मान</p>
-            <h1>आंगनवाड़ी कार्यकर्त्री पुरस्कार</h1>
-            <span>समर्पित सेवा · सशक्त समुदाय · स्वस्थ भविष्य</span>
-          </div>
-        </div>
+        
 
         <div className="anganwadi-login-content">
           <form className="anganwadi-form-panel" onSubmit={handleSubmit}>
             <div className="anganwadi-form-heading">
-              <span>आवेदक पोर्टल</span>
-              <h2>लॉगिन</h2>
+           
+              <h2>आंगनवाड़ी कार्यकर्त्री पुरस्कार</h2>
               <p>अपना पंजीकृत मोबाइल नंबर और पासवर्ड दर्ज करें।</p>
             </div>
 
