@@ -131,6 +131,13 @@ const APPLICATION_DOCUMENTS = [
     kind: "pdf",
     note: "Upload PDF size 10KB to 20MB",
   },
+  {
+    field: "appli_pdf3",
+    title: "महिला के जीवन का संक्षिप्त विवरण लिखें",
+    accept: ".pdf",
+    kind: "pdf",
+    note: "Upload PDF size 10KB to 20MB",
+  },
 ];
 const parseWorkAreaPoints = (points) => {
   const savedPoints = new Set(
@@ -279,6 +286,7 @@ const TiluRauteliUserDashboard = () => {
     appli_sign: "",
     appli_pdf1: "",
     appli_pdf2: "",
+    appli_pdf3: "",
   });
   const selectedWorkAreas = formData.term1;
 
@@ -744,12 +752,14 @@ const TiluRauteliUserDashboard = () => {
       appli_sign: ["image/jpeg", "image/png", "image/jpg"],
       appli_pdf1: ["application/pdf"],
       appli_pdf2: ["application/pdf"],
+      appli_pdf3: ["application/pdf"],
     };
     const limit = {
       appli_img: 500 * 1024,
       appli_sign: 500 * 1024,
       appli_pdf1: 20 * 1024 * 1024,
       appli_pdf2: 20 * 1024 * 1024,
+      appli_pdf3: 20 * 1024 * 1024,
     };
 
     if (!allowedTypes[field].includes(file.type)) {
@@ -1155,10 +1165,10 @@ const TiluRauteliUserDashboard = () => {
                 )}
               </div>
             </div>
+            
           );
         })}
-      </div>
-      <div className="tilu-form-grid tilu-social-link">
+          <div className="tilu-form-grid tilu-social-link">
         <div className="tilu-grid-half">
           <label className="tilu-field-label" htmlFor="tilu-application-url">
             Social media activity link (वैकल्पिक)
@@ -1173,6 +1183,8 @@ const TiluRauteliUserDashboard = () => {
           />
         </div>
       </div>
+      </div>
+    
     </>
   );
 

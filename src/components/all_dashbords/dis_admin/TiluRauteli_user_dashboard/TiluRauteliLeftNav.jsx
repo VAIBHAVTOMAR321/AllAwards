@@ -3,7 +3,7 @@ import { Nav, Offcanvas } from "react-bootstrap";
 import { FaAward, FaSignOutAlt } from "react-icons/fa";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../../../login/AuthContext";
-import "../../../../assets/css/dpoleftnav.css";
+import "../../../../assets/css/tiluleftnav.css";
 
 const TiluRauteliLeftNav = ({
   sidebarOpen,
@@ -45,7 +45,7 @@ const TiluRauteliLeftNav = ({
 
   return (
     <>
-      <aside className={`dpo-left-nav ${sidebarOpen ? "sidebar-open" : "sidebar-closed"}`}>
+      <aside className={`tilu-left-nav ${sidebarOpen ? "sidebar-open" : "sidebar-closed"}`}>
         <div className="sidebar-header">
           <div className="logo-container"><div className="logo">{sidebarOpen ? "Tilu Rauteli Panel" : "TR"}</div></div>
         </div>
