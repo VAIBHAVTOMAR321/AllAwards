@@ -570,6 +570,79 @@ const TiluRauteliUserDashboard = () => {
     setStatusMessage({ type: "", text: "" });
   };
 
+  const handlePrintPreview = () => {
+    const preview = document.querySelector(".tilu-preview-overlay");
+    if (!preview) {
+      window.alert("आवेदन का पूर्वावलोकन उपलब्ध नहीं है।");
+      return;
+    }
+
+    const printWindow = window.open("", "_blank", "width=1100,height=800");
+    if (!printWindow) {
+      window.alert(
+        "प्रिंट विंडो ब्लॉक हो गई है। कृपया इस साइट के लिए पॉप-अप की अनुमति दें और दोबारा प्रयास करें।",
+      );
+      return;
+    }
+
+    const stylesheets = Array.from(
+      document.querySelectorAll('link[rel="stylesheet"]'),
+    )
+      .map((stylesheet) => `<link rel="stylesheet" href="${stylesheet.href}">`)
+      .join("");
+    const inlineStyles = Array.from(document.querySelectorAll("style"))
+      .map((style) => `<style>${style.textContent}</style>`)
+      .join("");
+
+    printWindow.document.open();
+    printWindow.document.write(`<!doctype html>
+      <html lang="hi">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1">
+          <title>आवेदन का पूर्वावलोकन</title>
+          ${stylesheets}
+          ${inlineStyles}
+          <style>
+            @page { size: A4; margin: 12mm; }
+            html, body { margin: 0; padding: 0; background: #fff; }
+            body * { visibility: visible !important; }
+            .tilu-preview-overlay {
+              position: static !important;
+              display: block !important;
+              padding: 0 !important;
+              background: #fff !important;
+            }
+            .tilu-preview-modal {
+              width: 100% !important;
+              max-height: none !important;
+              display: block !important;
+              overflow: visible !important;
+              border-radius: 0 !important;
+              box-shadow: none !important;
+            }
+            .tilu-preview-content { overflow: visible !important; }
+            .tilu-preview-actions { display: none !important; }
+            .tilu-preview-section {
+              break-inside: avoid;
+              page-break-inside: avoid;
+            }
+            .tilu-preview-section ol,
+            .tilu-preview-section li {
+              text-align: left !important;
+            }
+          </style>
+        </head>
+        <body>${preview.outerHTML}</body>
+      </html>`);
+    printWindow.document.close();
+    printWindow.onafterprint = () => printWindow.close();
+    window.setTimeout(() => {
+      printWindow.focus();
+      printWindow.print();
+    }, 750);
+  };
+
   const handleStepNavigation = (stepNumber) => {
     setCurrentStep(stepNumber);
     setStatusMessage({ type: "", text: "" });
@@ -640,7 +713,22 @@ const TiluRauteliUserDashboard = () => {
       }
       setField(field, payload?.data?.[field] || file.name);
       updateDocumentPreview(field, file);
-      setStatusMessage({ type: "success", text: "दस्तावेज़ सफलतापूर्वक अपलोड किया गया है।" });
+      const allDocumentsUploaded = STEP_FOUR_REQUIRED_DOCUMENTS.every(
+        (requiredField) =>
+          requiredField === field || Boolean(formData[requiredField]),
+      );
+      if (allDocumentsUploaded) {
+        setShowApplicationPreview(true);
+        setStatusMessage({
+          type: "success",
+          text: "सभी दस्तावेज़ सफलतापूर्वक अपलोड हो गए हैं। आवेदन का पूर्वावलोकन खुल गया है।",
+        });
+      } else {
+        setStatusMessage({
+          type: "success",
+          text: "दस्तावेज़ सफलतापूर्वक अपलोड किया गया है।",
+        });
+      }
     } catch (error) {
       setStatusMessage({ type: "error", text: error.message || "डॉक्यूमेंट अपलोड विफल रहा।" });
     } finally {
@@ -1082,11 +1170,12 @@ const TiluRauteliUserDashboard = () => {
               </div>
             )}
 
-            {isApplicationLocked && (
+            {hasAllRequiredDocuments && (
               <button
                 type="button"
                 className="tilu-btn secondary"
                 onClick={() => setShowApplicationPreview(true)}
+                disabled={isSaving}
               >
                 आवेदन का पूर्वावलोकन देखें
               </button>
@@ -1151,13 +1240,24 @@ const TiluRauteliUserDashboard = () => {
               >
                 <header className="tilu-preview-header">
                   <h2 id="tilu-preview-title">आवेदन का पूर्वावलोकन</h2>
-                  <button
-                    type="button"
-                    onClick={() => setShowApplicationPreview(false)}
-                    aria-label="पूर्वावलोकन बंद करें"
-                  >
-                    ×
-                  </button>
+                  <div className="tilu-preview-actions">
+                    <button
+                      type="button"
+                      className="tilu-btn primary tilu-preview-print"
+                      onClick={handlePrintPreview}
+                      title="आवेदन को प्रिंट करें या PDF के रूप में सहेजें"
+                    >
+                      PDF डाउनलोड / प्रिंट
+                    </button>
+                    <button
+                      type="button"
+                      className="tilu-preview-close"
+                      onClick={() => setShowApplicationPreview(false)}
+                      aria-label="पूर्वावलोकन बंद करें"
+                    >
+                      ×
+                    </button>
+                  </div>
                 </header>
                 <div className="tilu-preview-content">
                   <section className="tilu-preview-section">
