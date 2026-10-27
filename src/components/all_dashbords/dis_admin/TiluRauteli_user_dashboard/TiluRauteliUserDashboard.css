@@ -337,6 +337,7 @@
   color: var(--tilu-navy);
   font-size: 0.82rem;
   line-height: 1.45;
+  text-align: justify;
 }
 
 .tilu-field-label .req {
@@ -442,6 +443,7 @@
   font-size: 0.82rem;
   line-height: 1.55;
   cursor: pointer;
+  text-align: justify;
 }
 
 .tilu-step-note {
