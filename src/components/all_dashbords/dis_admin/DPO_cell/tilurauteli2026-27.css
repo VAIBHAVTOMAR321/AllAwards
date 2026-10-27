@@ -313,6 +313,18 @@
   display: block;
 }
 
+.tilu-dpo-signature-cell {
+  text-align: center !important;
+}
+
+.tilu-dpo-signature {
+  display: block;
+  max-width: 180px;
+  max-height: 90px;
+  margin: 0 auto;
+  object-fit: contain;
+}
+
 .tilu-dpo-long-text {
   min-height: 125px;
   white-space: pre-wrap;

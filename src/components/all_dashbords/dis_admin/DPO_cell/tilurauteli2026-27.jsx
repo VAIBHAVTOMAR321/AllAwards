@@ -546,6 +546,20 @@ const TiluRauteli2026_27 = () => {
                           </span>
                         </td>
                       </tr>
+                      <tr>
+                        <th>महिला / किशोरी के हस्ताक्षर</th>
+                        <td className="tilu-dpo-signature-cell">
+                          {selectedApplication.appli_sign ? (
+                            <img
+                              className="tilu-dpo-signature"
+                              src={getMediaUrl(selectedApplication.appli_sign)}
+                              alt="आवेदिका के हस्ताक्षर"
+                            />
+                          ) : (
+                            "दस्तावेज़ उपलब्ध नहीं है।"
+                          )}
+                        </td>
+                      </tr>
                       {renderDetailRows(
                         DETAIL_FIELDS.filter(
                           ([label, field]) => !["appli_url"].includes(field),
