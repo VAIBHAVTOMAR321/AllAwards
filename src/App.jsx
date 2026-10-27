@@ -33,6 +33,7 @@ import ITCellDashBoard from "./components/all_dashbords/dis_admin/IT_celll/ITCel
 import DpoPhoneList from "./components/all_dashbords/dis_admin/IT_celll/DpoPhoneList";
 import ApplicantQueries from "./components/all_dashbords/dis_admin/IT_celll/ApplicantQueries";
 import DPODashboard from "./components/all_dashbords/dis_admin/DPO_cell/DPODashboard";
+import TiluRauteli2026_27 from "./components/all_dashbords/dis_admin/DPO_cell/tilurauteli2026-27";
 import CDPODashboard from "./components/all_dashbords/dis_admin/CDPO_cell/CDPODashboard";
 import TiluRauteliUserDashboard from "./components/all_dashbords/dis_admin/TiluRauteli_user_dashboard/TiluRauteliUserDashboard";
 import AnganwadiUserDashboard from "./components/all_dashbords/dis_admin/Anganwadi_user_dashboard/AnganwadiUserDashboard";
@@ -80,6 +81,7 @@ const AppContent = () => {
     "/ITCellDpoPhoneList",
     "/ITCellApplicantQueries",
     "/DPODashBoard",
+    "/TiluRauteli2026-27",
     "/CDPODashBoard",
     "/TiluRauteliUserDashboard",
     "/AnganwadiUserDashboard",
@@ -171,6 +173,14 @@ const AppContent = () => {
             element={
               <ProtectedRoute allowedRoles={["dpo"]}>
                 <DPODashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/TiluRauteli2026-27"
+            element={
+              <ProtectedRoute allowedRoles={["dpo"]}>
+                <TiluRauteli2026_27 />
               </ProtectedRoute>
             }
           />
