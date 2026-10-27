@@ -699,7 +699,7 @@
 /* Header Styles */
 .tilu-dashboard-header {
   background-color: #ffff;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 4px rgba(237, 237, 237, 0.1) !important;
 
   position: sticky;
   top: 0;
