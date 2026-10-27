@@ -723,7 +723,7 @@
   margin-top: 9px;
   border: 0;
   object-fit: contain;
-  background: #f5f9fc;
+
 }
 
 .tilu-preview-document p {
@@ -1042,25 +1042,29 @@
 }
 
 .tilu-preview-table th {
-  width: 36%;
+  width: 22%;
   font-weight: 700;
 }
 
 .tilu-preview-table td {
-  width: 64%;
+  width: 28%;
 }
 
 .tilu-preview-table .tilu-preview-table-title {
-  width: auto;
+  width: 25%;
   background: #f7f7f7;
   color: #173b5b;
   font-weight: 800;
 }
 
-.tilu-preview-points {
-  margin: 0;
-  padding-left: 25px;
+.tilu-preview-table th:not(.tilu-preview-table-title) {
+  width: 25%;
 }
+
+.tilu-preview-table td {
+  width: 25%;
+}
+ 
 
 .tilu-preview-points li {
   padding: 3px 0;
@@ -1097,27 +1101,20 @@
   text-align: center !important;
 }
 
-.tilu-preview-applicant-cell img {
-  display: block;
-  width: 112px;
-  height: 132px;
-  margin: 0 auto 8px;
+.tilu-preview-doc-scroll {
+  width: 100%;
+  max-height: 220px;
+  overflow: auto;
   border: 1px solid #d1d5db;
-  object-fit: contain;
+  border-radius: 8px;
+  background: #f8fafc;
 }
 
-.tilu-preview-applicant-cell strong,
-.tilu-preview-applicant-cell span {
-  display: block;
-}
-
-.tilu-preview-document-footer {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  margin-top: 14px;
-  color: #475569;
-  font-size: 0.8rem;
+.tilu-preview-doc-scroll embed,
+.tilu-preview-doc-scroll iframe {
+  width: 100%;
+  height: 320px;
+  border: 0;
 }
 
 @media (max-width: 768px) {

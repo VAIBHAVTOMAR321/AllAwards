@@ -1384,17 +1384,16 @@ const TiluRauteliUserDashboard = () => {
                     <table className="tilu-preview-table">
                       <tbody>
                         <tr>
-                          <th colSpan="2" className="tilu-preview-table-title">
-                            जानकारी का शीर्षक
-                          </th>
+                          <th className="tilu-preview-table-title" style={{ width: "25%" }}>जानकारी का शीर्षक</th>
+                          <th className="tilu-preview-table-title" colSpan="3" style={{ width: "75%" }}></th>
                         </tr>
                         <tr>
-                          <th>Form ID | आवेदन फार्म संख्या</th>
-                          <td>{formData.form_id || "—"}</td>
+                          <th style={{ width: "25%" }}>Form ID | आवेदन फार्म संख्या</th>
+                          <td colSpan="3" style={{ width: "75%" }}>{formData.form_id || "—"}</td>
                         </tr>
                         <tr>
-                          <th>Applicant | आवेदिका</th>
-                          <td className="tilu-preview-applicant-cell">
+                          <th style={{ width: "25%" }}>Applicant | आवेदिका</th>
+                          <td colSpan="3" className="tilu-preview-applicant-cell" style={{ width: "75%" }}>
                             {getPreviewUrl(formData.appli_img) && (
                               <img
                                 src={getPreviewUrl(formData.appli_img)}
@@ -1406,8 +1405,8 @@ const TiluRauteliUserDashboard = () => {
                           </td>
                         </tr>
                         <tr>
-                          <th>महिला / किशोरी के हस्ताक्षर</th>
-                          <td className="tilu-preview-image-cell">
+                          <th style={{ width: "25%" }}>महिला / किशोरी के हस्ताक्षर</th>
+                          <td colSpan="3" className="tilu-preview-image-cell" style={{ width: "75%" }}>
                             {getPreviewUrl(formData.appli_sign) ? (
                               <img
                                 src={getPreviewUrl(formData.appli_sign)}
@@ -1416,32 +1415,39 @@ const TiluRauteliUserDashboard = () => {
                             ) : "दस्तावेज़ उपलब्ध नहीं है।"}
                           </td>
                         </tr>
-                        {[
-                          ["जन्म तिथि", formData.dob],
-                          ["मोबाइल नंबर", formData.filer_mob],
-                          ["ईमेल आई.डी.", formData.filer_email],
-                          ["आधार नंबर", formData.filer_adhar],
-                          ["पिता / पति का नाम", formData.fath_husb_name],
-                          ["शैक्षिक योग्यता", formData.edu_qual],
-                          ["वर्तमान पता", formData.address],
-                          ["जनपद", formData.district],
-                          ["परियोजना / विकासखंड", formData.project],
-                          ["गांव / क्षेत्र", formData.village],
-                          ["पैन कार्ड नंबर", formData.appli_pan],
-                          ["बैंक खाता धारक का नाम", formData.appli_bank_ac_name],
-                          ["बैंक खाता संख्या", formData.appli_bank_acc],
-                          ["IFSC कोड", formData.appli_ifsc],
-                          ["बैंक का नाम", formData.appli_bank_name],
-                        ].map(([label, value]) => (
-                          <tr key={label}>
-                            <th>{label}</th>
-                            <td>{value || "—"}</td>
-                          </tr>
-                        ))}
+                        {(() => {
+                          const detailItems = [
+                            ["जन्म तिथि", formData.dob],
+                            ["मोबाइल नंबर", formData.filer_mob],
+                            ["ईमेल आई.डी.", formData.filer_email],
+                            ["आधार नंबर", formData.filer_adhar],
+                            ["पिता / पति का नाम", formData.fath_husb_name],
+                            ["शैक्षिक योग्यता", formData.edu_qual],
+                            ["वर्तमान पता", formData.address],
+                            ["जनपद", formData.district],
+                            ["परियोजना / विकासखंड", formData.project],
+                            ["गांव / क्षेत्र", formData.village],
+                            ["पैन कार्ड नंबर", formData.appli_pan],
+                            ["बैंक खाता धारक का नाम", formData.appli_bank_ac_name],
+                            ["बैंक खाता संख्या", formData.appli_bank_acc],
+                            ["IFSC कोड", formData.appli_ifsc],
+                            ["बैंक का नाम", formData.appli_bank_name],
+                          ];
+                          const rows = [];
+                          for (let i = 0; i < detailItems.length; i += 2) {
+                            rows.push([detailItems[i], detailItems[i + 1]]);
+                          }
+                          return rows.map(([first, second], rowIndex) => (
+                            <tr key={`detail-row-${rowIndex}`}>
+                            <th>{first[0]}</th>
+                            <td colSpan="3">{first[1] || "—"}</td>
+                            </tr>
+                          ));
+                        })()}
                         {formData.appli_url && (
                           <tr>
-                            <th>सोशल मीडिया लिंक</th>
-                            <td>
+                            <th style={{ width: "25%" }}>सोशल मीडिया लिंक</th>
+                            <td colSpan="3" style={{ width: "75%" }}>
                               <a
                                 href={formData.appli_url}
                                 target="_blank"
@@ -1454,58 +1460,73 @@ const TiluRauteliUserDashboard = () => {
                         )}
 
                         <tr>
-                          <th colSpan="2" className="tilu-preview-table-title">
-                            जानकारी का शीर्षक
-                          </th>
+                          <th className="tilu-preview-table-title" style={{ width: "25%" }}>जानकारी का शीर्षक</th>
+                          <th className="tilu-preview-table-title" colSpan="3" style={{ width: "75%" }}></th>
                         </tr>
                         <tr>
-                          <th>महिला की उपलब्धि किस प्रकार उत्कृष्ट आंकी गयी है — से संबंधित डॉक्यूमेंटेशन</th>
-                          <td>
+                          <th>महिला की उपलब्धि किस प्रकार उत्कृष्ट आंकी गयी है — से संबंधित विवरण</th>
+                          <td colSpan="3">
                             <div className="tilu-preview-description">{formData.manak1 || "—"}</div>
-                            <div className="tilu-preview-inline-document">
-                              {getPreviewUrl(formData.appli_pdf1) ? (
-                                <a href={getPreviewUrl(formData.appli_pdf1)} target="_blank" rel="noreferrer">
-                                  PDF देखें / डाउनलोड करें
-                                </a>
-                              ) : <span>दस्तावेज़ उपलब्ध नहीं है।</span>}
-                            </div>
+                            {getPreviewUrl(formData.appli_pdf1) ? (
+                              <div className="tilu-preview-doc-scroll" style={{ marginTop: "10px" }}>
+                                <embed
+                                  src={getPreviewUrl(formData.appli_pdf1)}
+                                  type="application/pdf"
+                                  title="महिला की उपलब्धि से संबंधित दस्तावेज़"
+                                />
+                              </div>
+                            ) : (
+                              <div style={{ marginTop: "6px" }}>दस्तावेज़ उपलब्ध नहीं है।</div>
+                            )}
                           </td>
                         </tr>
                         <tr>
-                          <th>महिला के जीवन के संक्षिप्त विवरण से संबंधित प्रमाण पत्र, अखबार की कतरनी आदि</th>
-                          <td>
+                          <th>महिला के जीवन का संक्षिप्त विवरण</th>
+                          <td colSpan="3">
                             <div className="tilu-preview-description">{formData.manak3 || "—"}</div>
-                            <div className="tilu-preview-inline-document">
-                              {getPreviewUrl(formData.appli_pdf2) ? (
-                                <a href={getPreviewUrl(formData.appli_pdf2)} target="_blank" rel="noreferrer">
-                                  PDF देखें / डाउनलोड करें
-                                </a>
-                              ) : <span>दस्तावेज़ उपलब्ध नहीं है।</span>}
-                            </div>
+                            {getPreviewUrl(formData.appli_pdf2) ? (
+                              <div className="tilu-preview-doc-scroll" style={{ marginTop: "10px" }}>
+                                <embed
+                                  src={getPreviewUrl(formData.appli_pdf2)}
+                                  type="application/pdf"
+                                  title="महिला के जीवन विवरण से संबंधित दस्तावेज़"
+                                />
+                              </div>
+                            ) : (
+                              <div style={{ marginTop: "6px" }}>दस्तावेज़ उपलब्ध नहीं है।</div>
+                            )}
                           </td>
                         </tr>
                         <tr>
-                          <th>उत्कृष्ट कार्यों से संबंधित राष्ट्रीय / अंतर्राष्ट्रीय सम्मान, पुरस्कार, प्रमाण पत्र आदि</th>
-                          <td>
+                          <th>उत्कृष्ट कार्यों से संबंधित विवरण</th>
+                          <td colSpan="3">
                             <div className="tilu-preview-description">{formData.manak2 || "—"}</div>
-                            <div className="tilu-preview-inline-document">
-                              {getPreviewUrl(formData.appli_pdf3) ? (
-                                <a href={getPreviewUrl(formData.appli_pdf3)} target="_blank" rel="noreferrer">
-                                  PDF देखें / डाउनलोड करें
-                                </a>
-                              ) : <span>दस्तावेज़ उपलब्ध नहीं है।</span>}
-                            </div>
+                            {getPreviewUrl(formData.appli_pdf3) ? (
+                              <div className="tilu-preview-doc-scroll" style={{ marginTop: "10px" }}>
+                                <embed
+                                  src={getPreviewUrl(formData.appli_pdf3)}
+                                  type="application/pdf"
+                                  title="उत्कृष्ट कार्यों से संबंधित दस्तावेज़"
+                                />
+                              </div>
+                            ) : (
+                              <div style={{ marginTop: "6px" }}>दस्तावेज़ उपलब्ध नहीं है।</div>
+                            )}
                           </td>
                         </tr>
 
                         <tr>
-                          <th colSpan="2" className="tilu-preview-table-title">
+                          <th colSpan="4" className="tilu-preview-table-title">
                             जानकारी का शीर्षक
                           </th>
                         </tr>
                         <tr>
-                          <th>उपलब्धि के क्षेत्र</th>
-                          <td>
+                          <th className="tilu-preview-table-title" style={{ width: "25%" }}>जानकारी का शीर्षक</th>
+                          <th className="tilu-preview-table-title" colSpan="3" style={{ width: "75%" }}></th>
+                        </tr>
+                        <tr>
+                          <th style={{ width: "25%" }}>उपलब्धि के क्षेत्र</th>
+                          <td colSpan="3" style={{ width: "75%" }}>
                             {selectedWorkAreas.length ? (
                               <ol className="tilu-preview-points">
                                 {selectedWorkAreas.map((area, index) => (
