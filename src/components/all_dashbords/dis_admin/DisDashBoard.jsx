@@ -443,10 +443,6 @@ const DisDashBoard = () => {
   const [directorateError, setDirectorateError] = useState(null);
   const [directorateActionMessage, setDirectorateActionMessage] = useState("");
 
-  // Registration list from the same source the IT Cell dashboard reads, used to
-  // build the step-status filter so it lists every stage including registered.
-  const [registrationList, setRegistrationList] = useState([]);
-
   // Table shows 50 rows at a time; the page resets whenever the filter set changes.
   const PAGE_SIZE = 50;
   const [currentPage, setCurrentPage] = useState(1);
@@ -570,37 +566,10 @@ const DisDashBoard = () => {
     }
   };
 
-  const fetchRegisteredApplications = async () => {
-    try {
-      const accessToken = localStorage.getItem("accessToken");
-      const response = await cookieFetch(`${BASE_URL}/bravery/it-cell/applications/`, {
-        headers: {
-          "Content-Type": "application/json",
-          ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
-        },
-      });
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const result = await response.json();
-      if (result.success && Array.isArray(result.data)) {
-        setRegistrationList(result.data);
-        return result.data;
-      }
-      setRegistrationList([]);
-      return [];
-    } catch (err) {
-      console.error("Failed to fetch registered applications:", err);
-      setRegistrationList([]);
-      return [];
-    }
-  };
-
   useEffect(() => {
     fetchApplicationsData();
     fetchRecommendedApplications();
     fetchDirectorRecommendations();
-    fetchRegisteredApplications();
   }, []);
 
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
@@ -961,13 +930,10 @@ const DisDashBoard = () => {
   const uniqueDistricts = Array.from(
     new Set(applications.map((app) => app.district).filter(Boolean))
   ).sort();
-  // Options come from both sources: every stage present in the step data plus
-  // the registration list, so a stage is never missing because no current row
-  // happens to sit in it.
+
   const uniqueStepStatuses = (() => {
     const seen = new Set([
       ...applications.map((app) => normalizeStepStatus(app.step_status)),
-      ...registrationList.map((item) => normalizeStepStatus(item.step_status)),
     ]);
     seen.delete("");
     const ordered = STEP_STATUS_ORDER.filter((label) => seen.has(label));

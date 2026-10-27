@@ -462,9 +462,6 @@ const DPODashboard = () => {
   const [recommendedLoading, setRecommendedLoading] = useState(false);
   const [recommendedError, setRecommendedError] = useState(null);
 
-  // Registration list from the same source the IT Cell dashboard reads, used to
-  // build the step-status filter so it lists every stage including registered.
-  const [registrationList, setRegistrationList] = useState([]);
   const [recommendationFile, setRecommendationFile] = useState(null);
   const [recommendationRemark, setRecommendationRemark] = useState("");
   const [savingRecommendation, setSavingRecommendation] = useState(false);
@@ -594,35 +591,6 @@ const DPODashboard = () => {
       return [];
     } finally {
       setRecommendedLoading(false);
-    }
-  };
-
-  const fetchRegisteredApplications = async () => {
-    try {
-      const accessToken = localStorage.getItem("accessToken");
-      const response = await cookieFetch(
-        "https://mahadevaaya.com/wecdallaward/wecdallaward_backend/api/bravery/it-cell/applications/",
-        {
-          headers: {
-            "Content-Type": "application/json",
-            ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
-          },
-        },
-      );
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const result = await response.json();
-      if (result.success && Array.isArray(result.data)) {
-        setRegistrationList(result.data);
-        return result.data;
-      }
-      setRegistrationList([]);
-      return [];
-    } catch (err) {
-      console.error("Failed to fetch registered applications:", err);
-      setRegistrationList([]);
-      return [];
     }
   };
 
@@ -1033,7 +1001,6 @@ const DPODashboard = () => {
   useEffect(() => {
     fetchApplicationsData();
     fetchRecommendedApplications();
-    fetchRegisteredApplications();
   }, []);
 
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
@@ -1226,7 +1193,6 @@ const DPODashboard = () => {
   const uniqueStepStatuses = (() => {
     const seen = new Set([
       ...applications.map((app) => normalizeStepStatus(app.step_status)),
-      ...registrationList.map((item) => normalizeStepStatus(item.step_status)),
     ]);
     seen.delete("");
     const ordered = STEP_STATUS_ORDER.filter((label) => seen.has(label));
