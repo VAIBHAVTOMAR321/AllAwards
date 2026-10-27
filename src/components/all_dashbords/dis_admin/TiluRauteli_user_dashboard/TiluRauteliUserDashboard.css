@@ -37,7 +37,7 @@
 }
 
 .tilu-hero {
-  background: linear-gradient(135deg, #0c3d5f 0%, #0d6e9b 58%, #0f8a95 100%);
+  background-color: #a30909;
   border-radius: 14px;
   box-shadow: var(--tilu-shadow);
   color: #fff;

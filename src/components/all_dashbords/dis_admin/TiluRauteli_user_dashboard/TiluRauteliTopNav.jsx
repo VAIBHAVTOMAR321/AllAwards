@@ -8,7 +8,7 @@ const TiluRauteliTopNav = ({ sidebarOpen, toggleSidebar }) => {
   const account = user?.user || user || {};
 
   return (
-    <header className="dpo-dashboard-header">
+    <header className=".tilu-dashboard-header">
       <Container fluid>
         <Row className="align-items-center">
           <Col xs="auto"><Button variant="light" className="sidebar-toggle" onClick={toggleSidebar} aria-label="Toggle navigation"><FaBars /></Button></Col>
