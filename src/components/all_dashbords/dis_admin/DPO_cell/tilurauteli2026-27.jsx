@@ -4,10 +4,14 @@ import { FaCheck, FaEye, FaFilePdf, FaPrint, FaTimes } from "react-icons/fa";
 import { cookieFetch } from "../../../login/AuthContext";
 import DPOLeftNav from "./DPOLeftNav";
 import DPOTopNav from "./DPOTopNav";
+import DisLeftnav from "../DisLeftnav";
+import DisTopNav from "../DisTopNav";
 import "./tilurauteli2026-27.css";
 
-const APPLICATIONS_URL =
+const DPO_APPLICATIONS_URL =
   "https://mahadevaaya.com/wecdallaward/wecdallaward_backend/api/telu-roteli-dpo-status/";
+const DIRECTOR_APPLICATIONS_URL =
+  "https://mahadevaaya.com/wecdallaward/wecdallaward_backend/api/telu-roteli-director-itcell-status/";
 const MEDIA_BASE_URL =
   "https://mahadevaaya.com/wecdallaward/wecdallaward_backend";
 
@@ -98,7 +102,20 @@ const displayValue = (value) =>
     ? "—"
     : value;
 
-const TiluRauteli2026_27 = () => {
+const TiluRauteli2026_27 = ({ panel = "dpo" }) => {
+  const isDirectorPanel = panel === "director";
+  const applicationsUrl = isDirectorPanel
+    ? DIRECTOR_APPLICATIONS_URL
+    : DPO_APPLICATIONS_URL;
+  const approvedStatus = isDirectorPanel
+    ? "approved by state committee"
+    : "approved by district committee";
+  const rejectedStatus = isDirectorPanel
+    ? "rejected by state committee"
+    : "rejected by district committee";
+  const stateApprovedStatus = "approved by state committee";
+  const stateRejectedStatus = "rejected by state committee";
+  const districtApprovedStatus = "approved by district committee";
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
   const [isTablet, setIsTablet] = useState(false);
@@ -111,6 +128,7 @@ const TiluRauteli2026_27 = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [activeTab, setActiveTab] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("all");
   const [selectedProjects, setSelectedProjects] = useState([]);
   const PAGE_SIZE = 100;
 
@@ -120,7 +138,7 @@ const TiluRauteli2026_27 = () => {
     setLoading(true);
     setLoadError("");
     try {
-      const response = await cookieFetch(APPLICATIONS_URL, { method: "GET" });
+      const response = await cookieFetch(applicationsUrl, { method: "GET" });
       const payload = await readResponse(response);
       if (!response.ok || payload.success === false) {
         throw new Error(
@@ -142,7 +160,7 @@ const TiluRauteli2026_27 = () => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [applicationsUrl]);
 
   useEffect(() => {
     fetchApplications();
@@ -150,7 +168,7 @@ const TiluRauteli2026_27 = () => {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchQuery, activeTab, selectedProjects]);
+  }, [searchQuery, activeTab, selectedProjects, statusFilter]);
 
   const uniqueProjects = [
     ...new Set(applications.map((a) => String(a.project || "")).filter(Boolean)),
@@ -158,18 +176,47 @@ const TiluRauteli2026_27 = () => {
 
   const filteredApplications = applications.filter((application) => {
     const query = searchQuery.toLowerCase().trim();
+    const applicationStatus = String(application.status || "")
+      .trim()
+      .toLowerCase();
+    const hasStateCommitteeDecision =
+      applicationStatus === stateApprovedStatus ||
+      applicationStatus === stateRejectedStatus;
     const matchesSearch =
       !query ||
       String(application.form_id || "").toLowerCase().includes(query) ||
       String(application.filer_name || "").toLowerCase().includes(query);
-    const matchesTab =
-      activeTab === "all" ||
-      String(application.status || "").toLowerCase() ===
-        "approved by district committee";
+    const matchesTab = isDirectorPanel
+      ? activeTab === "all" ||
+        (activeTab === "district-approved" &&
+          (applicationStatus === districtApprovedStatus ||
+            applicationStatus === approvedStatus)) ||
+        (activeTab === "state-approved" &&
+          applicationStatus === approvedStatus) ||
+        (activeTab === "report" &&
+          (applicationStatus.includes("approved") ||
+            applicationStatus.includes("rejected")))
+      : activeTab === "all" ||
+        activeTab === "report" ||
+        (activeTab === "approved" &&
+          (applicationStatus === approvedStatus || hasStateCommitteeDecision));
+    const matchesStatus =
+      (isDirectorPanel &&
+        (activeTab === "district-approved" || activeTab === "state-approved")) ||
+      (!isDirectorPanel && activeTab === "approved") ||
+      statusFilter === "all" ||
+      (statusFilter === "approved" &&
+        (isDirectorPanel
+          ? applicationStatus.includes("approved")
+          : applicationStatus === approvedStatus || hasStateCommitteeDecision)) ||
+      (statusFilter === "rejected" &&
+        (isDirectorPanel
+          ? applicationStatus.includes("rejected")
+          : applicationStatus === rejectedStatus));
     const matchesProject =
       selectedProjects.length === 0 ||
       selectedProjects.includes(String(application.project || ""));
-    return matchesSearch && matchesTab && matchesProject;
+    return matchesSearch && matchesTab && matchesStatus && matchesProject;
   });
 
   const totalPages = Math.max(1, Math.ceil(filteredApplications.length / PAGE_SIZE));
@@ -212,8 +259,7 @@ const TiluRauteli2026_27 = () => {
       });
       return;
     }
-    const actionLabel =
-      status === "approved by district committee" ? "Approved" : "Rejected";
+    const actionLabel = status === approvedStatus ? "Approved" : "Rejected";
     if (
       !window.confirm(
         `Do you want to ${actionLabel} application ${formId}?`,
@@ -224,7 +270,7 @@ const TiluRauteli2026_27 = () => {
     setUpdatingFormId(formId);
     setActionMessage(null);
     try {
-      const response = await cookieFetch(APPLICATIONS_URL, {
+      const response = await cookieFetch(applicationsUrl, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ form_id: formId, status }),
@@ -336,18 +382,35 @@ const TiluRauteli2026_27 = () => {
 
   return (
     <div className="dashboard-container tilu-dpo-dashboard">
-      <DPOLeftNav
-        sidebarOpen={sidebarOpen}
-        setSidebarOpen={setSidebarOpen}
-        isMobile={isMobile}
-        isTablet={isTablet}
-      />
+      {isDirectorPanel ? (
+        <DisLeftnav
+          sidebarOpen={sidebarOpen}
+          setSidebarOpen={setSidebarOpen}
+          isMobile={isMobile}
+          isTablet={isTablet}
+        />
+      ) : (
+        <DPOLeftNav
+          sidebarOpen={sidebarOpen}
+          setSidebarOpen={setSidebarOpen}
+          isMobile={isMobile}
+          isTablet={isTablet}
+        />
+      )}
       <div className="main-content-dash">
-        <DPOTopNav toggleSidebar={toggleSidebar} sidebarOpen={sidebarOpen} />
+        {isDirectorPanel ? (
+          <DisTopNav toggleSidebar={toggleSidebar} sidebarOpen={sidebarOpen} />
+        ) : (
+          <DPOTopNav toggleSidebar={toggleSidebar} sidebarOpen={sidebarOpen} />
+        )}
         <main className="tilu-dpo-page">
           <header className="tilu-dpo-page-header">
             <div>
-              <p>District Level Verification</p>
+              <p>
+                {isDirectorPanel
+                  ? "State Level Verification"
+                  : "District Level Verification"}
+              </p>
               <h1>State Women Power Tilu Rauteli Award 2026-27</h1>
               <span>Application Details and Approval</span>
             </div>
@@ -379,14 +442,31 @@ const TiluRauteli2026_27 = () => {
                     className={activeTab === "all" ? "tilu-dpo-tab active" : "tilu-dpo-tab"}
                     onClick={() => setActiveTab("all")}
                   >
-                    All Applications
+                    {isDirectorPanel ? "All Forms" : "All Applications"}
                   </button>
-                  <button
-                    className={activeTab === "approved" ? "tilu-dpo-tab active" : "tilu-dpo-tab"}
-                    onClick={() => setActiveTab("approved")}
-                  >
-                    Approved Applications
-                  </button>
+                  {isDirectorPanel ? (
+                    <>
+                      <button
+                        className={activeTab === "district-approved" ? "tilu-dpo-tab active" : "tilu-dpo-tab"}
+                        onClick={() => setActiveTab("district-approved")}
+                      >
+                        Approved by District Committee
+                      </button>
+                      <button
+                        className={activeTab === "state-approved" ? "tilu-dpo-tab active" : "tilu-dpo-tab"}
+                        onClick={() => setActiveTab("state-approved")}
+                      >
+                        Approved by State Committee
+                      </button>
+                    </>
+                  ) : (
+                    <button
+                      className={activeTab === "approved" ? "tilu-dpo-tab active" : "tilu-dpo-tab"}
+                      onClick={() => setActiveTab("approved")}
+                    >
+                      Approved Applications
+                    </button>
+                  )}
                   <button
                     className={activeTab === "report" ? "tilu-dpo-tab active" : "tilu-dpo-tab"}
                     onClick={() => setActiveTab("report")}
@@ -394,12 +474,14 @@ const TiluRauteli2026_27 = () => {
                     Report
                   </button>
                 </div>
-                <h2>Application List</h2>
-                <p>
-                  {loading
-                    ? "Loading applications..."
-                    : `Total Applications: ${filteredApplications.length}`}
-                </p>
+                <div className="tilu-dpo-heading-meta">
+                  <h2>Application List</h2>
+                  <p>
+                    {loading
+                      ? "Loading applications..."
+                      : `Total Applications: ${filteredApplications.length}`}
+                  </p>
+                </div>
               </div>
               <div className="tilu-dpo-filters">
                 <div className="tilu-dpo-search">
@@ -431,6 +513,21 @@ const TiluRauteli2026_27 = () => {
                     ))}
                   </select>
                 </div>
+                {activeTab !== "approved" &&
+                  activeTab !== "district-approved" &&
+                  activeTab !== "state-approved" && (
+                  <div className="tilu-dpo-status-filter">
+                    <label>Status</label>
+                    <select
+                      value={statusFilter}
+                      onChange={(event) => setStatusFilter(event.target.value)}
+                    >
+                      <option value="all">All</option>
+                      <option value="approved">Approved</option>
+                      <option value="rejected">Rejected</option>
+                    </select>
+                  </div>
+                )}
               </div>
             </div>
             <div className="tilu-dpo-table-scroll">
@@ -447,18 +544,19 @@ const TiluRauteli2026_27 = () => {
                         <th>IFSC Code</th>
                         <th>Mobile</th>
                         <th>Application Points</th>
+                        {isDirectorPanel && <th>Status</th>}
                       </tr>
                   </thead>
                   <tbody>
                     {loading ? (
                       <tr>
-                        <td colSpan="9" className="tilu-dpo-empty">
+                        <td colSpan={isDirectorPanel ? 10 : 9} className="tilu-dpo-empty">
                           <Spinner animation="border" size="sm" /> Loading applications...
                         </td>
                       </tr>
                     ) : filteredApplications.length === 0 ? (
                       <tr>
-                        <td colSpan="9" className="tilu-dpo-empty">
+                        <td colSpan={isDirectorPanel ? 10 : 9} className="tilu-dpo-empty">
                           No report data available.
                         </td>
                       </tr>
@@ -496,6 +594,13 @@ const TiluRauteli2026_27 = () => {
                                 "—"
                               )}
                             </td>
+                            {isDirectorPanel && (
+                              <td>
+                                <Badge bg={getStatusVariant(application.status)}>
+                                  {application.status || "pending"}
+                                </Badge>
+                              </td>
+                            )}
                           </tr>
                         );
                       })
@@ -510,7 +615,7 @@ const TiluRauteli2026_27 = () => {
                       <th>Form ID</th>
                       <th>Applicant Name</th>
                       <th>DOB</th>
-                      <th>Educational</th>
+                      <th>Educational </th>
                       <th>Address</th>
                       <th>District</th>
                       <th>Social Media Link</th>
@@ -534,12 +639,22 @@ const TiluRauteli2026_27 = () => {
                     ) : (
                       paginatedApplications.map((application, index) => {
                         const status = String(application.status || "pending");
+                        const normalizedStatus = status.trim().toLowerCase();
+                        const hasStateCommitteeDecision =
+                          normalizedStatus === stateApprovedStatus ||
+                          normalizedStatus === stateRejectedStatus;
+                        const displayStatus =
+                          !isDirectorPanel && hasStateCommitteeDecision
+                            ? districtApprovedStatus
+                            : activeTab === "district-approved" &&
+                                normalizedStatus === approvedStatus
+                              ? districtApprovedStatus
+                              : status;
                         const isApproved =
-                          status.toLowerCase() ===
-                          "approved by district committee";
+                          normalizedStatus === approvedStatus ||
+                          (!isDirectorPanel && hasStateCommitteeDecision);
                         const isRejected =
-                          status.toLowerCase() ===
-                          "rejected by district committee";
+                          normalizedStatus === rejectedStatus;
                         const isUpdating =
                           updatingFormId === String(application.form_id || "");
                         return (
@@ -570,8 +685,8 @@ const TiluRauteli2026_27 = () => {
                               )}
                             </td>
                             <td>
-                              <Badge bg={getStatusVariant(status)}>
-                                {status}
+                              <Badge bg={getStatusVariant(displayStatus)}>
+                                {displayStatus}
                               </Badge>
                             </td>
                             <td>
@@ -585,47 +700,52 @@ const TiluRauteli2026_27 = () => {
                                 >
                                   <FaEye /> View
                                 </Button>
-                                {isApproved ? (
-                                  <Button
-                                    size="sm"
-                                    variant="success"
-                                    disabled
-                                  >
-                                    <FaCheck /> Approved
-                                  </Button>
-                                ) : (
-                                  <Button
-                                    size="sm"
-                                    variant="success"
-                                    disabled={isUpdating || isApproved}
-                                    onClick={() =>
-                                      updateApplicationStatus(
-                                        application,
-                                        "approved by district committee",
-                                      )
-                                    }
-                                  >
-                                    {isUpdating ? (
-                                      <Spinner size="sm" animation="border" />
+                                {(!isDirectorPanel ||
+                                  activeTab === "district-approved") && (
+                                  <>
+                                    {isApproved ? (
+                                      <Button
+                                        size="sm"
+                                        variant="success"
+                                        disabled
+                                      >
+                                        <FaCheck /> Approved
+                                      </Button>
                                     ) : (
-                                      <FaCheck />
-                                    )}{" "}
-                                    Approve
-                                  </Button>
+                                      <Button
+                                        size="sm"
+                                        variant="success"
+                                        disabled={isUpdating || isApproved || isRejected}
+                                        onClick={() =>
+                                          updateApplicationStatus(
+                                            application,
+                                            approvedStatus,
+                                          )
+                                        }
+                                      >
+                                        {isUpdating ? (
+                                          <Spinner size="sm" animation="border" />
+                                        ) : (
+                                          <FaCheck />
+                                        )}{" "}
+                                        Approve
+                                      </Button>
+                                    )}
+                                    <Button
+                                      size="sm"
+                                      variant="outline-danger"
+                                      disabled={isUpdating || isRejected || isApproved}
+                                      onClick={() =>
+                                        updateApplicationStatus(
+                                          application,
+                                          rejectedStatus,
+                                        )
+                                      }
+                                    >
+                                      {isRejected ? "Rejected" : "Reject"}
+                                    </Button>
+                                  </>
                                 )}
-                                <Button
-                                  size="sm"
-                                  variant="outline-danger"
-                                  disabled={isUpdating || isRejected || isApproved}
-                                  onClick={() =>
-                                    updateApplicationStatus(
-                                      application,
-                                      "rejected by district committee",
-                                    )
-                                  }
-                                >
-                                  {isRejected ? "Rejected" : "Reject"}
-                                </Button>
                               </div>
                             </td>
                           </tr>
