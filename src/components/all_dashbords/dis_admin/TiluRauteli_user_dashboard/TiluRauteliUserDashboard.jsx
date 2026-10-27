@@ -71,6 +71,7 @@ const DEFAULT_FORM = {
   appli_pdf3: "",
   appli_url: "",
   appli_points: "",
+  status: "",
   term1: [],
 };
 
@@ -239,6 +240,7 @@ const parseApiRecord = (record = {}) => {
     appli_pdf3: record.appli_pdf3 || "",
     appli_url: record.appli_url || "",
     appli_points: record.appli_points || term1.join("*"),
+    status: record.status || "",
   };
 };
 
@@ -356,9 +358,7 @@ const TiluRauteliUserDashboard = () => {
         }));
         setCurrentStep(getFirstIncompleteStep(normalized));
         setApplicationSubmitted(
-          STEP_FOUR_REQUIRED_DOCUMENTS.every((field) =>
-            Boolean(normalized[field]),
-          ),
+          String(normalized.status || "").trim().toLowerCase() === "final",
         );
       } catch (error) {
         console.error("Tilu application load failed:", error);
@@ -375,12 +375,10 @@ const TiluRauteliUserDashboard = () => {
   }, []);
 
   const setField = (field, value) => {
-    setApplicationSubmitted(false);
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   const toggleWorkArea = (value) => {
-    setApplicationSubmitted(false);
     setFormData((prev) => {
       const current = prev.term1 || [];
       const hasValue = current.includes(value);
@@ -540,26 +538,93 @@ const TiluRauteliUserDashboard = () => {
   };
 
   const handleNext = async () => {
+    if (currentStep === 4) return;
     if (!validateStep(currentStep)) return;
     setIsSaving(true);
     try {
       await submitStep(currentStep);
-      if (currentStep === 4) {
-        setApplicationSubmitted(true);
-        setShowApplicationPreview(true);
-      }
       setStatusMessage({
         type: "success",
-        text:
-          currentStep === 4
-            ? "आवेदन सफलतापूर्वक सबमिट हो गया है।"
-            : "डेटा सफलतापूर्वक सेव हो गया है।",
+        text: "डेटा सफलतापूर्वक सेव हो गया है।",
       });
-      if (currentStep < 4) {
-        setCurrentStep((step) => step + 1);
-      }
+      setCurrentStep((step) => step + 1);
     } catch (error) {
       setStatusMessage({ type: "error", text: error.message || "कुछ गलत हुआ।" });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleFinalSubmit = async () => {
+    for (const stepNumber of [1, 2, 3, 4]) {
+      if (!validateStep(stepNumber)) {
+        setCurrentStep(stepNumber);
+        return;
+      }
+    }
+
+    setIsSaving(true);
+    try {
+      const finalPayload = {
+        ...pickFields(formData, [
+          "fath_husb_name",
+          "dob",
+          "filer_adhar",
+          "edu_qual",
+          "project",
+          "village",
+          "address",
+          "manak1",
+          "manak2",
+          "manak3",
+          "appli_pan",
+          "appli_bank_ac_name",
+          "appli_bank_acc",
+          "appli_ifsc",
+          "appli_bank_name",
+          "appli_url",
+        ]),
+        appli_points: selectedWorkAreas.join("*") || formData.appli_points,
+        status: "final",
+      };
+      const response = await cookieFetch(`${TELU_API_BASE}/`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(finalPayload),
+      });
+      const payload = await readApiResponse(response);
+      if (!response.ok || payload.success === false) {
+        console.error("[Tilu API] Final application PUT failed", {
+          url: `${TELU_API_BASE}/`,
+          status: response.status,
+          statusText: response.statusText,
+          request: redactSensitiveFields(finalPayload),
+          response: payload,
+        });
+        throw new Error(
+          response.status === 401
+            ? "सत्र अधिकृत नहीं है। कृपया लॉगआउट करके दोबारा लॉगिन करें।"
+            : getApiErrorMessage(
+                payload,
+                `आवेदन सबमिट नहीं हो सका (HTTP ${response.status})।`,
+              ),
+        );
+      }
+      setFormData((prev) => ({
+        ...prev,
+        status: "final",
+      }));
+      setApplicationSubmitted(true);
+      setShowApplicationPreview(true);
+      setStatusMessage({
+        type: "success",
+        text: "आवेदन सफलतापूर्वक अंतिम रूप से सबमिट हो गया है।",
+      });
+    } catch (error) {
+      setStatusMessage({
+        type: "error",
+        text: error.message || "आवेदन सबमिट नहीं हो सका।",
+      });
     } finally {
       setIsSaving(false);
     }
@@ -742,10 +807,9 @@ const TiluRauteliUserDashboard = () => {
           requiredField === field || Boolean(formData[requiredField]),
       );
       if (allDocumentsUploaded) {
-        setShowApplicationPreview(true);
         setStatusMessage({
           type: "success",
-          text: "सभी दस्तावेज़ सफलतापूर्वक अपलोड हो गए हैं। आवेदन का पूर्वावलोकन खुल गया है।",
+          text: "सभी दस्तावेज़ अपलोड हो गए हैं। अंतिम सबमिट करने से पहले आप आवेदन में बदलाव कर सकते हैं।",
         });
       } else {
         setStatusMessage({
@@ -1166,7 +1230,7 @@ const TiluRauteliUserDashboard = () => {
                     key={label}
                     className={`tilu-progress-step ${stepState}`}
                     onClick={() => handleStepNavigation(stepNumber)}
-                    disabled={loadingRecord || isSaving}
+                    disabled={loadingRecord || isSaving || isApplicationLocked}
                     aria-current={currentStep === stepNumber ? "step" : undefined}
                   >
                     <div className="tilu-progress-mark">
@@ -1194,7 +1258,7 @@ const TiluRauteliUserDashboard = () => {
               </div>
             )}
 
-            {hasAllRequiredDocuments && (
+            {isApplicationLocked && (
               <button
                 type="button"
                 className="tilu-btn secondary"
@@ -1204,6 +1268,21 @@ const TiluRauteliUserDashboard = () => {
                 आवेदन का पूर्वावलोकन देखें
               </button>
             )}
+            {hasAllRequiredDocuments && !isApplicationLocked && (
+              <div className="tilu-final-submit">
+                <p>
+                  सभी आवश्यक दस्तावेज़ अपलोड हैं। अंतिम सबमिट करने से पहले आप किसी भी चरण में बदलाव कर सकते हैं।
+                </p>
+                <button
+                  type="button"
+                  className="tilu-btn success"
+                  onClick={handleFinalSubmit}
+                  disabled={isSaving || loadingRecord}
+                >
+                  {isSaving ? "सबमिट हो रहा है..." : "अंतिम रूप से सबमिट करें"}
+                </button>
+              </div>
+            )}
 
             {loadingRecord ? (
               <div className="tilu-status-alert success">लोड हो रहा है...</div>
@@ -1211,9 +1290,7 @@ const TiluRauteliUserDashboard = () => {
               <>
                 <fieldset
                   className="tilu-form-fields"
-                  disabled={
-                    isSaving || (isApplicationLocked && currentStep !== 4)
-                  }
+                  disabled={isSaving || isApplicationLocked}
                 >
                   {stepContent[currentStep]()}
                 </fieldset>
@@ -1223,12 +1300,12 @@ const TiluRauteliUserDashboard = () => {
                       type="button"
                       className="tilu-btn secondary"
                       onClick={handleBack}
-                      disabled={currentStep === 1 || isSaving}
+                      disabled={currentStep === 1 || isSaving || isApplicationLocked}
                     >
                       Back
                     </button>
                     {!isApplicationLocked &&
-                      (currentStep !== 4 || hasAllRequiredDocuments) && (
+                      currentStep < 4 && (
                         <button
                           type="button"
                           className="tilu-btn primary"
@@ -1237,9 +1314,7 @@ const TiluRauteliUserDashboard = () => {
                         >
                           {isSaving
                             ? "Loading..."
-                            : currentStep === 4
-                              ? "Proceed"
-                              : "Save / Continue"}
+                            : "Save / Continue"}
                         </button>
                       )}
                   </div>

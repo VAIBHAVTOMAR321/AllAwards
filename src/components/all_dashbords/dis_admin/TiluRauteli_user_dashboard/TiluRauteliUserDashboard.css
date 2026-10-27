@@ -265,6 +265,25 @@
   color: var(--tilu-success);
 }
 
+.tilu-final-submit {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 14px 0;
+  padding: 14px 16px;
+  border: 1px solid rgba(31, 163, 106, 0.24);
+  border-radius: 12px;
+  background: #f0faf4;
+}
+
+.tilu-final-submit p {
+  margin: 0;
+  color: #176b44;
+  font-size: 0.84rem;
+  line-height: 1.5;
+}
+
 .tilu-form-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -875,6 +894,11 @@
   .tilu-button-row {
     flex-direction: column;
     align-items: stretch;
+  }
+
+  .tilu-final-submit {
+    align-items: stretch;
+    flex-direction: column;
   }
 
   .tilu-actions {
