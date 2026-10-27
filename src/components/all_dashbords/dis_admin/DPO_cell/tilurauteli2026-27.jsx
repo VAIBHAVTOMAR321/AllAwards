@@ -14,25 +14,36 @@ const MEDIA_BASE_URL =
 const REQUIRED_DOCUMENTS = [
   { field: "appli_img", label: "आवेदिका का फोटो", type: "image" },
   { field: "appli_sign", label: "हस्ताक्षर", type: "image" },
-  { field: "appli_pdf1", label: "उपलब्धियों का प्रमाण", type: "pdf" },
-  { field: "appli_pdf2", label: "पुरस्कार / प्रमाण पत्र", type: "pdf" },
-  { field: "appli_pdf3", label: "अन्य दस्तावेज़", type: "pdf" },
+  {
+    field: "appli_pdf1",
+    label: "महिला की उपलब्धि से संबंधित दस्तावेज़",
+    type: "pdf",
+  },
+  {
+    field: "appli_pdf2",
+    label: "जीवन-वृत्त / समाचार-पत्र / प्रमाण पत्र",
+    type: "pdf",
+  },
+  {
+    field: "appli_pdf3",
+    label: "सम्मान / पुरस्कार / अन्य प्रमाण पत्र",
+    type: "pdf",
+  },
 ];
 
 const DETAIL_FIELDS = [
-  ["आवेदिका का नाम", "filer_name"],
-  ["पिता / पति का नाम", "fath_husb_name"],
   ["जन्म तिथि", "dob"],
   ["मोबाइल नंबर", "filer_mob"],
-  ["ईमेल", "filer_email"],
+  ["ईमेल आईडी", "filer_email"],
   ["आधार नंबर", "filer_adhar"],
+  ["पिता / पति का नाम", "fath_husb_name"],
   ["शैक्षिक योग्यता", "edu_qual"],
+  ["वर्तमान पता", "address"],
   ["जनपद", "district"],
   ["परियोजना / विकासखंड", "project"],
   ["गांव / क्षेत्र", "village"],
-  ["पूरा पता", "address"],
   ["पैन कार्ड नंबर", "appli_pan"],
-  ["खाताधारक का नाम", "appli_bank_ac_name"],
+  ["बैंक खाता धारक का नाम", "appli_bank_ac_name"],
   ["बैंक खाता संख्या", "appli_bank_acc"],
   ["IFSC कोड", "appli_ifsc"],
   ["बैंक का नाम", "appli_bank_name"],
@@ -82,6 +93,11 @@ const formatDate = (date) => {
       });
 };
 
+const displayValue = (value) =>
+  value === null || value === undefined || String(value).trim() === ""
+    ? "—"
+    : value;
+
 const TiluRauteli2026_27 = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
@@ -110,7 +126,9 @@ const TiluRauteli2026_27 = () => {
         );
       }
       if (!Array.isArray(payload.data)) {
-        throw new Error("सर्वर से आवेदन सूची सही प्रारूप में प्राप्त नहीं हुई।");
+        throw new Error(
+          "सर्वर से आवेदन सूची सही प्रारूप में प्राप्त नहीं हुई।",
+        );
       }
       setApplications(payload.data);
     } catch (error) {
@@ -136,6 +154,20 @@ const TiluRauteli2026_27 = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  useEffect(() => {
+    if (!selectedApplication) return undefined;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const onKeyDown = (event) => {
+      if (event.key === "Escape") setSelectedApplication(null);
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [selectedApplication]);
+
   const updateApplicationStatus = async (application, status) => {
     const formId = String(application.form_id || "").trim();
     if (!formId) {
@@ -145,16 +177,14 @@ const TiluRauteli2026_27 = () => {
       });
       return;
     }
-
     const actionLabel =
       status === "approved by district committee" ? "स्वीकृत" : "अस्वीकृत";
     if (
       !window.confirm(
         `क्या आप आवेदन ${formId} को ${actionLabel} करना चाहते हैं?`,
       )
-    ) {
+    )
       return;
-    }
 
     setUpdatingFormId(formId);
     setActionMessage(null);
@@ -174,34 +204,20 @@ const TiluRauteli2026_27 = () => {
         );
       }
       const updatedRecord = payload.data;
+      const returnedRecord = Array.isArray(updatedRecord)
+        ? updatedRecord.find((record) => record.form_id === formId)
+        : updatedRecord;
+      const newStatus = returnedRecord?.status || status;
       setApplications((current) =>
         current.map((item) =>
-          item.form_id === formId
-            ? {
-                ...item,
-                ...(updatedRecord && !Array.isArray(updatedRecord)
-                  ? updatedRecord
-                  : {}),
-                status:
-                  updatedRecord?.status ||
-                  (Array.isArray(updatedRecord)
-                    ? updatedRecord.find((record) => record.form_id === formId)
-                        ?.status
-                    : "") ||
-                  status,
-              }
+          String(item.form_id) === formId
+            ? { ...item, ...(returnedRecord || {}), status: newStatus }
             : item,
         ),
       );
       setSelectedApplication((current) =>
-        current?.form_id === formId
-          ? {
-              ...current,
-              ...(updatedRecord && !Array.isArray(updatedRecord)
-                ? updatedRecord
-                : {}),
-              status: updatedRecord?.status || status,
-            }
+        current && String(current.form_id) === formId
+          ? { ...current, ...(returnedRecord || {}), status: newStatus }
           : current,
       );
       setActionMessage({
@@ -209,7 +225,10 @@ const TiluRauteli2026_27 = () => {
         text: `आवेदन ${formId} ${actionLabel} कर दिया गया है।`,
       });
     } catch (error) {
-      console.error(`Failed to update Tilu Rauteli status for ${formId}:`, error);
+      console.error(
+        `Failed to update Tilu Rauteli status for ${formId}:`,
+        error,
+      );
       setActionMessage({
         type: "danger",
         text: error.message || "स्टेटस अपडेट नहीं हो सका।",
@@ -220,6 +239,65 @@ const TiluRauteli2026_27 = () => {
   };
 
   const handlePrint = () => window.print();
+
+  const renderDetailRows = (fields) =>
+    fields.map(([label, field]) => {
+      const value = selectedApplication[field];
+      if (field === "appli_url" && !value) return null;
+      return (
+        <tr key={field}>
+          <th>{label}</th>
+          <td>
+            {field === "appli_url" && value ? (
+              <a href={value} target="_blank" rel="noreferrer">
+                {value}
+              </a>
+            ) : field === "dob" ? (
+              formatDate(value)
+            ) : (
+              displayValue(value)
+            )}
+          </td>
+        </tr>
+      );
+    });
+
+  const renderDocument = ({ field, label, type }) => {
+    const url = getMediaUrl(selectedApplication[field]);
+    return (
+      <tr key={field}>
+        <th>{label}</th>
+        <td className="tilu-dpo-document-cell">
+          {!url ? (
+            <span>दस्तावेज़ उपलब्ध नहीं है।</span>
+          ) : type === "image" ? (
+            <a
+              href={url}
+              target="_blank"
+              rel="noreferrer"
+              className="tilu-dpo-image-link"
+            >
+              <img src={url} alt={label} />
+            </a>
+          ) : (
+            <a
+              href={url}
+              target="_blank"
+              rel="noreferrer"
+              className="tilu-dpo-document-link"
+            >
+              <FaFilePdf /> PDF देखें / डाउनलोड करें
+            </a>
+          )}
+        </td>
+      </tr>
+    );
+  };
+
+  const achievementPoints = String(selectedApplication?.appli_points || "")
+    .split("*")
+    .map((point) => point.trim())
+    .filter(Boolean);
 
   return (
     <div className="dashboard-container tilu-dpo-dashboard">
@@ -239,7 +317,7 @@ const TiluRauteli2026_27 = () => {
               <span>आवेदनों का विवरण एवं अनुमोदन</span>
             </div>
             <Button
-              variant="outline-primary"
+              variant="outline-light"
               onClick={fetchApplications}
               disabled={loading}
             >
@@ -270,26 +348,27 @@ const TiluRauteli2026_27 = () => {
               </div>
             </div>
             <div className="tilu-dpo-table-scroll">
-              <Table hover responsive className="tilu-dpo-table mb-0">
+              <Table hover className="tilu-dpo-table mb-0">
                 <thead>
                   <tr>
-                    <th>S.no</th>
+                    <th>क्रम संख्या</th>
                     <th>Form ID</th>
-                    <th>Applicant Name</th>
-                    <th>DOB</th>
-                    <th>Education</th>
-                    <th>Address</th>
-                    <th>District</th>
-                    <th>Social Media Link/URL</th>
-                    <th>Status</th>
-                    <th>Action</th>
+                    <th>आवेदिका का नाम</th>
+                    <th>जन्म तिथि</th>
+                    <th>शैक्षिक योग्यता</th>
+                    <th>पता</th>
+                    <th>जनपद</th>
+                    <th>सोशल मीडिया लिंक</th>
+                    <th>स्थिति</th>
+                    <th>कार्यवाही</th>
                   </tr>
                 </thead>
                 <tbody>
                   {loading ? (
                     <tr>
                       <td colSpan="10" className="tilu-dpo-empty">
-                        <Spinner animation="border" size="sm" /> आवेदन लोड हो रहे हैं...
+                        <Spinner animation="border" size="sm" /> आवेदन लोड हो
+                        रहे हैं...
                       </td>
                     </tr>
                   ) : applications.length === 0 ? (
@@ -308,7 +387,7 @@ const TiluRauteli2026_27 = () => {
                         status.toLowerCase() ===
                         "rejected by district committee";
                       const isUpdating =
-                        updatingFormId === application.form_id;
+                        updatingFormId === String(application.form_id || "");
                       return (
                         <tr key={application.form_id || application.id}>
                           <td>{index + 1}</td>
@@ -330,14 +409,16 @@ const TiluRauteli2026_27 = () => {
                                 rel="noreferrer"
                                 className="tilu-dpo-url"
                               >
-                                Link
+                                लिंक देखें
                               </a>
                             ) : (
-                              <span className="tilu-dpo-no-link">×</span>
+                              <span className="tilu-dpo-no-link">—</span>
                             )}
                           </td>
                           <td>
-                            <Badge bg={getStatusVariant(status)}>{status}</Badge>
+                            <Badge bg={getStatusVariant(status)}>
+                              {status}
+                            </Badge>
                           </td>
                           <td>
                             <div className="tilu-dpo-actions">
@@ -398,9 +479,8 @@ const TiluRauteli2026_27 = () => {
         <div
           className="tilu-dpo-modal-backdrop"
           onMouseDown={(event) => {
-            if (event.target === event.currentTarget) {
+            if (event.target === event.currentTarget)
               setSelectedApplication(null);
-            }
           }}
         >
           <section
@@ -411,128 +491,192 @@ const TiluRauteli2026_27 = () => {
           >
             <header className="tilu-dpo-modal-toolbar">
               <div>
-                <h2 id="tilu-dpo-preview-title">
-                  आवेदन का पूर्वावलोकन
-                </h2>
+                <h2 id="tilu-dpo-preview-title">आवेदन का पूर्वावलोकन</h2>
                 <span>Form ID: {selectedApplication.form_id || "—"}</span>
               </div>
               <div className="tilu-dpo-modal-actions">
-                <Button variant="primary" onClick={handlePrint}>
-                  <FaPrint /> View as PDF / Print
+                <Button variant="light" onClick={handlePrint}>
+                  <FaPrint /> प्रिंट / PDF
                 </Button>
                 <Button
-                  variant="outline-secondary"
+                  variant="outline-light"
                   onClick={() => setSelectedApplication(null)}
                 >
-                  बंद करें
+                  <FaTimes /> बंद करें
                 </Button>
               </div>
             </header>
+
             <div className="tilu-dpo-print-area">
-              <div className="tilu-dpo-document-header">
-                <h1>महिला सशक्तिकरण एवं बाल विकास विभाग</h1>
-                <p>उत्तराखण्ड सरकार</p>
-                <h2>राज्य स्त्री शक्ति तीलू रौतेली पुरस्कार 2026-27</h2>
-                <div className="tilu-dpo-document-meta">
-                  <strong>Form ID: {selectedApplication.form_id || "—"}</strong>
-                  <Badge bg={getStatusVariant(selectedApplication.status)}>
-                    {selectedApplication.status || "pending"}
-                  </Badge>
-                </div>
-              </div>
+              <article className="tilu-dpo-application-document">
+                <header className="tilu-dpo-document-header">
+                  <div className="tilu-dpo-department-name">
+                    महिला सशक्तिकरण एवं बाल विकास विभाग
+                  </div>
+                  <h2>
+                    राज्य स्त्री शक्ति तीलू रौतेली पुरस्कार हेतु आवेदन पत्र
+                  </h2>
+                </header>
 
-              <section className="tilu-dpo-detail-section">
-                <h3>आवेदिका का विवरण</h3>
-                <div className="tilu-dpo-detail-grid">
-                  {DETAIL_FIELDS.map(([label, field]) => {
-                    if (field === "appli_url" && !selectedApplication[field]) {
-                      return null;
-                    }
-                    return (
-                      <div className="tilu-dpo-detail-item" key={field}>
-                        <strong>{label}</strong>
-                        {field === "appli_url" && selectedApplication[field] ? (
-                          <a
-                            href={selectedApplication[field]}
-                            target="_blank"
-                            rel="noreferrer"
-                          >
-                            {selectedApplication[field]}
-                          </a>
-                        ) : (
-                          <span>{selectedApplication[field] || "—"}</span>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              </section>
+                <section className="tilu-dpo-pdf-section">
+                  <table className="tilu-dpo-pdf-table">
+                    <tbody>
+                      <tr className="tilu-dpo-table-title">
+                        <th colSpan="2">जानकारी का शीर्षक</th>
+                      </tr>
+                      <tr>
+                        <th>Form ID | आवेदन फार्म संख्या</th>
+                        <td>{displayValue(selectedApplication.form_id)}</td>
+                      </tr>
+                      <tr>
+                        <th>Applicant | आवेदिका</th>
+                        <td className="tilu-dpo-applicant-photo-cell">
+                          {selectedApplication.appli_img && (
+                            <img
+                              className="tilu-dpo-applicant-photo"
+                              src={getMediaUrl(selectedApplication.appli_img)}
+                              alt="आवेदिका का फोटो"
+                            />
+                          )}
+                          <strong>
+                            {displayValue(selectedApplication.filer_name)}
+                          </strong>
+                          <span>
+                            {displayValue(selectedApplication.filer_mob)}
+                          </span>
+                        </td>
+                      </tr>
+                      {renderDetailRows(
+                        DETAIL_FIELDS.filter(
+                          ([label, field]) => !["appli_url"].includes(field),
+                        ),
+                      )}
+                    </tbody>
+                  </table>
+                </section>
 
-              <section className="tilu-dpo-detail-section">
-                <h3>विशिष्ट कार्य क्षेत्र</h3>
-                {String(selectedApplication.appli_points || "")
-                  .split("*")
-                  .map((point) => point.trim())
-                  .filter(Boolean).length ? (
-                  <ol className="tilu-dpo-points">
-                    {String(selectedApplication.appli_points || "")
-                      .split("*")
-                      .map((point) => point.trim())
-                      .filter(Boolean)
-                      .map((point, index) => (
-                        <li key={`${index}-${point}`}>{point}</li>
-                      ))}
-                  </ol>
-                ) : (
-                  <p>—</p>
-                )}
-              </section>
+                <section className="tilu-dpo-pdf-section">
+                  <table className="tilu-dpo-pdf-table">
+                    <tbody>
+                      <tr className="tilu-dpo-table-title">
+                        <th colSpan="2">जानकारी का शीर्षक</th>
+                      </tr>
+                      <tr>
+                        <th>
+                          महिला की उपलब्धि किस प्रकार उत्कृष्ट आंकी गयी है — से
+                          संबंधित डॉक्यूमेंटेशन
+                        </th>
+                        <td className="tilu-dpo-long-text">
+                          <div>{displayValue(selectedApplication.manak1)}</div>
+                          <div className="tilu-dpo-inline-document">
+                            {getMediaUrl(selectedApplication.appli_pdf1) ? (
+                              <a
+                                href={getMediaUrl(
+                                  selectedApplication.appli_pdf1,
+                                )}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="tilu-dpo-document-link"
+                              >
+                                <FaFilePdf /> PDF देखें / डाउनलोड करें
+                              </a>
+                            ) : (
+                              <span>दस्तावेज़ उपलब्ध नहीं है।</span>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                      <tr>
+                        <th>
+                          महिला के जीवन के संक्षिप्त विवरण से संबंधित प्रमाण
+                          पत्र, अखबार की कतरनी (newspaper cutting) आदि
+                        </th>
+                        <td className="tilu-dpo-long-text">
+                          <div>{displayValue(selectedApplication.manak3)}</div>
+                          <div className="tilu-dpo-inline-document">
+                            {getMediaUrl(selectedApplication.appli_pdf2) ? (
+                              <a
+                                href={getMediaUrl(
+                                  selectedApplication.appli_pdf2,
+                                )}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="tilu-dpo-document-link"
+                              >
+                                <FaFilePdf /> PDF देखें / डाउनलोड करें
+                              </a>
+                            ) : (
+                              <span>दस्तावेज़ उपलब्ध नहीं है।</span>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                      <tr>
+                        <th>
+                          उत्कृष्ट कार्यों से संबंधित राष्ट्रीय / अंतर्राष्ट्रीय
+                          सम्मान, पुरस्कार, प्रमाण पत्र आदि
+                        </th>
+                        <td className="tilu-dpo-long-text">
+                          <div>{displayValue(selectedApplication.manak2)}</div>
+                          <div className="tilu-dpo-inline-document">
+                            {getMediaUrl(selectedApplication.appli_pdf3) ? (
+                              <a
+                                href={getMediaUrl(
+                                  selectedApplication.appli_pdf3,
+                                )}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="tilu-dpo-document-link"
+                              >
+                                <FaFilePdf /> PDF देखें / डाउनलोड करें
+                              </a>
+                            ) : (
+                              <span>दस्तावेज़ उपलब्ध नहीं है।</span>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </section>
 
-              <section className="tilu-dpo-detail-section">
-                <h3>उपलब्धियों एवं योगदान का विवरण</h3>
-                <div className="tilu-dpo-detail-grid">
-                  {[
-                    ["महिला की उपलब्धि का विवरण", "manak1"],
-                    ["सम्मान / पुरस्कार का विवरण", "manak2"],
-                    ["जीवन का संक्षिप्त विवरण", "manak3"],
-                  ].map(([label, field]) => (
-                    <div className="tilu-dpo-detail-item full" key={field}>
-                      <strong>{label}</strong>
-                      <span>{selectedApplication[field] || "—"}</span>
-                    </div>
-                  ))}
-                </div>
-              </section>
+                <section className="tilu-dpo-pdf-section">
+                  <table className="tilu-dpo-pdf-table">
+                    <tbody>
+                      <tr className="tilu-dpo-table-title">
+                        <th colSpan="2">जानकारी का शीर्षक</th>
+                      </tr>
+                     
+<tr>
+  <th>उपलब्धि के क्षेत्र</th>
+  <td className="tilu-dpo-long-text">
+    {achievementPoints.length > 0 ? (
+      <ol className="tilu-dpo-points">
+        {achievementPoints.map((point, index) => (
+          <li key={`${index}-${point}`}>
+            {point}
+          </li>
+        ))}
+      </ol>
+    ) : (
+      "—"
+    )}
+  </td>
+</tr>
 
-              <section className="tilu-dpo-detail-section">
-                <h3>अपलोड किए गए दस्तावेज़</h3>
-                <div className="tilu-dpo-documents">
-                  {REQUIRED_DOCUMENTS.map(({ field, label, type }) => {
-                    const url = getMediaUrl(selectedApplication[field]);
-                    return (
-                      <div className="tilu-dpo-document" key={field}>
-                        <strong>{label}</strong>
-                        {!url ? (
-                          <p>दस्तावेज़ उपलब्ध नहीं है।</p>
-                        ) : type === "image" ? (
-                          <a href={url} target="_blank" rel="noreferrer">
-                            <img src={url} alt={label} />
-                          </a>
-                        ) : (
-                          <a
-                            href={url}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="tilu-dpo-document-link"
-                          >
-                            <FaFilePdf /> PDF देखें / डाउनलोड करें
-                          </a>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              </section>
+                    </tbody>
+                  </table>
+                  <div className="tilu-dpo-document-footer">
+                    <span>
+                      Form ID: {displayValue(selectedApplication.form_id)}
+                    </span>
+                    <span>
+                      स्थिति:{" "}
+                      {displayValue(selectedApplication.status || "pending")}
+                    </span>
+                  </div>
+                </section>
+              </article>
             </div>
           </section>
         </div>
