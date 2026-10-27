@@ -462,13 +462,9 @@ const DisDashBoard = () => {
     try {
       setLoading(true);
       setError(null);
-      const accessToken = localStorage.getItem("accessToken");
-      const response = await cookieFetch(`${BASE_URL}/director-itcell/application/status/`, {
-        headers: {
-          "Content-Type": "application/json",
-          ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
-        },
-      });
+       const response = await cookieFetch(`${BASE_URL}/director-itcell/application/status/`, {
+         method: "GET",
+       });
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -509,13 +505,9 @@ const DisDashBoard = () => {
     try {
       setRecommendedLoading(true);
       setRecommendedError(null);
-      const accessToken = localStorage.getItem("accessToken");
-      const response = await cookieFetch(`${BASE_URL}/recommended-application/`, {
-        headers: {
-          "Content-Type": "application/json",
-          ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
-        },
-      });
+       const response = await cookieFetch(`${BASE_URL}/recommended-application/`, {
+         method: "GET",
+       });
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -538,13 +530,9 @@ const DisDashBoard = () => {
   const fetchDirectorRecommendations = async () => {
     try {
       setDirectorRecommendationsLoading(true);
-      const accessToken = localStorage.getItem("accessToken");
-      const response = await cookieFetch(DIRECTOR_RECOMMENDATION_URL, {
-        headers: {
-          "Content-Type": "application/json",
-          ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
-        },
-      });
+       const response = await cookieFetch(DIRECTOR_RECOMMENDATION_URL, {
+         method: "GET",
+       });
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
       const result = await response.json();
       if (result.success && Array.isArray(result.data)) {
@@ -563,6 +551,32 @@ const DisDashBoard = () => {
       return [];
     } finally {
       setDirectorRecommendationsLoading(false);
+    }
+  };
+
+  const fetchRegisteredApplications = async () => {
+    try {
+      const accessToken = localStorage.getItem("accessToken");
+      const response = await cookieFetch(`${BASE_URL}/bravery/it-cell/applications/`, {
+        headers: {
+          "Content-Type": "application/json",
+          ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+        },
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const result = await response.json();
+      if (result.success && Array.isArray(result.data)) {
+        setRegistrationList(result.data);
+        return result.data;
+      }
+      setRegistrationList([]);
+      return [];
+    } catch (err) {
+      console.error("Failed to fetch registered applications:", err);
+      setRegistrationList([]);
+      return [];
     }
   };
 
@@ -645,8 +659,8 @@ const DisDashBoard = () => {
   };
 
   const requestDirectorRecommendation = async ({ method, payload, file }) => {
-    const accessToken = localStorage.getItem("accessToken");
-    const authHeaders = accessToken ? { Authorization: `Bearer ${accessToken}` } : {};
+    const accessToken = null;
+    const authHeaders = {};
     const formData = new FormData();
     Object.entries(payload).forEach(([key, value]) => {
       if (key !== "dir_file" && value !== null && value !== undefined) {
