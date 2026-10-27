@@ -14,6 +14,7 @@ import ITCellLogin from "./components/login/ITCellLogin";
 import NavBar from "./components/nav_bar/NavBar";
 
 import DisDashBoard from "./components/all_dashbords/dis_admin/DisDashBoard";
+import DirectorTiluRauteli2026_27 from "./components/all_dashbords/dis_admin/DirectorTiluRauteli2026-27";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
@@ -86,6 +87,7 @@ const AppContent = () => {
     "/TiluRauteliUserDashboard",
     "/AnganwadiUserDashboard",
     "/DisDashBoard",
+    "/DirectorTiluRauteli2026-27",
   ].some((route) => location.pathname.startsWith(route));
   const isHomeRoute = normalizedPath === "/";
   const isLoginRoute = ["/login", "/loginit"].includes(normalizedPath);
@@ -197,6 +199,14 @@ const AppContent = () => {
             element={
               <ProtectedRoute allowedRoles={["director"]}>
                 <DisDashBoard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/DirectorTiluRauteli2026-27"
+            element={
+              <ProtectedRoute allowedRoles={["director"]}>
+                <DirectorTiluRauteli2026_27 />
               </ProtectedRoute>
             }
           />

@@ -95,11 +95,19 @@ const DisLeftnav = ({ sidebarOpen, setSidebarOpen, isMobile, isTablet, onNavClic
         ],
       },
       {
-       
+        icon: <FaTrophy />,
         label: "राज्य स्त्री शक्ति तीलू रौतेली पुरस्कार",
-        path: null,
-        active: false,
-        disabled: true,
+        submenu: [
+          {
+            label: "वर्ष 2026-27",
+            path: "/DirectorTiluRauteli2026-27",
+          },
+          {
+            label: "वर्ष 2027-28",
+            path: null,
+            disabled: true,
+          },
+        ],
       },
       {
        
