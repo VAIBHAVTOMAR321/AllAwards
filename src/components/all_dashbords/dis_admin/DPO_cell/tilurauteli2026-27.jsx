@@ -56,7 +56,7 @@ const readResponse = async (response) => {
   try {
     return JSON.parse(body);
   } catch {
-    throw new Error("सर्वर से अमान्य प्रतिक्रिया प्राप्त हुई।");
+    throw new Error("Invalid response received from the server.");
   }
 };
 
@@ -108,6 +108,12 @@ const TiluRauteli2026_27 = () => {
   const [actionMessage, setActionMessage] = useState(null);
   const [updatingFormId, setUpdatingFormId] = useState("");
   const [selectedApplication, setSelectedApplication] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [activeTab, setActiveTab] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [selectedProjects, setSelectedProjects] = useState([]);
+  const PAGE_SIZE = 100;
 
   const toggleSidebar = () => setSidebarOpen((open) => !open);
 
@@ -121,19 +127,19 @@ const TiluRauteli2026_27 = () => {
         throw new Error(
           getErrorMessage(
             payload,
-            `आवेदन लोड नहीं हो सके (HTTP ${response.status})।`,
+            `Failed to load applications (HTTP ${response.status}).`,
           ),
         );
       }
       if (!Array.isArray(payload.data)) {
         throw new Error(
-          "सर्वर से आवेदन सूची सही प्रारूप में प्राप्त नहीं हुई।",
+          "Server did not return application list in correct format.",
         );
       }
       setApplications(payload.data);
     } catch (error) {
       console.error("Failed to load Tilu Rauteli applications:", error);
-      setLoadError(error.message || "आवेदन लोड नहीं हो सके।");
+      setLoadError(error.message || "Failed to load applications.");
     } finally {
       setLoading(false);
     }
@@ -142,6 +148,45 @@ const TiluRauteli2026_27 = () => {
   useEffect(() => {
     fetchApplications();
   }, [fetchApplications]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, activeTab, selectedProjects, statusFilter]);
+
+  const uniqueProjects = [
+    ...new Set(applications.map((a) => String(a.project || "")).filter(Boolean)),
+  ].sort();
+
+  const filteredApplications = applications.filter((application) => {
+    const query = searchQuery.toLowerCase().trim();
+    const matchesSearch =
+      !query ||
+      String(application.form_id || "").toLowerCase().includes(query) ||
+      String(application.filer_name || "").toLowerCase().includes(query);
+    const matchesTab =
+      activeTab === "all" ||
+      activeTab === "report" ||
+      String(application.status || "").toLowerCase() ===
+        "approved by district committee";
+    const matchesStatus =
+      statusFilter === "all" ||
+      (statusFilter === "approved" &&
+        String(application.status || "").toLowerCase() ===
+          "approved by district committee") ||
+      (statusFilter === "rejected" &&
+        String(application.status || "").toLowerCase() ===
+          "rejected by district committee");
+    const matchesProject =
+      selectedProjects.length === 0 ||
+      selectedProjects.includes(String(application.project || ""));
+    return matchesSearch && matchesTab && matchesStatus && matchesProject;
+  });
+
+  const totalPages = Math.max(1, Math.ceil(filteredApplications.length / PAGE_SIZE));
+  const paginatedApplications = filteredApplications.slice(
+    (currentPage - 1) * PAGE_SIZE,
+    currentPage * PAGE_SIZE
+  );
 
   useEffect(() => {
     const handleResize = () => {
@@ -173,15 +218,15 @@ const TiluRauteli2026_27 = () => {
     if (!formId) {
       setActionMessage({
         type: "danger",
-        text: "इस आवेदन का Form ID उपलब्ध नहीं है।",
+        text: "Form ID not available for this application.",
       });
       return;
     }
     const actionLabel =
-      status === "approved by district committee" ? "स्वीकृत" : "अस्वीकृत";
+      status === "approved by district committee" ? "Approved" : "Rejected";
     if (
       !window.confirm(
-        `क्या आप आवेदन ${formId} को ${actionLabel} करना चाहते हैं?`,
+        `Do you want to ${actionLabel} application ${formId}?`,
       )
     )
       return;
@@ -199,7 +244,7 @@ const TiluRauteli2026_27 = () => {
         throw new Error(
           getErrorMessage(
             payload,
-            `स्टेटस अपडेट नहीं हो सका (HTTP ${response.status})।`,
+            `Status could not be updated (HTTP ${response.status}).`,
           ),
         );
       }
@@ -222,7 +267,7 @@ const TiluRauteli2026_27 = () => {
       );
       setActionMessage({
         type: "success",
-        text: `आवेदन ${formId} ${actionLabel} कर दिया गया है।`,
+        text: `Application ${formId} has been ${actionLabel}.`,
       });
     } catch (error) {
       console.error(
@@ -231,7 +276,7 @@ const TiluRauteli2026_27 = () => {
       );
       setActionMessage({
         type: "danger",
-        text: error.message || "स्टेटस अपडेट नहीं हो सका।",
+        text: error.message || "Status could not be updated.",
       });
     } finally {
       setUpdatingFormId("");
@@ -269,7 +314,7 @@ const TiluRauteli2026_27 = () => {
         <th>{label}</th>
         <td className="tilu-dpo-document-cell">
           {!url ? (
-            <span>दस्तावेज़ उपलब्ध नहीं है।</span>
+            <span>Document not available.</span>
           ) : type === "image" ? (
             <a
               href={url}
@@ -286,7 +331,7 @@ const TiluRauteli2026_27 = () => {
               rel="noreferrer"
               className="tilu-dpo-document-link"
             >
-              <FaFilePdf /> PDF देखें / डाउनलोड करें
+                <FaFilePdf /> View / Download PDF
             </a>
           )}
         </td>
@@ -312,16 +357,16 @@ const TiluRauteli2026_27 = () => {
         <main className="tilu-dpo-page">
           <header className="tilu-dpo-page-header">
             <div>
-              <p>जिला स्तरीय सत्यापन</p>
-              <h1>राज्य स्त्री शक्ति तीलू रौतेली पुरस्कार 2026-27</h1>
-              <span>आवेदनों का विवरण एवं अनुमोदन</span>
+              <p>District Level Verification</p>
+              <h1>State Women Power Tilu Rauteli Award 2026-27</h1>
+              <span>Application Details and Approval</span>
             </div>
             <Button
               variant="outline-light"
               onClick={fetchApplications}
               disabled={loading}
             >
-              {loading ? <Spinner size="sm" animation="border" /> : "रीफ्रेश"}
+              {loading ? <Spinner size="sm" animation="border" /> : "Refresh"}
             </Button>
           </header>
 
@@ -338,139 +383,307 @@ const TiluRauteli2026_27 = () => {
 
           <section className="tilu-dpo-table-card">
             <div className="tilu-dpo-table-heading">
-              <div>
-                <h2>आवेदन सूची</h2>
-                <p>
-                  {loading
-                    ? "आवेदन लोड हो रहे हैं..."
-                    : `कुल आवेदन: ${applications.length}`}
-                </p>
+              <div className="tilu-dpo-heading-left">
+                <div className="tilu-dpo-tabs">
+                  <button
+                    className={activeTab === "all" ? "tilu-dpo-tab active" : "tilu-dpo-tab"}
+                    onClick={() => setActiveTab("all")}
+                  >
+                    All Applications
+                  </button>
+                  <button
+                    className={activeTab === "approved" ? "tilu-dpo-tab active" : "tilu-dpo-tab"}
+                    onClick={() => setActiveTab("approved")}
+                  >
+                    Approved Applications
+                  </button>
+                  <button
+                    className={activeTab === "report" ? "tilu-dpo-tab active" : "tilu-dpo-tab"}
+                    onClick={() => setActiveTab("report")}
+                  >
+                    Report
+                  </button>
+                </div>
+                <div className="tilu-dpo-heading-meta">
+                  <h2>Application List</h2>
+                  <p>
+                    {loading
+                      ? "Loading applications..."
+                      : `Total Applications: ${filteredApplications.length}`}
+                  </p>
+                </div>
+              </div>
+              <div className="tilu-dpo-filters">
+                <div className="tilu-dpo-search">
+                  <input
+                    type="text"
+                    placeholder="Search by Form ID or Applicant Name..."
+                    value={searchQuery}
+                    onChange={(event) => setSearchQuery(event.target.value)}
+                  />
+                </div>
+                <div className="tilu-dpo-project-filter">
+                  <label>Project / Development Block</label>
+                  <select
+                    multiple
+                    size={Math.min(uniqueProjects.length, 5) || 1}
+                    value={selectedProjects}
+                    onChange={(event) => {
+                      const values = Array.from(
+                        event.target.selectedOptions,
+                        (option) => option.value,
+                      );
+                      setSelectedProjects(values);
+                    }}
+                  >
+                    {uniqueProjects.map((project) => (
+                      <option key={project} value={project}>
+                        {project}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                {activeTab !== "approved" && (
+                  <div className="tilu-dpo-status-filter">
+                    <label>Status</label>
+                    <select
+                      value={statusFilter}
+                      onChange={(event) => setStatusFilter(event.target.value)}
+                    >
+                      <option value="all">All</option>
+                      <option value="approved">Approved</option>
+                      <option value="rejected">Rejected</option>
+                    </select>
+                  </div>
+                )}
               </div>
             </div>
             <div className="tilu-dpo-table-scroll">
-              <Table hover className="tilu-dpo-table mb-0">
-                <thead>
-                  <tr>
-                    <th>क्रम संख्या</th>
-                    <th>Form ID</th>
-                    <th>आवेदिका का नाम</th>
-                    <th>जन्म तिथि</th>
-                    <th>शैक्षिक योग्यता</th>
-                    <th>पता</th>
-                    <th>जनपद</th>
-                    <th>सोशल मीडिया लिंक</th>
-                    <th>स्थिति</th>
-                    <th>कार्यवाही</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {loading ? (
+              {activeTab === "report" ? (
+                <Table hover className="tilu-dpo-table mb-0 tilu-dpo-report-table">
+                  <thead>
+                      <tr>
+                        <th>S.no</th>
+                        <th>District</th>
+                        <th>Applicant</th>
+                        <th>Husband/Father Name</th>
+                        <th>Bank Name</th>
+                        <th>Account Number</th>
+                        <th>IFSC Code</th>
+                        <th>Mobile</th>
+                        <th>Application Points</th>
+                      </tr>
+                  </thead>
+                  <tbody>
+                    {loading ? (
+                      <tr>
+                        <td colSpan="9" className="tilu-dpo-empty">
+                          <Spinner animation="border" size="sm" /> Loading applications...
+                        </td>
+                      </tr>
+                    ) : filteredApplications.length === 0 ? (
+                      <tr>
+                        <td colSpan="9" className="tilu-dpo-empty">
+                          No report data available.
+                        </td>
+                      </tr>
+                    ) : (
+                      paginatedApplications.map((application, index) => {
+                        const achievementPoints = String(
+                          application.appli_points || ""
+                        )
+                          .split("*")
+                          .map((point) => point.trim())
+                          .filter(Boolean);
+                        return (
+                          <tr key={application.form_id || application.id}>
+                            <td>{index + 1}</td>
+                            <td>{application.district || "—"}</td>
+                            <td>{application.filer_name || "—"}</td>
+                            <td>{application.fath_husb_name || "—"}</td>
+                            <td>{application.appli_bank_name || "—"}</td>
+                            <td>{application.appli_bank_acc || "—"}</td>
+                            <td>{application.appli_ifsc || "—"}</td>
+                            <td>{application.filer_mob || "—"}</td>
+                            <td>
+                              {achievementPoints.length > 0 ? (
+                                <ol
+                                  className="tilu-dpo-points"
+                                  style={{ margin: 0, paddingLeft: 20 }}
+                                >
+                                  {achievementPoints.map(
+                                    (point, pi) => (
+                                      <li key={pi}>{point}</li>
+                                    )
+                                  )}
+                                </ol>
+                              ) : (
+                                "—"
+                              )}
+                            </td>
+                          </tr>
+                        );
+                      })
+                    )}
+                  </tbody>
+                </Table>
+              ) : (
+                <Table hover className="tilu-dpo-table mb-0">
+                  <thead>
                     <tr>
-                      <td colSpan="10" className="tilu-dpo-empty">
-                        <Spinner animation="border" size="sm" /> आवेदन लोड हो
-                        रहे हैं...
-                      </td>
+                      <th>S.no</th>
+                      <th>Form ID</th>
+                      <th>Applicant Name</th>
+                      <th>DOB</th>
+                      <th>Educational </th>
+                      <th>Address</th>
+                      <th>District</th>
+                      <th>Social Media Link</th>
+                      <th>Status</th>
+                      <th>Action</th>
                     </tr>
-                  ) : applications.length === 0 ? (
-                    <tr>
-                      <td colSpan="10" className="tilu-dpo-empty">
-                        कोई आवेदन उपलब्ध नहीं है।
-                      </td>
-                    </tr>
-                  ) : (
-                    applications.map((application, index) => {
-                      const status = String(application.status || "pending");
-                      const isApproved =
-                        status.toLowerCase() ===
-                        "approved by district committee";
-                      const isRejected =
-                        status.toLowerCase() ===
-                        "rejected by district committee";
-                      const isUpdating =
-                        updatingFormId === String(application.form_id || "");
-                      return (
-                        <tr key={application.form_id || application.id}>
-                          <td>{index + 1}</td>
-                          <td className="tilu-dpo-form-id">
-                            {application.form_id || "—"}
-                          </td>
-                          <td>{application.filer_name || "—"}</td>
-                          <td>{formatDate(application.dob)}</td>
-                          <td>{application.edu_qual || "—"}</td>
-                          <td className="tilu-dpo-address">
-                            {application.address || "—"}
-                          </td>
-                          <td>{application.district || "—"}</td>
-                          <td>
-                            {application.appli_url ? (
-                              <a
-                                href={application.appli_url}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="tilu-dpo-url"
-                              >
-                                लिंक देखें
-                              </a>
-                            ) : (
-                              <span className="tilu-dpo-no-link">—</span>
-                            )}
-                          </td>
-                          <td>
-                            <Badge bg={getStatusVariant(status)}>
-                              {status}
-                            </Badge>
-                          </td>
-                          <td>
-                            <div className="tilu-dpo-actions">
-                              <Button
-                                size="sm"
-                                variant="outline-primary"
-                                onClick={() =>
-                                  setSelectedApplication(application)
-                                }
-                              >
-                                <FaEye /> View
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="success"
-                                disabled={isUpdating || isApproved}
-                                onClick={() =>
-                                  updateApplicationStatus(
-                                    application,
-                                    "approved by district committee",
-                                  )
-                                }
-                              >
-                                {isUpdating ? (
-                                  <Spinner size="sm" animation="border" />
+                  </thead>
+                  <tbody>
+                    {loading ? (
+                      <tr>
+                        <td colSpan="10" className="tilu-dpo-empty">
+                          <Spinner animation="border" size="sm" /> Loading applications...
+                        </td>
+                      </tr>
+                    ) : filteredApplications.length === 0 ? (
+                      <tr>
+                        <td colSpan="10" className="tilu-dpo-empty">
+                          No applications available.
+                        </td>
+                      </tr>
+                    ) : (
+                      paginatedApplications.map((application, index) => {
+                        const status = String(application.status || "pending");
+                        const isApproved =
+                          status.toLowerCase() ===
+                          "approved by district committee";
+                        const isRejected =
+                          status.toLowerCase() ===
+                          "rejected by district committee";
+                        const isUpdating =
+                          updatingFormId === String(application.form_id || "");
+                        return (
+                          <tr key={application.form_id || application.id}>
+                            <td>{index + 1}</td>
+                            <td className="tilu-dpo-form-id">
+                              {application.form_id || "—"}
+                            </td>
+                            <td>{application.filer_name || "—"}</td>
+                            <td>{formatDate(application.dob)}</td>
+                            <td>{application.edu_qual || "—"}</td>
+                            <td className="tilu-dpo-address">
+                              {application.address || "—"}
+                            </td>
+                            <td>{application.district || "—"}</td>
+                            <td>
+                              {application.appli_url ? (
+                                  <a
+                                    href={application.appli_url}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="tilu-dpo-url"
+                                  >
+                                    View Link
+                                  </a>
+                              ) : (
+                                <span className="tilu-dpo-no-link">—</span>
+                              )}
+                            </td>
+                            <td>
+                              <Badge bg={getStatusVariant(status)}>
+                                {status}
+                              </Badge>
+                            </td>
+                            <td>
+                              <div className="tilu-dpo-actions">
+                                <Button
+                                  size="sm"
+                                  variant="outline-primary"
+                                  onClick={() =>
+                                    setSelectedApplication(application)
+                                  }
+                                >
+                                  <FaEye /> View
+                                </Button>
+                                {isApproved ? (
+                                  <Button
+                                    size="sm"
+                                    variant="success"
+                                    disabled
+                                  >
+                                    <FaCheck /> Approved
+                                  </Button>
                                 ) : (
-                                  <FaCheck />
-                                )}{" "}
-                                Approve
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="outline-danger"
-                                disabled={isUpdating || isRejected}
-                                onClick={() =>
-                                  updateApplicationStatus(
-                                    application,
-                                    "rejected by district committee",
-                                  )
-                                }
-                              >
-                                <FaTimes /> Reject
-                              </Button>
-                            </div>
-                          </td>
-                        </tr>
-                      );
-                    })
-                  )}
-                </tbody>
-              </Table>
+                                  <Button
+                                    size="sm"
+                                    variant="success"
+                                    disabled={isUpdating || isApproved || isRejected}
+                                    onClick={() =>
+                                      updateApplicationStatus(
+                                        application,
+                                        "approved by district committee",
+                                      )
+                                    }
+                                  >
+                                    {isUpdating ? (
+                                      <Spinner size="sm" animation="border" />
+                                    ) : (
+                                      <FaCheck />
+                                    )}{" "}
+                                    Approve
+                                  </Button>
+                                )}
+                                <Button
+                                  size="sm"
+                                  variant="outline-danger"
+                                  disabled={isUpdating || isRejected || isApproved}
+                                  onClick={() =>
+                                    updateApplicationStatus(
+                                      application,
+                                      "rejected by district committee",
+                                    )
+                                  }
+                                >
+                                  {isRejected ? "Rejected" : "Reject"}
+                                </Button>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })
+                    )}
+                  </tbody>
+                </Table>
+              )}
             </div>
+            {totalPages > 1 && (
+              <div className="tilu-dpo-pagination">
+                <span className="tilu-dpo-page-info">
+                  Page {currentPage} of {totalPages}
+                </span>
+                <Button
+                  size="sm"
+                  variant="outline-secondary"
+                  disabled={currentPage === 1 || loading}
+                  onClick={() => setCurrentPage((page) => page - 1)}
+                >
+                  Previous
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline-secondary"
+                  disabled={currentPage === totalPages || loading}
+                  onClick={() => setCurrentPage((page) => page + 1)}
+                >
+                  Next
+                </Button>
+              </div>
+            )}
           </section>
         </main>
       </div>
@@ -658,12 +871,12 @@ const TiluRauteli2026_27 = () => {
                   <table className="tilu-dpo-pdf-table">
                     <tbody>
                       <tr className="tilu-dpo-table-title">
-                        <th colSpan="2">जानकारी का शीर्षक</th>
+                        <th colSpan="2">Information Title</th>
                       </tr>
                      
-<tr>
-  <th>उपलब्धि के क्षेत्र</th>
-  <td className="tilu-dpo-long-text">
+ <tr>
+   <th>उपलब्धि के क्षेत्र</th>
+   <td className="tilu-dpo-long-text">
     {achievementPoints.length > 0 ? (
       <ol className="tilu-dpo-points">
         {achievementPoints.map((point, index) => (

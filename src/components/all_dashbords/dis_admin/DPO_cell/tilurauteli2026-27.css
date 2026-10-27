@@ -64,9 +64,88 @@
 .tilu-dpo-table-heading {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   padding: 16px 20px;
   border-bottom: 1px solid #e8edf3;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+/* Left block: tabs + title + count */
+.tilu-dpo-heading-left {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+  min-width: 260px;
+}
+
+.tilu-dpo-heading-meta {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.tilu-dpo-heading-meta h2 {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #173b5b;
+}
+
+.tilu-dpo-heading-meta p {
+  margin: 0;
+  color: #64748b;
+  font-size: 0.8rem;
+}
+
+/* Right block: filters in one row */
+.tilu-dpo-filters {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+  min-width: 260px;
+}
+
+.tilu-dpo-search,
+.tilu-dpo-project-filter,
+.tilu-dpo-status-filter {
+  width: auto;
+  max-width: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+}
+
+/* Tabs */
+.tilu-dpo-tabs {
+  display: flex;
+  gap: 8px;
+}
+
+.tilu-dpo-tab {
+  padding: 6px 14px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #64748b;
+  background: #f1f5f9;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.tilu-dpo-tab:hover {
+  background: #e2e8f0;
+  border-color: #94a3b8;
+}
+
+.tilu-dpo-tab.active {
+  background: #123f67;
+  color: #fff;
+  border-color: #123f67;
 }
 
 .tilu-dpo-table-heading h2 {
@@ -89,7 +168,29 @@
 
 .tilu-dpo-table {
   min-width: 1200px;
-  vertical-align: middle;
+}
+
+.tilu-dpo-report-table {
+  min-width: 950px;
+}
+
+.tilu-dpo-report-table thead th {
+  padding: 12px 8px;
+  border-bottom: 1px solid #dfe6ee;
+  background: #eef4fb;
+  color: #24364b;
+  font-size: 0.78rem;
+  font-weight: 800;
+  white-space: nowrap;
+  vertical-align: top !important;
+}
+
+.tilu-dpo-report-table tbody td {
+  padding: 11px 8px;
+  color: #344256;
+  font-size: 0.82rem;
+  vertical-align: top !important;
+  text-align: left;
 }
 
 .tilu-dpo-table thead th {
@@ -154,6 +255,105 @@
   padding: 32px !important;
   color: #64748b !important;
   text-align: center;
+}
+
+/* Search input above table */
+.tilu-dpo-search input {
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  width: 220px;
+  min-width: 160px;
+}
+
+.tilu-dpo-search input:focus {
+  outline: none;
+  border-color: #1769aa;
+  box-shadow: 0 0 0 2px rgba(23, 105, 170, 0.15);
+}
+
+/* Project multi-select filter */
+.tilu-dpo-project-filter {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.tilu-dpo-project-filter label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #475569;
+}
+
+.tilu-dpo-project-filter select {
+  padding: 6px 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  min-width: 150px;
+  background: #fff;
+}
+
+.tilu-dpo-status-filter select {
+  padding: 6px 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  min-width: 140px;
+  background: #fff;
+}
+
+.tilu-dpo-project-filter select:focus {
+  outline: none;
+  border-color: #1769aa;
+  box-shadow: 0 0 0 2px rgba(23, 105, 170, 0.15);
+}
+
+/* Status filter */
+.tilu-dpo-status-filter {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.tilu-dpo-status-filter label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #475569;
+}
+
+.tilu-dpo-status-filter select {
+  padding: 6px 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  min-width: 220px;
+  background: #fff;
+}
+
+.tilu-dpo-status-filter select:focus {
+  outline: none;
+  border-color: #1769aa;
+  box-shadow: 0 0 0 2px rgba(23, 105, 170, 0.15);
+}
+
+/* Pagination controls */
+.tilu-dpo-pagination {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 20px;
+  border-top: 1px solid #e8edf3;
+  background: #fbfbfd;
+}
+
+.tilu-dpo-page-info {
+  font-size: 0.82rem;
+  color: #64748b;
+  font-weight: 600;
+  margin-right: 12px;
 }
 
 /* Full-window preview modal */
@@ -340,6 +540,7 @@
 .tilu-dpo-points li {
   padding: 3px 0;
   line-height: 1.55;
+  text-align: left;
 }
 
 /* Supporting documents */
@@ -427,6 +628,20 @@
 
   .tilu-dpo-pdf-table {
     font-size: 0.78rem;
+  }
+
+  .tilu-dpo-table,
+  .tilu-dpo-report-table {
+    min-width: 700px;
+    font-size: 0.75rem;
+  }
+
+  .tilu-dpo-table thead th,
+  .tilu-dpo-table tbody td,
+  .tilu-dpo-report-table thead th,
+  .tilu-dpo-report-table tbody td {
+    padding: 7px 5px;
+    font-size: 0.75rem;
   }
 
   .tilu-dpo-pdf-table th,
