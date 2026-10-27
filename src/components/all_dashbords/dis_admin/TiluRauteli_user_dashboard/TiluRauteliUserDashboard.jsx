@@ -594,6 +594,10 @@ const TiluRauteliUserDashboard = () => {
       .map((style) => `<style>${style.textContent}</style>`)
       .join("");
 
+    printWindow.onload = () => {
+      printWindow.focus();
+      printWindow.print();
+    };
     printWindow.document.open();
     printWindow.document.write(`<!doctype html>
       <html lang="hi">
@@ -631,16 +635,36 @@ const TiluRauteliUserDashboard = () => {
             .tilu-preview-section li {
               text-align: left !important;
             }
+            .tilu-print-window-toolbar {
+              position: sticky;
+              top: 0;
+              z-index: 1;
+              padding: 10px 16px;
+              background: #0b3d5c;
+              text-align: right;
+            }
+            .tilu-print-window-toolbar button {
+              border: 0;
+              border-radius: 6px;
+              padding: 9px 14px;
+              background: #fff;
+              color: #0b3d5c;
+              font: 600 14px Arial, sans-serif;
+              cursor: pointer;
+            }
+            @media print {
+              .tilu-print-window-toolbar { display: none !important; }
+            }
           </style>
         </head>
-        <body>${preview.outerHTML}</body>
+        <body>
+          <div class="tilu-print-window-toolbar">
+            <button type="button" onclick="window.print()">Print / Save as PDF</button>
+          </div>
+          ${preview.outerHTML}
+        </body>
       </html>`);
     printWindow.document.close();
-    printWindow.onafterprint = () => printWindow.close();
-    window.setTimeout(() => {
-      printWindow.focus();
-      printWindow.print();
-    }, 750);
   };
 
   const handleStepNavigation = (stepNumber) => {
