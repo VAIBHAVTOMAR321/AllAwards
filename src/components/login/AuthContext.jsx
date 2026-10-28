@@ -25,6 +25,10 @@ const isCookieAuthEndpoint = (url) =>
     "/telu-roteli/verify-otp/",
     "/telu-roteli/register/",
     "/telu-roteli/login/",
+    "/ang-puruskar/send-otp/",
+    "/ang-puruskar/verify-otp/",
+    "/angan-puruskar/register/",
+    "/angan-puruskar/login/",
     "/refresh-token/",
     "/logout/",
   ].some((path) => url.includes(path));
@@ -39,6 +43,7 @@ const usesCookieSession = (userData) =>
     "cdpo",
     "it_cell",
     "telu_rautli_user",
+    "ang_puruskar_user",
   ].includes(getUserRole(userData));
 
 export const useAuth = () => useContext(AuthContext);
@@ -213,6 +218,8 @@ export const AuthProvider = ({ children }) => {
         ? "/loginit"
         : normalizedRole === "telu_rautli_user"
           ? "/TiluRauteliLogin"
+          : normalizedRole === "ang_puruskar_user"
+            ? "/AnganwadiLogin"
           : "/Login";
     navigate(loginPath, { replace: true });
   }, [navigate, user]);
@@ -281,6 +288,8 @@ export const AuthProvider = ({ children }) => {
       navigate("/loginit", { replace: true });
     } else if (normalizedRole === "telu_rautli_user") {
       navigate("/TiluRauteliLogin", { replace: true });
+    } else if (normalizedRole === "ang_puruskar_user") {
+      navigate("/AnganwadiLogin", { replace: true });
     } else if (normalizedRole === "user" && user?.portal === "anganwadi") {
       navigate("/AnganwadiLogin", { replace: true });
     } else if (normalizedRole === "user") {

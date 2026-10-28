@@ -46,6 +46,7 @@ import { useAuth } from "./components/login/AuthContext";
 
 const roleLoginPath = (role, portal) => {
   if (portal === "anganwadi") return "/AnganwadiLogin";
+  if (role === "ang_puruskar_user") return "/AnganwadiLogin";
   if (role === "it_cell") return "/loginit";
   if (role === "telu_rautli_user") return "/TiluRauteliLogin";
   return "/Login";
@@ -139,7 +140,7 @@ const AppContent = () => {
             path="/AnganwadiUserDashboard"
             element={
               <ProtectedRoute
-                allowedRoles={["user"]}
+                allowedRoles={["ang_puruskar_user"]}
                 loginPath="/AnganwadiLogin"
               >
                 <AnganwadiUserDashboard />

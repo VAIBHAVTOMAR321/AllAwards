@@ -1,0 +1,153 @@
+.anganwadi-dashboard-shell {
+  --anganwadi-ink: #263248;
+  --anganwadi-navy: #243b64;
+  --anganwadi-blue: #4267a5;
+  --anganwadi-gold: #d49a37;
+  --anganwadi-line: #e2e8f0;
+  display: flex;
+  min-height: 100vh;
+  background: #f4f6fa;
+  color: var(--anganwadi-ink);
+  font-family: "Noto Sans Devanagari", "Segoe UI", sans-serif;
+}
+
+.anganwadi-dashboard-shell .main-content-dash {
+  min-width: 0;
+  min-height: 100vh;
+  margin-left: 260px;
+  display: flex;
+  flex-direction: column;
+  transition: margin-left 0.25s ease;
+}
+
+.anganwadi-left-nav.sidebar-closed ~ .main-content-dash {
+  margin-left: 70px;
+}
+
+.anganwadi-dashboard-content {
+  flex: 1;
+  padding: 24px 20px 36px;
+}
+
+.anganwadi-dashboard-hero {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(24px, 4vw, 42px);
+  border-radius: 16px;
+  background: linear-gradient(120deg, #243b64, #4267a5);
+  box-shadow: 0 14px 32px rgba(36, 59, 100, 0.18);
+  color: #fff;
+}
+
+.anganwadi-dashboard-hero::after {
+  position: absolute;
+  right: -40px;
+  bottom: -95px;
+  width: 220px;
+  height: 220px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  content: "";
+}
+
+.anganwadi-dashboard-hero > * {
+  position: relative;
+  z-index: 1;
+}
+
+.anganwadi-dashboard-hero span {
+  color: #ffe4b2;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.anganwadi-dashboard-hero h1 {
+  margin: 10px 0 6px;
+  color: #fff;
+  font-size: clamp(1.35rem, 3vw, 2rem);
+  font-weight: 800;
+}
+
+.anganwadi-dashboard-hero p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.86);
+  font-size: 13px;
+}
+
+.anganwadi-account-section {
+  margin-top: 26px;
+}
+
+.anganwadi-account-section h2 {
+  margin: 0 0 14px;
+  color: var(--anganwadi-navy);
+  font-size: 17px;
+  font-weight: 800;
+}
+
+.anganwadi-account-card {
+  border: 1px solid var(--anganwadi-line);
+  border-radius: 12px;
+  box-shadow: 0 5px 16px rgba(38, 50, 72, 0.06);
+}
+
+.anganwadi-account-card .card-body {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+  padding: 18px;
+}
+
+.anganwadi-account-card .card-body > svg {
+  flex: 0 0 auto;
+  color: var(--anganwadi-blue);
+  font-size: 23px;
+}
+
+.anganwadi-account-card .card-body > div {
+  min-width: 0;
+}
+
+.anganwadi-account-card span,
+.anganwadi-sector-card span {
+  display: block;
+  margin-bottom: 4px;
+  color: #718096;
+  font-size: 11px;
+}
+
+.anganwadi-account-card strong,
+.anganwadi-sector-card strong {
+  display: block;
+  overflow-wrap: anywhere;
+  color: var(--anganwadi-ink);
+  font-size: 13px;
+}
+
+.anganwadi-sector-card {
+  border: 1px solid var(--anganwadi-line);
+  border-radius: 12px;
+}
+
+.anganwadi-sector-card .card-body {
+  padding: 16px 18px;
+}
+
+@media (max-width: 1023px) {
+  .anganwadi-dashboard-shell .main-content-dash,
+  .anganwadi-left-nav.sidebar-closed ~ .main-content-dash {
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 575px) {
+  .anganwadi-dashboard-content {
+    padding: 18px 10px 28px;
+  }
+
+  .anganwadi-dashboard-hero {
+    border-radius: 12px;
+  }
+}
