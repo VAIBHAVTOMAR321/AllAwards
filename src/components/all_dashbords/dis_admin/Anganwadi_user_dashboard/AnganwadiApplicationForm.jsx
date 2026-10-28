@@ -19,6 +19,7 @@ import {
 } from "react-icons/fa";
 import {
   getAnganwadiApplication,
+  getMissingAnganwadiStepOneFields,
   isAnganwadiApplicationDemoMode,
   saveAnganwadiApplicationStep,
   submitAnganwadiApplication,
@@ -64,7 +65,12 @@ const STEP_ONE_GROUPS = [
   {
     title: "व्यक्तिगत जानकारी",
     fields: [
-      { name: "filer_name", label: "आवेदक का नाम", readOnly: true },
+      {
+        name: "filer_name",
+        label: "आवेदक का नाम",
+        readOnly: true,
+        required: true,
+      },
       { name: "fath_husb_name", label: "पिता / पति का नाम", required: true },
       { name: "dob", label: "जन्म तिथि", type: "date", required: true },
       {
@@ -73,7 +79,12 @@ const STEP_ONE_GROUPS = [
         readOnly: true,
         help: "जन्म तिथि चुनने पर आयु अपने आप दिखाई जाएगी।",
       },
-      { name: "filer_mob", label: "मोबाइल नंबर", readOnly: true },
+      {
+        name: "filer_mob",
+        label: "मोबाइल नंबर",
+        readOnly: true,
+        required: true,
+      },
       { name: "filer_email", label: "ईमेल आईडी", type: "email" },
       {
         name: "filer_adhar",
@@ -95,18 +106,17 @@ const STEP_ONE_GROUPS = [
   {
     title: "कार्य विवरण",
     fields: [
-      { name: "district", label: "जनपद", readOnly: true },
-      { name: "project", label: "विकासखंड / परियोजना", readOnly: true },
       {
         name: "awc_center",
-        label: "आंगनवाड़ी केंद्र",
-        type: "select",
+        label: "आंगनवाड़ी केंद्र / केंद्र कोड",
         required: true,
-        options: [
-          "डेमो आंगनवाड़ी केंद्र 01 (AWC-DEMO-001)",
-          "डेमो आंगनवाड़ी केंद्र 02 (AWC-DEMO-002)",
-          "डेमो मिनी आंगनवाड़ी केंद्र (AWC-DEMO-003)",
-        ],
+      },
+      { name: "district", label: "जनपद", readOnly: true, required: true },
+      {
+        name: "project",
+        label: "विकासखंड / परियोजना",
+        readOnly: true,
+        required: true,
       },
       {
         name: "joining_date",
@@ -271,10 +281,22 @@ const ASSESSMENT_GROUPS = [
   {
     title: "आंगनवाड़ी केंद्र एवं आसपास की साफ-सफाई",
     checkboxes: [
-      "हाथ धोने का प्रशिक्षण दिया है",
-      "बच्चों के नाखून कटे हुए हैं",
-      "केंद्र के आसपास सफाई है",
-      "केंद्र में पोस्टर लगाए गए हैं",
+      {
+        label: "हाथ धोने का प्रशिक्षण दिया है",
+        value: "हाथ धोने का प्रशिक्षण दिया है",
+      },
+      {
+        label: "बच्चों के नाखून कटे हुए है",
+        value: "बच्चों के नाखेन कटे हुए है",
+      },
+      {
+        label: "केन्द्र के आसपास सफाई है",
+        value: "केन्द्र के आसपास सफाई है",
+      },
+      {
+        label: "केन्द्र में पोस्टर लगाये गये हैं",
+        value: "केन्द्र में पोस्टर लगाये गये हैं",
+      },
     ],
   },
   {
@@ -683,9 +705,18 @@ const formatPreviewDate = (value) => {
   }).format(date);
 };
 
+const normalizeSelectedValues = (value) => {
+  if (Array.isArray(value)) return value;
+  if (typeof value === "string" && value.trim()) {
+    return value.split(",").map((item) => item.trim()).filter(Boolean);
+  }
+  return [];
+};
+
 const AnganwadiApplicationForm = ({ account }) => {
   const applicationRef = useRef(null);
   const filePreviewUrlsRef = useRef({});
+  const [selectedFiles, setSelectedFiles] = useState({});
   const [applicationKey, setApplicationKey] = useState("");
   const [formData, setFormData] = useState(null);
   const [filePreviews, setFilePreviews] = useState({});
@@ -715,16 +746,15 @@ const AnganwadiApplicationForm = ({ account }) => {
         if (!active) return;
         setApplicationKey(key);
         setFormData(application);
-        if (application.status === "step1") setCurrentStep(2);
-        if (application.status === "step2" || application.status === "step3") {
+        const status = application.status;
+        if (status === "step1") setCurrentStep(2);
+        if (status === "step2" || status === "step3" || status === "final") {
           setCurrentStep(3);
         }
-        if (application.status === "step3" || application.status === "final") {
-          setShowPreview(true);
-        }
+        if (status === "step3" || status === "final") setShowPreview(true);
       })
       .catch((loadError) => {
-        console.error("Anganwadi demo application load failed:", loadError);
+        console.error("Anganwadi application load failed:", loadError);
         if (active) setError(loadError.message || "आवेदन लोड नहीं हो सका।");
       })
       .finally(() => {
@@ -761,7 +791,13 @@ const AnganwadiApplicationForm = ({ account }) => {
       ...previous,
       [name]: { url, type: file.type, name: file.name },
     }));
+    setSelectedFiles((previous) => ({ ...previous, [name]: file }));
     updateField(name, file.name);
+  };
+
+  const getServerFileUrl = (filePath) => {
+    if (/^https?:\/\//i.test(filePath)) return filePath;
+    return `https://mahadevaaya.com${filePath.startsWith("/") ? "" : "/"}${filePath}`;
   };
 
   const renderPreviewFile = (name) => {
@@ -775,22 +811,44 @@ const AnganwadiApplicationForm = ({ account }) => {
     }
 
     const preview = filePreviews[name];
+    const serverFileUrl = !preview?.url ? getServerFileUrl(fileName) : "";
     return (
       <div className="anganwadi-preview-file">
         {preview?.url && preview.type.startsWith("image/") ? (
           <img src={preview.url} alt={fileName} />
         ) : null}
+        {!preview?.url && /\.(png|jpe?g|gif|webp)$/i.test(fileName) ? (
+          <img src={serverFileUrl} alt={fileName} />
+        ) : null}
         {preview?.url && preview.type === "application/pdf" ? (
           <iframe title={fileName} src={preview.url} />
         ) : null}
-        <span>{fileName}</span>
-        <small>डेमो पूर्वावलोकन; फाइल सर्वर पर अपलोड नहीं हुई है।</small>
+        {!preview?.url && /\.pdf($|\?)/i.test(fileName) ? (
+          <iframe title={fileName} src={serverFileUrl} />
+        ) : null}
+        <a href={preview?.url || serverFileUrl} target="_blank" rel="noreferrer">
+          {fileName}
+        </a>
+        {preview?.url && (
+          <small>डेमो पूर्वावलोकन; फाइल सर्वर पर अपलोड नहीं हुई है।</small>
+        )}
       </div>
     );
   };
 
   const saveStep = async (event) => {
     event.preventDefault();
+    if (currentStep === 1) {
+      const missingFields = getMissingAnganwadiStepOneFields(formData);
+      if (missingFields.length) {
+        setError(
+          "कृपया चरण 1 के सभी आवश्यक विवरण भरें: " +
+            missingFields.join(", "),
+        );
+        return;
+      }
+    }
+
     setSaving(true);
     setError("");
     setNotice("");
@@ -799,23 +857,46 @@ const AnganwadiApplicationForm = ({ account }) => {
         applicationKey,
         formData,
         currentStep,
+        selectedFiles,
       );
+      if (saved.status !== `step${currentStep}`) {
+        throw new Error(
+          `सर्वर ने चरण ${currentStep} की पूर्ण स्थिति की पुष्टि नहीं की।`,
+        );
+      }
+      if (currentStep === 1) {
+        const missingSavedFields = getMissingAnganwadiStepOneFields(saved);
+        if (missingSavedFields.length) {
+          setFormData(saved);
+          setError(
+            "सर्वर से चरण 1 के सभी आवश्यक विवरण नहीं मिले: " +
+              missingSavedFields.join(", "),
+          );
+          return;
+        }
+      }
       setFormData(saved);
       if (currentStep === 3) {
+        Object.values(filePreviewUrlsRef.current).forEach((url) =>
+          URL.revokeObjectURL(url),
+        );
+        filePreviewUrlsRef.current = {};
+        setFilePreviews({});
+        setSelectedFiles({});
+        setNotice("चरण 3 के दस्तावेज़ सर्वर पर सेव हुए।");
         setShowPreview(true);
-        setNotice("डेमो आवेदन पूर्वावलोकन के लिए तैयार है।");
       } else {
         setCurrentStep((step) => step + 1);
-        setNotice("डेमो में जानकारी सेव हुई।");
-        window.requestAnimationFrame(() => {
-          applicationRef.current?.scrollIntoView({
-            behavior: "smooth",
-            block: "start",
-          });
-        });
+        setNotice(`चरण ${currentStep} सर्वर पर सेव हुआ।`);
       }
+      window.requestAnimationFrame(() => {
+        applicationRef.current?.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      });
     } catch (saveError) {
-      console.error("Anganwadi demo application save failed:", saveError);
+      console.error("Anganwadi application save failed:", saveError);
       setError(saveError.message || "जानकारी सेव नहीं हो सकी।");
     } finally {
       setSaving(false);
@@ -835,7 +916,7 @@ const AnganwadiApplicationForm = ({ account }) => {
       setConfirmFinalSubmit(false);
       setShowPreview(true);
     } catch (submitError) {
-      console.error("Anganwadi demo application submission failed:", submitError);
+      console.error("Anganwadi final submission failed:", submitError);
       setError(submitError.message || "आवेदन सबमिट नहीं हो सका।");
     } finally {
       setSaving(false);
@@ -951,12 +1032,6 @@ const AnganwadiApplicationForm = ({ account }) => {
             <Row className="g-3">
               {group.fields.map((field) => renderField(field))}
             </Row>
-            {group.title === "कार्य विवरण" && (
-              <Alert variant="info" className="mt-3 mb-0">
-                आंगनवाड़ी केंद्रों की सूची अभी डेमो विकल्पों से दिखाई जा रही है।
-                वास्तविक केंद्र सूची API जुड़ने पर विकल्प बदलेंगे।
-              </Alert>
-            )}
           </Card.Body>
         </Card>
       ))}
@@ -984,24 +1059,29 @@ const AnganwadiApplicationForm = ({ account }) => {
         )}
         {group.checkboxes && (
           <div className="anganwadi-checklist">
-            {group.checkboxes.map((label) => {
-              const checked = (formData.saaf_ans || []).includes(label);
+            {group.checkboxes.map(({ label, value }) => {
+              const checked = (formData.saaf_ans || []).includes(value);
               return (
                 <Form.Check
                   key={label}
-                  id={`anganwadi-clean-${group.checkboxes.indexOf(label)}`}
+                  id={`anganwadi-clean-${value}`}
                   type="checkbox"
                   label={label}
                   checked={checked}
                   disabled={saving || submitted}
-                  onChange={() =>
-                    updateField(
-                      "saaf_ans",
-                      checked
-                        ? formData.saaf_ans.filter((item) => item !== label)
-                        : [...formData.saaf_ans, label],
-                    )
-                  }
+                  onChange={(event) => {
+                    const isChecked = event.target.checked;
+                    setFormData((previous) => {
+                      const selected = normalizeSelectedValues(previous.saaf_ans);
+                      return {
+                        ...previous,
+                        saaf_ans: isChecked
+                          ? [...new Set([...selected, value])]
+                          : selected.filter((item) => item !== value),
+                      };
+                    });
+                    setNotice("");
+                  }}
                 />
               );
             })}
@@ -1015,8 +1095,8 @@ const AnganwadiApplicationForm = ({ account }) => {
     <>
       <Alert variant="warning">
         प्रत्येक PDF की अधिकतम सीमा 2 MB तथा फोटो / हस्ताक्षर की अधिकतम सीमा
-        100 KB है। डेमो मोड में फाइल का नाम ही रखा जाता है; फाइल सर्वर पर अपलोड
-        नहीं होती।
+        100 KB है। आवेदन के पहले तीन चरण API के माध्यम से सर्वर पर सेव होते हैं।
+        अंतिम सबमिशन API उपलब्ध नहीं है।
       </Alert>
       {DOCUMENT_GROUPS.map((group) => (
         <Card className="anganwadi-form-section" key={group.title}>
@@ -1163,9 +1243,8 @@ const AnganwadiApplicationForm = ({ account }) => {
     >
       {isAnganwadiApplicationDemoMode && (
         <Alert variant="warning" className="anganwadi-demo-alert">
-          डेमो मोड: इस फॉर्म में दर्ज जानकारी केवल इस ब्राउज़र सत्र में अस्थायी
-          रूप से रखी जाती है। अभी कोई वास्तविक आवेदन या दस्तावेज़ सर्वर पर जमा
-          नहीं होता।
+          व्यक्तिगत विवरण, मूल्यांकन और दस्तावेज़ चरण API के माध्यम से सर्वर पर
+          सेव होते हैं। अंतिम सबमिशन API अभी उपलब्ध नहीं है।
         </Alert>
       )}
       <header className="anganwadi-application-header">
