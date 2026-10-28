@@ -4,8 +4,19 @@ const API_BASE =
   "https://wecdukaward.in/balvirtaawardproject/balvirtaawardproject_backend/api";
 const TELU_API_BASE =
   "https://mahadevaaya.com/wecdallaward/wecdallaward_backend/api/telu-roteli";
+const ANGANWADI_API_BASE =
+  "https://mahadevaaya.com/wecdallaward/wecdallaward_backend/api";
 const TILU_DISTRICTS_API =
   "https://mahadevaaya.com/wecdallaward/wecdallaward_backend/api/cdpo-dropdown/";
+const ANGANWADI_SECTOR_API = `${ANGANWADI_API_BASE}/sector-dropdown/`;
+
+const readAnganwadiResponse = async (response, fallbackMessage) => {
+  try {
+    return await response.json();
+  } catch {
+    throw new Error(fallbackMessage);
+  }
+};
 
 export async function fetchDistrictList() {
   const response = await fetch(TILU_DISTRICTS_API, {
@@ -38,6 +49,49 @@ export async function fetchTiluBlockList(district) {
   return [
     ...new Set(data.data.map(({ project_name }) => project_name).filter(Boolean)),
   ];
+}
+
+export async function fetchAnganwadiDistrictList() {
+  const response = await fetch(ANGANWADI_SECTOR_API, {
+    credentials: "omit",
+  });
+  const data = await readAnganwadiResponse(
+    response,
+    "जनपद सूची का उत्तर पढ़ा नहीं जा सका।",
+  );
+
+  if (!response.ok || data.success === false || !Array.isArray(data.data)) {
+    throw new Error(data.message || data.detail || "जनपद सूची लोड नहीं हो सकी।");
+  }
+
+  return [
+    ...new Set(data.data.map(({ district }) => district).filter(Boolean)),
+  ];
+}
+
+export async function fetchAnganwadiProjectSectors(district) {
+  if (!district) return [];
+
+  const response = await fetch(
+    `${ANGANWADI_SECTOR_API}?district=${encodeURIComponent(district)}`,
+    { credentials: "omit" },
+  );
+  const data = await readAnganwadiResponse(
+    response,
+    "परियोजना और सेक्टर सूची का उत्तर पढ़ा नहीं जा सका।",
+  );
+
+  if (!response.ok || data.success === false || !Array.isArray(data.data)) {
+    throw new Error(
+      data.message || data.detail || "परियोजना और सेक्टर सूची लोड नहीं हो सकी।",
+    );
+  }
+
+  return data.data.filter(
+    (project) =>
+      project.project_name &&
+      Array.isArray(project.sectors),
+  );
 }
 
 const postTiluApi = async (path, body, fallbackMessage) => {
@@ -78,6 +132,66 @@ export const loginTiluUser = (phone, password) =>
   postTiluApi(
     "login",
     { phone, password, role: "telu-rautli-user" },
+    "लॉगिन विफल। कृपया मोबाइल नंबर और पासवर्ड जांचें।",
+  );
+
+const postAnganwadiApi = async (path, body, fallbackMessage) => {
+  const response = await cookieFetch(`${ANGANWADI_API_BASE}/${path}/`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  const data = await readAnganwadiResponse(
+    response,
+    "सर्वर से अमान्य उत्तर मिला।",
+  );
+  if (!response.ok || data.success === false) {
+    throw new Error(data.detail || data.message || fallbackMessage);
+  }
+  return data;
+};
+
+export const sendAnganwadiRegistrationOtp = (phone) =>
+  postAnganwadiApi(
+    "ang-puruskar/send-otp",
+    { phone },
+    "OTP भेजने में विफल।",
+  );
+
+export const verifyAnganwadiRegistrationOtp = (phone, otp) =>
+  postAnganwadiApi(
+    "ang-puruskar/verify-otp",
+    { phone, otp },
+    "OTP सत्यापन विफल।",
+  );
+
+export const registerAnganwadiUser = ({
+  name,
+  phone,
+  password,
+  adhar_no,
+  district,
+  project,
+  sector,
+}) =>
+  postAnganwadiApi(
+    "angan-puruskar/register",
+    {
+      name,
+      mobile_no: phone,
+      passw: password,
+      adhar_no,
+      district,
+      project,
+      sector,
+    },
+    "पंजीकरण पूरा नहीं हो सका।",
+  );
+
+export const loginAnganwadiUser = (phone, password) =>
+  postAnganwadiApi(
+    "angan-puruskar/login",
+    { phone, password, role: "ang-puruskar-user" },
     "लॉगिन विफल। कृपया मोबाइल नंबर और पासवर्ड जांचें।",
   );
 

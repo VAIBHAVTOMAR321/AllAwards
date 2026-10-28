@@ -2,17 +2,25 @@ import React, { useCallback, useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   FaArrowRight,
+  FaAddressCard,
   FaEye,
   FaEyeSlash,
   FaKey,
   FaMapMarkerAlt,
   FaMobileAlt,
+  FaUser,
   FaUserShield,
 } from "react-icons/fa";
 import { useAuth } from "../login/AuthContext";
 import anganwadiImage from "../../assets/images/images-5.jpeg";
-import { fetchDistrictList, loginAwardPortal } from "./awardPortalLogin";
-import { sendOtpApi, verifyOtpApi } from "../otpsendverify/api";
+import {
+  fetchAnganwadiDistrictList,
+  fetchAnganwadiProjectSectors,
+  loginAnganwadiUser,
+  registerAnganwadiUser,
+  sendAnganwadiRegistrationOtp,
+  verifyAnganwadiRegistrationOtp,
+} from "./awardPortalLogin";
 import AwardPasswordRecovery from "./AwardPasswordRecovery";
 import "./AnganwadiLogin.css";
 
@@ -24,13 +32,21 @@ export default function AnganwadiLogin() {
   const [showRegistration, setShowRegistration] = useState(false);
   const [registrationStep, setRegistrationStep] = useState("details");
   const [registration, setRegistration] = useState({
+    name: "",
     phone: "",
-    email: "",
+    adhar_no: "",
     district: "",
+    project: "",
+    sector: "",
   });
   const [registrationOtp, setRegistrationOtp] = useState("");
+  const [registrationPassword, setRegistrationPassword] = useState("");
+  const [registrationConfirmPassword, setRegistrationConfirmPassword] =
+    useState("");
   const [districts, setDistricts] = useState([]);
+  const [projects, setProjects] = useState([]);
   const [districtsLoading, setDistrictsLoading] = useState(false);
+  const [projectsLoading, setProjectsLoading] = useState(false);
   const [registrationLoading, setRegistrationLoading] = useState(false);
   const [registrationError, setRegistrationError] = useState("");
   const [error, setError] = useState("");
@@ -60,13 +76,41 @@ export default function AnganwadiLogin() {
 
     setDistrictsLoading(true);
     try {
-      setDistricts(await fetchDistrictList());
+      setDistricts(await fetchAnganwadiDistrictList());
     } catch (districtError) {
       setRegistrationError(districtError.message || "जनपद सूची लोड नहीं हो सकी।");
     } finally {
       setDistrictsLoading(false);
     }
   }, [districts.length, districtsLoading]);
+
+  const handleDistrictChange = async (district) => {
+    setRegistration((current) => ({
+      ...current,
+      district,
+      project: "",
+      sector: "",
+    }));
+    setProjects([]);
+    setRegistrationError("");
+    if (!district) return;
+
+    setProjectsLoading(true);
+    try {
+      setProjects(await fetchAnganwadiProjectSectors(district));
+    } catch (projectError) {
+      setRegistrationError(
+        projectError.message || "परियोजना और सेक्टर सूची लोड नहीं हो सकी।",
+      );
+    } finally {
+      setProjectsLoading(false);
+    }
+  };
+
+  const selectedProject = projects.find(
+    ({ project_name }) => project_name === registration.project,
+  );
+  const sectors = selectedProject?.sectors || [];
 
   useEffect(() => {
     if (!location.state?.openRegistration) return;
@@ -87,10 +131,22 @@ export default function AnganwadiLogin() {
       setRegistrationError("कृपया 10 अंकों का मोबाइल नंबर दर्ज करें।");
       return;
     }
+    if (!registration.name.trim() || !/^[0-9]{12}$/.test(registration.adhar_no)) {
+      setRegistrationError("कृपया नाम और 12 अंकों का आधार नंबर दर्ज करें।");
+      return;
+    }
+    if (
+      !registration.district ||
+      !registration.project ||
+      !registration.sector
+    ) {
+      setRegistrationError("कृपया जनपद, परियोजना और सेक्टर चुनें।");
+      return;
+    }
 
     setRegistrationLoading(true);
     try {
-      await sendOtpApi(registration.phone);
+      await sendAnganwadiRegistrationOtp(registration.phone);
       setRegistrationOtp("");
       setRegistrationStep("otp");
     } catch (otpError) {
@@ -110,10 +166,71 @@ export default function AnganwadiLogin() {
 
     setRegistrationLoading(true);
     try {
-      await verifyOtpApi(registration.phone, registrationOtp);
+      await verifyAnganwadiRegistrationOtp(
+        registration.phone,
+        registrationOtp,
+      );
       setRegistrationStep("verified");
     } catch (otpError) {
       setRegistrationError(otpError.message || "OTP सत्यापन विफल।");
+    } finally {
+      setRegistrationLoading(false);
+    }
+  };
+
+  const handleAnganwadiRegistration = async (event) => {
+    event.preventDefault();
+    setRegistrationError("");
+    if (registrationPassword !== registrationConfirmPassword) {
+      setRegistrationError("दोनों पासवर्ड मेल नहीं खाते।");
+      return;
+    }
+
+    setRegistrationLoading(true);
+    let accountCreated = false;
+    try {
+      await registerAnganwadiUser({
+        name: registration.name.trim(),
+        phone: registration.phone,
+        password: registrationPassword,
+        adhar_no: registration.adhar_no,
+        district: registration.district,
+        project: registration.project,
+        sector: registration.sector,
+      });
+      accountCreated = true;
+      const loginData = await loginAnganwadiUser(
+        registration.phone,
+        registrationPassword,
+      );
+      const account = loginData.user || loginData;
+      login({
+        role: account.role || "ang-puruskar-user",
+        user: {
+          ...account,
+          name: account.name || registration.name.trim(),
+          district: account.district || registration.district,
+          project: account.project || registration.project,
+          sector: account.sector || registration.sector,
+        },
+      });
+      setShowRegistration(false);
+      navigate("/AnganwadiUserDashboard", { replace: true });
+    } catch (registrationSubmitError) {
+      if (accountCreated) {
+        setShowRegistration(false);
+        setPhone(registration.phone);
+        setPassword(registrationPassword);
+        setError(
+          `पंजीकरण सफल हुआ, लेकिन स्वचालित लॉगिन विफल रहा: ${
+            registrationSubmitError.message || "कृपया दोबारा लॉगिन करें।"
+          }`,
+        );
+      } else {
+        setRegistrationError(
+          registrationSubmitError.message || "पंजीकरण पूरा नहीं हो सका।",
+        );
+      }
     } finally {
       setRegistrationLoading(false);
     }
@@ -125,8 +242,13 @@ export default function AnganwadiLogin() {
     setLoading(true);
 
     try {
-      await loginAwardPortal(phone.trim(), password, login, "anganwadi");
-      navigate("/AnganwadiUserDashboard");
+      const loginData = await loginAnganwadiUser(phone.trim(), password);
+      const account = loginData.user || loginData;
+      login({
+        role: account.role || "ang-puruskar-user",
+        user: account,
+      });
+      navigate("/AnganwadiUserDashboard", { replace: true });
     } catch (loginError) {
       setError(loginError.message);
     } finally {
@@ -260,7 +382,7 @@ export default function AnganwadiLogin() {
                     ? "नया पंजीकरण"
                     : registrationStep === "otp"
                       ? "मोबाइल सत्यापन"
-                      : "मोबाइल सत्यापित"}
+                      : "पासवर्ड बनाएं"}
                 </h2>
               </div>
               <button
@@ -276,8 +398,27 @@ export default function AnganwadiLogin() {
               <form onSubmit={handleRegistrationSubmit}>
                 <div className="anganwadi-registration-body">
                   <p className="anganwadi-registration-hint">
-                    कृपया अपना मोबाइल नंबर, ईमेल और जनपद दर्ज करें।
+                    कृपया अपना नाम, मोबाइल नंबर, आधार और कार्यक्षेत्र की जानकारी दर्ज करें।
                   </p>
+                  <label htmlFor="anganwadi-register-name">कार्यकर्त्री का नाम <span>*</span></label>
+                  <div className="anganwadi-registration-input">
+                    <FaUser aria-hidden="true" />
+                    <input
+                      id="anganwadi-register-name"
+                      type="text"
+                      autoComplete="name"
+                      value={registration.name}
+                      onChange={(event) =>
+                        setRegistration((current) => ({
+                          ...current,
+                          name: event.target.value,
+                        }))
+                      }
+                      placeholder="पूरा नाम दर्ज करें"
+                      required
+                    />
+                  </div>
+
                   <label htmlFor="anganwadi-register-phone">मोबाइल नंबर <span>*</span></label>
                   <div className="anganwadi-registration-input">
                     <FaMobileAlt aria-hidden="true" />
@@ -299,21 +440,23 @@ export default function AnganwadiLogin() {
                     />
                   </div>
 
-                  <label htmlFor="anganwadi-register-email">ईमेल पता <span>*</span></label>
+                  <label htmlFor="anganwadi-register-adhar">आधार नंबर <span>*</span></label>
                   <div className="anganwadi-registration-input">
-                    <span aria-hidden="true">@</span>
+                    <FaAddressCard aria-hidden="true" />
                     <input
-                      id="anganwadi-register-email"
-                      type="email"
-                      autoComplete="email"
-                      value={registration.email}
+                      id="anganwadi-register-adhar"
+                      type="text"
+                      inputMode="numeric"
+                      autoComplete="off"
+                      maxLength={12}
+                      value={registration.adhar_no}
                       onChange={(event) =>
                         setRegistration((current) => ({
                           ...current,
-                          email: event.target.value,
+                          adhar_no: event.target.value.replace(/\D/g, "").slice(0, 12),
                         }))
                       }
-                      placeholder="ईमेल पता दर्ज करें"
+                      placeholder="12 अंकों का आधार नंबर"
                       required
                     />
                   </div>
@@ -324,12 +467,7 @@ export default function AnganwadiLogin() {
                     <select
                       id="anganwadi-register-district"
                       value={registration.district}
-                      onChange={(event) =>
-                        setRegistration((current) => ({
-                          ...current,
-                          district: event.target.value,
-                        }))
-                      }
+                      onChange={(event) => handleDistrictChange(event.target.value)}
                       disabled={districtsLoading}
                       required
                     >
@@ -338,6 +476,59 @@ export default function AnganwadiLogin() {
                       </option>
                       {districts.map((district) => (
                         <option value={district} key={district}>{district}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <label htmlFor="anganwadi-register-project">परियोजना / ब्लॉक <span>*</span></label>
+                  <div className="anganwadi-registration-input">
+                    <FaMapMarkerAlt aria-hidden="true" />
+                    <select
+                      id="anganwadi-register-project"
+                      value={registration.project}
+                      onChange={(event) =>
+                        setRegistration((current) => ({
+                          ...current,
+                          project: event.target.value,
+                          sector: "",
+                        }))
+                      }
+                      disabled={!registration.district || projectsLoading}
+                      required
+                    >
+                      <option value="">
+                        {projectsLoading
+                          ? "परियोजनाएं लोड हो रही हैं..."
+                          : "परियोजना / ब्लॉक चुनें"}
+                      </option>
+                      {projects.map(({ project_name }) => (
+                        <option value={project_name} key={project_name}>
+                          {project_name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <label htmlFor="anganwadi-register-sector">सेक्टर <span>*</span></label>
+                  <div className="anganwadi-registration-input">
+                    <FaMapMarkerAlt aria-hidden="true" />
+                    <select
+                      id="anganwadi-register-sector"
+                      value={registration.sector}
+                      onChange={(event) =>
+                        setRegistration((current) => ({
+                          ...current,
+                          sector: event.target.value,
+                        }))
+                      }
+                      disabled={!registration.project}
+                      required
+                    >
+                      <option value="">सेक्टर चुनें</option>
+                      {sectors.map(({ sector }) => (
+                        <option value={sector} key={sector}>
+                          {sector}
+                        </option>
                       ))}
                     </select>
                   </div>
@@ -350,7 +541,13 @@ export default function AnganwadiLogin() {
                 <footer className="anganwadi-registration-footer">
                   <button
                     type="submit"
-                    disabled={registrationLoading || districtsLoading || !districts.length}
+                    disabled={
+                      registrationLoading ||
+                      districtsLoading ||
+                      projectsLoading ||
+                      !districts.length ||
+                      !projects.length
+                    }
                   >
                     {registrationLoading ? "OTP भेज रहे हैं..." : "पंजीकरण जारी रखें"}
                     <FaArrowRight aria-hidden="true" />
@@ -398,21 +595,83 @@ export default function AnganwadiLogin() {
             )}
 
             {registrationStep === "verified" && (
-              <div className="anganwadi-registration-body">
-                <p className="anganwadi-registration-success" role="status">
-                  मोबाइल नंबर सत्यापित हो गया है।
-                </p>
-                <p className="anganwadi-registration-hint">
-                  इस परियोजना में पंजीकरण पूरा करने के लिए खाता बनाने की सेवा अभी उपलब्ध नहीं है।
-                </p>
-                <button
-                  type="button"
-                  className="anganwadi-registration-done"
-                  onClick={closeRegistration}
-                >
-                  बंद करें
-                </button>
-              </div>
+              <form onSubmit={handleAnganwadiRegistration}>
+                <div className="anganwadi-registration-body">
+                  <p className="anganwadi-registration-success" role="status">
+                    मोबाइल नंबर सत्यापित हो गया है। अब अपना पासवर्ड बनाएं।
+                  </p>
+                  <label htmlFor="anganwadi-verified-name">कार्यकर्त्री का नाम</label>
+                  <div className="anganwadi-registration-input">
+                    <FaUser aria-hidden="true" />
+                    <input id="anganwadi-verified-name" value={registration.name} readOnly />
+                  </div>
+                  <label htmlFor="anganwadi-verified-phone">मोबाइल नंबर</label>
+                  <div className="anganwadi-registration-input">
+                    <FaMobileAlt aria-hidden="true" />
+                    <input id="anganwadi-verified-phone" value={registration.phone} readOnly />
+                  </div>
+                  <label htmlFor="anganwadi-verified-district">जनपद</label>
+                  <div className="anganwadi-registration-input">
+                    <FaMapMarkerAlt aria-hidden="true" />
+                    <input id="anganwadi-verified-district" value={registration.district} readOnly />
+                  </div>
+                  <label htmlFor="anganwadi-verified-project">परियोजना / ब्लॉक</label>
+                  <div className="anganwadi-registration-input">
+                    <FaMapMarkerAlt aria-hidden="true" />
+                    <input id="anganwadi-verified-project" value={registration.project} readOnly />
+                  </div>
+                  <label htmlFor="anganwadi-verified-sector">सेक्टर</label>
+                  <div className="anganwadi-registration-input">
+                    <FaMapMarkerAlt aria-hidden="true" />
+                    <input id="anganwadi-verified-sector" value={registration.sector} readOnly />
+                  </div>
+                  <label htmlFor="anganwadi-register-password">पासवर्ड <span>*</span></label>
+                  <div className="anganwadi-registration-input">
+                    <FaKey aria-hidden="true" />
+                    <input
+                      id="anganwadi-register-password"
+                      type="password"
+                      autoComplete="new-password"
+                      value={registrationPassword}
+                      onChange={(event) =>
+                        setRegistrationPassword(event.target.value)
+                      }
+                      placeholder="पासवर्ड दर्ज करें"
+                      required
+                    />
+                  </div>
+                  <label htmlFor="anganwadi-register-confirm-password">
+                    पासवर्ड की पुष्टि करें <span>*</span>
+                  </label>
+                  <div className="anganwadi-registration-input">
+                    <FaKey aria-hidden="true" />
+                    <input
+                      id="anganwadi-register-confirm-password"
+                      type="password"
+                      autoComplete="new-password"
+                      value={registrationConfirmPassword}
+                      onChange={(event) =>
+                        setRegistrationConfirmPassword(event.target.value)
+                      }
+                      placeholder="पासवर्ड दोबारा दर्ज करें"
+                      required
+                    />
+                  </div>
+                  {registrationError && (
+                    <p className="anganwadi-registration-error" role="alert">
+                      {registrationError}
+                    </p>
+                  )}
+                </div>
+                <footer className="anganwadi-registration-footer">
+                  <button type="submit" disabled={registrationLoading}>
+                    {registrationLoading
+                      ? "पंजीकरण हो रहा है..."
+                      : "पंजीकरण पूरा करें"}
+                    <FaArrowRight aria-hidden="true" />
+                  </button>
+                </footer>
+              </form>
             )}
           </section>
         </div>

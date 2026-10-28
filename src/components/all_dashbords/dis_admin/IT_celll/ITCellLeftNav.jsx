@@ -94,6 +94,12 @@ const ITCellLeftNav = ({ sidebarOpen, setSidebarOpen, isMobile, isTablet, onNavC
         path: "/ITCellApplicantQueries",
         active: location.pathname === "/ITCellApplicantQueries",
       },
+      {
+        icon: <FaTrophy />,
+        label: "राज्य स्तरीय आंगनवाड़ी कार्यकर्त्री पुरस्कार",
+        path: "/ITCellAnganwadi2026-27",
+        active: location.pathname === "/ITCellAnganwadi2026-27",
+      },
      ];
 
   //  Auto-close sidebar when switching to mobile or tablet
