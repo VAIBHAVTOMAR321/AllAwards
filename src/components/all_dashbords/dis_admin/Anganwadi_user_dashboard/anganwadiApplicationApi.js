@@ -464,13 +464,13 @@ export const saveAnganwadiApplicationStep = async (
       3,
       buildStepThreePayload(selectedFiles),
     );
-    const savedResponse = await requestApplication(3);
     return {
       ...application,
-      ...(savedResponse.data || response.data || {}),
+      ...(response.data || {}),
       applicant_id:
-        savedResponse.form_id || response.form_id || application.applicant_id,
-      status: normalizeStatus(savedResponse.status || response.status || "step3"),
+        response.form_id || application.applicant_id,
+      status: normalizeStatus(response.status || "step3"),
+      editable: response.editable ?? false,
     };
   }
 

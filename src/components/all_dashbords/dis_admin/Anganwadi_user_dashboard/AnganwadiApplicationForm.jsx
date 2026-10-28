@@ -768,18 +768,6 @@ const AnganwadiApplicationForm = ({ account }) => {
     };
   }, [account]);
 
-  useEffect(() => {
-    if (!formData) return;
-    const status = formData.status;
-    if (status === "step1") {
-      setCurrentStep(2);
-      setShowPreview(false);
-    } else if (status === "step2" || status === "step3" || status === "final") {
-      setCurrentStep(3);
-      setShowPreview(status === "step3" || status === "final");
-    }
-  }, [formData]);
-
   const currentTitle = PROGRESS_STEPS[currentStep - 1];
   const completedSteps = useMemo(() => {
     if (formData?.status === "step1") return [1];
@@ -816,7 +804,7 @@ const AnganwadiApplicationForm = ({ account }) => {
 
   const getFileNameOnly = (filePath) => {
     if (!filePath) return "";
-    const parts = String(filePath).split(/[\/\\]/);
+    const parts = String(filePath).split(/[/\\]/);
     return parts[parts.length - 1] || filePath;
   };
 
@@ -859,7 +847,8 @@ const AnganwadiApplicationForm = ({ account }) => {
 
   const saveStep = async (event) => {
     event.preventDefault();
-    if (currentStep === 1) {
+    const isEditing = formData?.status === "step3" && formData?.editable !== false;
+    if (currentStep === 1 && !isEditing) {
       const missingFields = getMissingAnganwadiStepOneFields(formData);
       if (missingFields.length) {
         setError(
@@ -880,12 +869,12 @@ const AnganwadiApplicationForm = ({ account }) => {
         currentStep,
         selectedFiles,
       );
-      if (saved.status !== `step${currentStep}`) {
+      if (!isEditing && saved.status !== `step${currentStep}`) {
         throw new Error(
           `सर्वर ने चरण ${currentStep} की पूर्ण स्थिति की पुष्टि नहीं की।`,
         );
       }
-      if (currentStep === 1) {
+      if (currentStep === 1 && !isEditing) {
         const missingSavedFields = getMissingAnganwadiStepOneFields(saved);
         if (missingSavedFields.length) {
           setFormData(saved);
@@ -897,7 +886,9 @@ const AnganwadiApplicationForm = ({ account }) => {
         }
       }
       setFormData(saved);
-      if (currentStep === 3) {
+      if (isEditing) {
+        setNotice(`चरण ${currentStep} सर्वर पर सेव हुआ।`);
+      } else if (currentStep === 3) {
         Object.values(filePreviewUrlsRef.current).forEach((url) =>
           URL.revokeObjectURL(url),
         );
