@@ -209,6 +209,11 @@ export default function AnganwadiLogin() {
         user: {
           ...account,
           name: account.name || registration.name.trim(),
+          adhar_no:
+            account.adhar_no ||
+            account.aadhaar_no ||
+            account.aadhar_no ||
+            registration.adhar_no,
           district: account.district || registration.district,
           project: account.project || registration.project,
           sector: account.sector || registration.sector,
