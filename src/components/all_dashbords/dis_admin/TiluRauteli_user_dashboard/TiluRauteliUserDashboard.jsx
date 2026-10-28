@@ -1515,11 +1515,11 @@ const TiluRauteliUserDashboard = () => {
                           </td>
                         </tr>
 
-                        <tr>
+                        {/* <tr>
                           <th colSpan="4" className="tilu-preview-table-title">
                             जानकारी का शीर्षक
                           </th>
-                        </tr>
+                        </tr> */}
                         <tr>
                           <th className="tilu-preview-table-title" style={{ width: "25%" }}>जानकारी का शीर्षक</th>
                           <th className="tilu-preview-table-title" colSpan="3" style={{ width: "75%" }}></th>
