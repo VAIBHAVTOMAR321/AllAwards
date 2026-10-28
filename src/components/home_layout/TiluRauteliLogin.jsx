@@ -246,9 +246,8 @@ export default function TiluRauteliLogin() {
         </section>
 
         <section className="tilu-form-panel">
-          <div className="tilu-award-mark" aria-hidden="true">✦</div>
-          <p className="tilu-form-eyebrow">आवेदक लॉगिन</p>
-          <h2>अपने खाते में प्रवेश करें</h2>
+         
+          <h2>तीलू रौतेली पुरस्कार लॉगिन</h2>
           <p className="tilu-form-intro">
             पंजीकृत मोबाइल नंबर और पासवर्ड से आगे बढ़ें।
           </p>
@@ -315,10 +314,7 @@ export default function TiluRauteliLogin() {
             </button>
           </form>
 
-          <p className="tilu-security-note">
-            <FaUserShield aria-hidden="true" />
-            सुरक्षित लॉगिन · महिला सशक्तिकरण एवं बाल विकास विभाग
-          </p>
+         
         </section>
       </div>
       {showRecovery && (
