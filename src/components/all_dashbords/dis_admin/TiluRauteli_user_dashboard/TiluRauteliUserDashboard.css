@@ -799,61 +799,77 @@
 }
 
 @media print {
-  body * {
-    visibility: hidden;
+  body.tilu-printing-preview * {
+    visibility: hidden !important;
   }
 
-  .tilu-preview-overlay,
-  .tilu-preview-overlay * {
-    visibility: visible;
+  body.tilu-printing-preview .tilu-preview-overlay,
+  body.tilu-printing-preview .tilu-preview-overlay * {
+    visibility: visible !important;
   }
 
-  .tilu-preview-overlay {
-    position: absolute;
-    inset: 0;
-    display: block;
-    padding: 0;
-    background: #fff;
+  body.tilu-printing-preview .tilu-preview-overlay {
+    position: absolute !important;
+    inset: 0 !important;
+    display: block !important;
+    padding: 0 !important;
+    background: #fff !important;
+    z-index: 99999 !important;
   }
 
-  .tilu-preview-modal {
-    width: 100%;
-    max-height: none;
-    display: block;
-    overflow: visible;
-    border-radius: 0;
-    box-shadow: none;
+  body.tilu-printing-preview .tilu-preview-modal {
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: none !important;
+    margin: 0 !important;
+    display: block !important;
+    overflow: visible !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
   }
 
-  .tilu-preview-header {
-    padding: 10px 0;
-    background: #fff;
-    color: #0b3d5c;
-  }
-
-  .tilu-preview-actions,
-  .tilu-preview-print,
-  .tilu-preview-close {
+  body.tilu-printing-preview .tilu-preview-header {
     display: none !important;
   }
 
-  .tilu-preview-content {
-    overflow: visible;
-    padding: 0;
+  body.tilu-printing-preview .tilu-preview-actions,
+  body.tilu-printing-preview .tilu-preview-close,
+  body.tilu-printing-preview .tilu-preview-print {
+    display: none !important;
   }
 
-  .tilu-preview-section {
-    break-inside: avoid;
+  body.tilu-printing-preview .tilu-preview-content {
+    overflow: visible !important;
+    padding: 0 !important;
+  }
+
+  body.tilu-printing-preview .tilu-preview-document {
+    box-shadow: none !important;
+    border: none !important;
+    max-width: 100% !important;
+  }
+
+  body.tilu-printing-preview .tilu-preview-table,
+  body.tilu-printing-preview .tilu-preview-table th,
+  body.tilu-printing-preview .tilu-preview-table td {
+    border-color: #000 !important;
+  }
+
+  body.tilu-printing-preview .tilu-preview-document img,
+  body.tilu-printing-preview .tilu-preview-document embed {
+    max-width: 100% !important;
     page-break-inside: avoid;
   }
 
-  .tilu-preview-section ol,
-  .tilu-preview-section li {
-    text-align: left !important;
+  body.tilu-printing-preview .tilu-preview-section,
+  body.tilu-printing-preview .tilu-preview-table tr {
+    page-break-inside: avoid;
   }
 
-  .tilu-preview-section ol {
-    padding-inline-start: 28px;
+  @page {
+    size: A4;
+    margin: 10mm;
   }
 }
 

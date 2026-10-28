@@ -666,13 +666,7 @@ const TiluRauteliUserDashboard = () => {
     setStatusMessage({ type: "", text: "" });
   };
 
-  const handlePrintPreview = () => {
-    const preview = document.querySelector(".tilu-preview-overlay");
-    if (!preview) {
-      window.alert("आवेदन का पूर्वावलोकन उपलब्ध नहीं है।");
-      return;
-    }
-
+  const handleDirectPdfDownload = () => {
     const printWindow = window.open("", "_blank", "width=1100,height=800");
     if (!printWindow) {
       window.alert(
@@ -681,86 +675,108 @@ const TiluRauteliUserDashboard = () => {
       return;
     }
 
-    const stylesheets = Array.from(
-      document.querySelectorAll('link[rel="stylesheet"]'),
-    )
-      .map((stylesheet) => `<link rel="stylesheet" href="${stylesheet.href}">`)
-      .join("");
-    const inlineStyles = Array.from(document.querySelectorAll("style"))
-      .map((style) => `<style>${style.textContent}</style>`)
-      .join("");
+    const stylesheets = "";
+    const inlineStyles = "";
 
-    printWindow.onload = () => {
-      printWindow.focus();
-      printWindow.print();
-    };
+    const applicantImg = getPreviewUrl(formData.appli_img);
+    const signImg = getPreviewUrl(formData.appli_sign);
+    const pdf1 = getPreviewUrl(formData.appli_pdf1);
+    const pdf2 = getPreviewUrl(formData.appli_pdf2);
+    const pdf3 = getPreviewUrl(formData.appli_pdf3);
+
     printWindow.document.open();
     printWindow.document.write(`<!doctype html>
       <html lang="hi">
         <head>
           <meta charset="UTF-8">
           <meta name="viewport" content="width=device-width, initial-scale=1">
-          <title>आवेदन का पूर्वावलोकन</title>
+          <title>तीलू रौतेली पुरस्कार आवेदन पत्र</title>
           ${stylesheets}
           ${inlineStyles}
           <style>
             @page { size: A4; margin: 12mm; }
-            html, body { margin: 0; padding: 0; background: #fff; }
-            body * { visibility: visible !important; }
-            .tilu-preview-overlay {
-              position: static !important;
-              display: block !important;
-              padding: 0 !important;
-              background: #fff !important;
-            }
-            .tilu-preview-modal {
-              width: 100% !important;
-              max-height: none !important;
-              display: block !important;
-              overflow: visible !important;
-              border-radius: 0 !important;
-              box-shadow: none !important;
-            }
-            .tilu-preview-content { overflow: visible !important; }
-            .tilu-preview-actions { display: none !important; }
-            .tilu-preview-section {
-              break-inside: avoid;
-              page-break-inside: avoid;
-            }
-            .tilu-preview-section ol,
-            .tilu-preview-section li {
-              text-align: left !important;
-            }
-            .tilu-print-window-toolbar {
-              position: sticky;
-              top: 0;
-              z-index: 1;
-              padding: 10px 16px;
-              background: #0b3d5c;
-              text-align: right;
-            }
-            .tilu-print-window-toolbar button {
-              border: 0;
-              border-radius: 6px;
-              padding: 9px 14px;
-              background: #fff;
-              color: #0b3d5c;
-              font: 600 14px Arial, sans-serif;
-              cursor: pointer;
-            }
-            @media print {
-              .tilu-print-window-toolbar { display: none !important; }
-            }
+            html, body { margin: 0; padding: 0; background: #fff; font-family: Arial, sans-serif; }
+            .tilu-pdf-container { max-width: 210mm; margin: 0 auto; padding: 20px; }
+            .tilu-pdf-header { text-align: center; margin-bottom: 20px; }
+            .tilu-pdf-header h1 { font-size: 18px; margin: 5px 0; }
+            .tilu-pdf-header h2 { font-size: 16px; margin: 10px 0; }
+            .tilu-pdf-table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
+            .tilu-pdf-table th, .tilu-pdf-table td { border: 1px solid #000; padding: 6px 8px; font-size: 11px; text-align: left; vertical-align: top; }
+            .tilu-pdf-table th { background: #f5f5f5; font-weight: 600; }
+            .tilu-pdf-img { max-width: 80px; max-height: 100px; }
+            .tilu-pdf-sign { max-width: 120px; max-height: 60px; }
+            .tilu-pdf-points { margin: 0; padding-left: 18px; }
+            .tilu-pdf-points li { margin: 3px 0; }
+            .tilu-pdf-footer { display: flex; justify-content: space-between; margin-top: 15px; font-size: 11px; }
           </style>
         </head>
         <body>
-          <div class="tilu-print-window-toolbar">
-            <button type="button" onclick="window.print()">Print / Save as PDF</button>
+          <div class="tilu-pdf-container">
+            <div class="tilu-pdf-header">
+              <h1>महिला सशक्तिकरण एवं बाल विकास विभाग</h1>
+              <p>उत्तराखण्ड शासन</p>
+              <h2>तीलू रौतेली राज्य स्तरीय पुरस्कार हेतु आवेदन पत्र</h2>
+            </div>
+            <table class="tilu-pdf-table">
+              <tr><th colspan="2">आवेदन विवरण</th></tr>
+              <tr><th style="width:30%">Form ID</th><td>${formData.form_id || "—"}</td></tr>
+              <tr><th>आवेदिका का नाम</th><td>${applicantImg ? `<img src="${applicantImg}" class="tilu-pdf-img" alt="फोटो"/><br/>` : ""}${formData.filer_name || "—"}</td></tr>
+              <tr><th>पिता/पति का नाम</th><td>${formData.fath_husb_name || "—"}</td></tr>
+              <tr><th>जन्म तिथि</th><td>${formData.dob || "—"}</td></tr>
+              <tr><th>मोबाइल नंबर</th><td>${formData.filer_mob || "—"}</td></tr>
+              <tr><th>ईमेल</th><td>${formData.filer_email || "—"}</td></tr>
+              <tr><th>आधार नंबर</th><td>${formData.filer_adhar || "—"}</td></tr>
+              <tr><th>शैक्षिक योग्यता</th><td>${formData.edu_qual || "—"}</td></tr>
+              <tr><th>पता</th><td>${formData.address || "—"}</td></tr>
+              <tr><th>गांव/क्षेत्र</th><td>${formData.village || "—"}</td></tr>
+              <tr><th>जनपद</th><td>${formData.district || "—"}</td></tr>
+              <tr><th>परियोजना</th><td>${formData.project || "—"}</td></tr>
+              <tr><th>हस्ताक्षर</th><td>${signImg ? `<img src="${signImg}" class="tilu-pdf-sign" alt="हस्ताक्षर"/>` : "—"}</td></tr>
+            </table>
+            <table class="tilu-pdf-table">
+              <tr><th colspan="2">बैंक विवरण</th></tr>
+              <tr><th style="width:30%">बैंक खाता धारक का नाम</th><td>${formData.appli_bank_ac_name || "—"}</td></tr>
+              <tr><th>बैंक खाता संख्या</th><td>${formData.appli_bank_acc || "—"}</td></tr>
+              <tr><th>IFSC कोड</th><td>${formData.appli_ifsc || "—"}</td></tr>
+              <tr><th>बैंक का नाम</th><td>${formData.appli_bank_name || "—"}</td></tr>
+              <tr><th>पैन कार्ड नंबर</th><td>${formData.appli_pan || "—"}</td></tr>
+            </table>
+            <table class="tilu-pdf-table">
+              <tr><th colspan="2">उपलब्धि विवरण</th></tr>
+              <tr><th style="width:30%">उपलब्धि का विवरण</th><td>${(formData.manak1 || "—").replace(/\n/g, "<br/>")}</td></tr>
+              <tr><th>जीवन का संक्षिप्त विवरण</th><td>${(formData.manak3 || "—").replace(/\n/g, "<br/>")}</td></tr>
+              <tr><th>उत्कृष्ट कार्यों का विवरण</th><td>${(formData.manak2 || "—").replace(/\n/g, "<br/>")}</td></tr>
+              <tr><th>उपलब्धि के क्षेत्र</th><td>${selectedWorkAreas.length ? `<ol class="tilu-pdf-points">${selectedWorkAreas.map(a => `<li>${a}</li>`).join("")}</ol>` : "—"}</td></tr>
+              ${formData.appli_url ? `<tr><th>सोशल मीडिया लिंक</th><td>${formData.appli_url}</td></tr>` : ""}
+            </table>
+            <div class="tilu-pdf-footer">
+              <span>Form ID: ${formData.form_id || "—"}</span>
+              <span>स्थिति: ${formData.status || "ड्राफ्ट"}</span>
+            </div>
           </div>
-          ${preview.outerHTML}
         </body>
       </html>`);
     printWindow.document.close();
+
+    const triggerPrint = () => {
+      try {
+        if (!printWindow.closed) {
+          printWindow.focus();
+          printWindow.print();
+          printWindow.close();
+        }
+      } catch (error) {
+        console.error("[Tilu PDF] Failed to trigger print", error);
+      }
+    };
+
+    if (printWindow.document.readyState === "complete") {
+      setTimeout(triggerPrint, 300);
+    } else {
+      printWindow.addEventListener("load", () => setTimeout(triggerPrint, 300), {
+        once: true,
+      });
+    }
   };
 
   const handleStepNavigation = (stepNumber) => {
@@ -1387,10 +1403,10 @@ const TiluRauteliUserDashboard = () => {
                     <button
                       type="button"
                       className="tilu-btn primary tilu-preview-print"
-                      onClick={handlePrintPreview}
-                      title="आवेदन को प्रिंट करें या PDF के रूप में सहेजें"
+                      onClick={handleDirectPdfDownload}
+                      title="PDF के रूप में डाउनलोड करें"
                     >
-                      PDF डाउनलोड / प्रिंट
+                      PDF डाउनलोड
                     </button>
                     <button
                       type="button"
@@ -1462,14 +1478,10 @@ const TiluRauteliUserDashboard = () => {
                             ["IFSC कोड", formData.appli_ifsc],
                             ["बैंक का नाम", formData.appli_bank_name],
                           ];
-                          const rows = [];
-                          for (let i = 0; i < detailItems.length; i += 2) {
-                            rows.push([detailItems[i], detailItems[i + 1]]);
-                          }
-                          return rows.map(([first, second], rowIndex) => (
+                          return detailItems.map(([label, value], rowIndex) => (
                             <tr key={`detail-row-${rowIndex}`}>
-                            <th>{first[0]}</th>
-                            <td colSpan="3">{first[1] || "—"}</td>
+                              <th>{label}</th>
+                              <td colSpan="3">{value || "—"}</td>
                             </tr>
                           ));
                         })()}
