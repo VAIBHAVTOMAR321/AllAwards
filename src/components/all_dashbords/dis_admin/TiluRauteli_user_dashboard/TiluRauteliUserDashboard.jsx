@@ -76,6 +76,8 @@ const DEFAULT_FORM = {
 };
 
 const IFSC_PATTERN = /^[A-Za-z]{4}0[A-Z0-9a-z]{6}$/;
+const PAN_PATTERN = /^[A-Z]{5}[0-9]{4}[A-Z]$/;
+const BANK_ACCOUNT_PATTERN = /^[0-9]{9,18}$/;
 const STEP_TWO_REQUIRED_FIELDS = [
   "fath_husb_name",
   "dob",
@@ -172,6 +174,13 @@ const getFirstIncompleteStep = (form) =>
   [1, 2, 3, 4].find((stepNumber) => !isStepComplete(form, stepNumber)) || 4;
 
 const getApiErrorMessage = (data, fallback) => {
+  if (data?.errors && typeof data.errors === "object") {
+    const messages = Object.entries(data.errors).map(([field, value]) => {
+      const msgs = Array.isArray(value) ? value : [value];
+      return `${field}: ${msgs.join(", ")}`;
+    });
+    if (messages.length) return messages.join(" | ");
+  }
   const detail = data?.detail || data?.message || data?.error;
   if (typeof detail === "string") return detail;
   if (detail) return JSON.stringify(detail);
@@ -453,6 +462,20 @@ const TiluRauteliUserDashboard = () => {
         setStatusMessage({
           type: "error",
           text: "IFSC कोड सही प्रारूप में दर्ज करें (उदाहरण: SBIN0001234)।",
+        });
+        return false;
+      }
+      if (!PAN_PATTERN.test(String(formData.appli_pan || "").trim().toUpperCase())) {
+        setStatusMessage({
+          type: "error",
+          text: "पैन कार्ड नंबर 10 अक्षरों का होना चाहिए: पहले 5 अपरकेस अक्षर, फिर 4 अंक, अंत में 1 अपरकेस अक्षर।",
+        });
+        return false;
+      }
+      if (!BANK_ACCOUNT_PATTERN.test(String(formData.appli_bank_acc || "").trim())) {
+        setStatusMessage({
+          type: "error",
+          text: "बैंक खाता नंबर केवल अंकों (0-9) में 9 से 18 अंकों का होना चाहिए।",
         });
         return false;
       }
@@ -1042,13 +1065,14 @@ const TiluRauteliUserDashboard = () => {
       </div>
       <div className="tilu-grid-half">
         <label className="tilu-field-label">Pancard no./पैन कार्ड न० <span className="req">*</span></label>
-        <input
-          type="text"
-          className="tilu-input"
-          value={formData.appli_pan}
-          onChange={(event) => setField("appli_pan", event.target.value)}
-          placeholder="Applicant Pan card Name"
-        />
+<input
+            type="text"
+            className="tilu-input"
+            value={formData.appli_pan}
+            onChange={(event) => setField("appli_pan", event.target.value.toUpperCase())}
+            placeholder="Applicant Pan card Name"
+            maxLength={10}
+          />
       </div>
       <div className="tilu-grid-half">
         <label className="tilu-field-label">Bank Account Holder Name/बैंक खाता के धारक का नाम <span className="req">*</span></label>
@@ -1061,14 +1085,19 @@ const TiluRauteliUserDashboard = () => {
         />
       </div>
       <div className="tilu-grid-half">
-        <label className="tilu-field-label">Bank Account No./बैंक खाता नम्बर <span className="req">*</span></label>
-        <input
-          type="text"
-          className="tilu-input"
-          value={formData.appli_bank_acc}
-          onChange={(event) => setField("appli_bank_acc", event.target.value)}
-          placeholder="Applicant Bank Account No."
-        />
+<label className="tilu-field-label">Bank Account No./बैंक खाता नम्बर <span className="req">*</span></label>
+          <input
+            type="text"
+            className="tilu-input"
+            value={formData.appli_bank_acc}
+            onChange={(event) => {
+              const value = event.target.value.replace(/\D/g, "");
+              setField("appli_bank_acc", value);
+            }}
+            placeholder="Applicant Bank Account No."
+            maxLength={18}
+            inputMode="numeric"
+          />
       </div>
       <div className="tilu-grid-half">
         <label className="tilu-field-label">IFSC Code/IFSC कोड <span className="req">*</span></label>
