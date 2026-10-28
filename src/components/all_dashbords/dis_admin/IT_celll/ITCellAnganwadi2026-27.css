@@ -1,0 +1,66 @@
+.it-anganwadi-dashboard {
+  background: #f5f3ff;
+}
+
+.it-anganwadi-page {
+  flex: 1;
+  padding: 28px;
+}
+
+.it-anganwadi-heading {
+  display: flex;
+  align-items: stretch;
+  gap: 22px;
+  max-width: 1180px;
+  padding: 26px;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 10px 28px rgba(76, 29, 149, 0.1);
+  color: #2e1065;
+}
+
+.it-anganwadi-accent {
+  width: 8px;
+  flex: 0 0 8px;
+  border-radius: 8px;
+  background: linear-gradient(180deg, #7c3aed, #c084fc);
+}
+
+.it-anganwadi-heading p,
+.it-anganwadi-heading h1,
+.it-anganwadi-heading span {
+  margin: 0;
+}
+
+.it-anganwadi-heading p {
+  margin-bottom: 8px;
+  color: #7e22ce;
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.it-anganwadi-heading h1 {
+  font-size: clamp(1.25rem, 2.3vw, 1.8rem);
+  font-weight: 800;
+  line-height: 1.45;
+}
+
+.it-anganwadi-heading span {
+  display: inline-block;
+  margin-top: 12px;
+  color: #6b21a8;
+  font-weight: 700;
+}
+
+@media (max-width: 767px) {
+  .it-anganwadi-page {
+    padding: 18px 14px;
+  }
+
+  .it-anganwadi-heading {
+    gap: 14px;
+    padding: 20px 16px;
+  }
+}

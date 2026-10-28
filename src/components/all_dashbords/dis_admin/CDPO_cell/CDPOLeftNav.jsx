@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { Nav, Offcanvas } from "react-bootstrap";
-import { FaAward, FaSignOutAlt } from "react-icons/fa";
+import { FaAward, FaSignOutAlt, FaTrophy } from "react-icons/fa";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../../../login/AuthContext";
 import "../../../../assets/css/dpoleftnav.css";
@@ -46,6 +46,20 @@ const CDPOLeftNav = ({
             <FaAward />
           </span>
           <span className="nav-text">Dashboard</span>
+        </Link>
+        <Link
+          to="/CDPOAnganwadi2026-27"
+          className={`nav-item nav-link ${
+            location.pathname === "/CDPOAnganwadi2026-27" ? "active" : ""
+          }`}
+          onClick={() => setSidebarOpen(false)}
+        >
+          <span className="nav-icon">
+            <FaTrophy />
+          </span>
+          <span className="nav-text">
+            राज्य स्तरीय आंगनवाड़ी कार्यकर्त्री पुरस्कार
+          </span>
         </Link>
       </Nav>
       <div className="sidebar-footer">

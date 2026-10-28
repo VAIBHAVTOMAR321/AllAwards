@@ -169,9 +169,12 @@ const DPOLeftNav = ({ sidebarOpen, setSidebarOpen, isMobile, isTablet, onNavClic
     {
       icon: <FaTrophy />,
       label: "राज्य स्तरीय आंगनवाड़ी कार्यकर्त्री पुरस्कार",
-      path: null,
-      active: false,
-      disabled: true,
+      submenu: [
+        {
+          label: "वर्ष 2026-27",
+          path: "/DPOAnganwadi2026-27",
+        },
+      ],
     },
   ];
 
