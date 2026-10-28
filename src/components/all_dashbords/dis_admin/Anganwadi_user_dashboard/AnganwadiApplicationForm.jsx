@@ -811,7 +811,13 @@ const AnganwadiApplicationForm = ({ account }) => {
 
   const getServerFileUrl = (filePath) => {
     if (/^https?:\/\//i.test(filePath)) return filePath;
-    return `https://mahadevaaya.com${filePath.startsWith("/") ? "" : "/"}${filePath}`;
+    return `https://mahadevaaya.com/wecdallaward/wecdallaward_backend${filePath.startsWith("/") ? "" : "/"}${filePath}`;
+  };
+
+  const getFileNameOnly = (filePath) => {
+    if (!filePath) return "";
+    const parts = String(filePath).split(/[\/\\]/);
+    return parts[parts.length - 1] || filePath;
   };
 
   const renderPreviewFile = (name) => {
@@ -826,22 +832,23 @@ const AnganwadiApplicationForm = ({ account }) => {
 
     const preview = filePreviews[name];
     const serverFileUrl = !preview?.url ? getServerFileUrl(fileName) : "";
+    const displayName = getFileNameOnly(fileName);
     return (
       <div className="anganwadi-preview-file">
         {preview?.url && preview.type.startsWith("image/") ? (
-          <img src={preview.url} alt={fileName} />
+          <img src={preview.url} alt={displayName} />
         ) : null}
         {!preview?.url && /\.(png|jpe?g|gif|webp)$/i.test(fileName) ? (
-          <img src={serverFileUrl} alt={fileName} />
+          <img src={serverFileUrl} alt={displayName} />
         ) : null}
         {preview?.url && preview.type === "application/pdf" ? (
-          <iframe title={fileName} src={preview.url} />
+          <iframe title={displayName} src={preview.url} />
         ) : null}
         {!preview?.url && /\.pdf($|\?)/i.test(fileName) ? (
-          <iframe title={fileName} src={serverFileUrl} />
+          <iframe title={displayName} src={serverFileUrl} />
         ) : null}
         <a href={preview?.url || serverFileUrl} target="_blank" rel="noreferrer">
-          {fileName}
+          {displayName}
         </a>
         {preview?.url && (
           <small>डेमो पूर्वावलोकन; फाइल सर्वर पर अपलोड नहीं हुई है।</small>
