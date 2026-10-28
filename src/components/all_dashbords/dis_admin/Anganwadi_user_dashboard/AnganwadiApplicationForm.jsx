@@ -23,6 +23,7 @@ import {
   isAnganwadiApplicationDemoMode,
   saveAnganwadiApplicationStep,
   submitAnganwadiApplication,
+  editAnganwadiApplication,
 } from "./anganwadiApplicationApi";
 import "./AnganwadiApplicationForm.css";
 
@@ -728,7 +729,8 @@ const AnganwadiApplicationForm = ({ account }) => {
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [showPreview, setShowPreview] = useState(false);
-  const submitted = formData?.status === "final";
+  const submitted =
+    formData?.status === "final" || formData?.editable === false;
 
   useEffect(
     () => () => {
@@ -765,6 +767,18 @@ const AnganwadiApplicationForm = ({ account }) => {
       active = false;
     };
   }, [account]);
+
+  useEffect(() => {
+    if (!formData) return;
+    const status = formData.status;
+    if (status === "step1") {
+      setCurrentStep(2);
+      setShowPreview(false);
+    } else if (status === "step2" || status === "step3" || status === "final") {
+      setCurrentStep(3);
+      setShowPreview(status === "step3" || status === "final");
+    }
+  }, [formData]);
 
   const currentTitle = PROGRESS_STEPS[currentStep - 1];
   const completedSteps = useMemo(() => {
@@ -912,12 +926,35 @@ const AnganwadiApplicationForm = ({ account }) => {
         formData,
       );
       setFormData(submittedApplication);
-      setNotice("डेमो आवेदन अंतिम रूप से सबमिट किया गया।");
+      setNotice("आवेदन अंतिम रूप से जमा किया गया।");
       setConfirmFinalSubmit(false);
+      setCurrentStep(3);
       setShowPreview(true);
     } catch (submitError) {
       console.error("Anganwadi final submission failed:", submitError);
       setError(submitError.message || "आवेदन सबमिट नहीं हो सका।");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const editApplication = async () => {
+    setSaving(true);
+    setError("");
+    try {
+      const editedApplication = await editAnganwadiApplication(
+        applicationKey,
+        formData,
+      );
+      setFormData(editedApplication);
+      setNotice("संपादन के लिए फॉर्म खोला गया।");
+      setConfirmEdit(false);
+      setShowPreview(false);
+      setCurrentStep(1);
+    } catch (editError) {
+      console.error("Anganwadi edit failed:", editError);
+      setError(editError.message || "फॉर्म संपादन के लिए नहीं खोला जा सका।");
+      setConfirmEdit(false);
     } finally {
       setSaving(false);
     }
@@ -1093,11 +1130,6 @@ const AnganwadiApplicationForm = ({ account }) => {
 
   const renderStepThree = () => (
     <>
-      <Alert variant="warning">
-        प्रत्येक PDF की अधिकतम सीमा 2 MB तथा फोटो / हस्ताक्षर की अधिकतम सीमा
-        100 KB है। आवेदन के पहले तीन चरण API के माध्यम से सर्वर पर सेव होते हैं।
-        अंतिम सबमिशन API उपलब्ध नहीं है।
-      </Alert>
       {DOCUMENT_GROUPS.map((group) => (
         <Card className="anganwadi-form-section" key={group.title}>
           <Card.Header>{group.title}</Card.Header>
@@ -1244,7 +1276,7 @@ const AnganwadiApplicationForm = ({ account }) => {
       {isAnganwadiApplicationDemoMode && (
         <Alert variant="warning" className="anganwadi-demo-alert">
           व्यक्तिगत विवरण, मूल्यांकन और दस्तावेज़ चरण API के माध्यम से सर्वर पर
-          सेव होते हैं। अंतिम सबमिशन API अभी उपलब्ध नहीं है।
+          सेव होते हैं।
         </Alert>
       )}
       <header className="anganwadi-application-header">
@@ -1268,8 +1300,7 @@ const AnganwadiApplicationForm = ({ account }) => {
               className={currentStep === step ? "active" : ""}
               disabled={
                 saving ||
-                submitted ||
-                step > (completedSteps.length ? Math.max(...completedSteps) + 1 : 1)
+                step > (completedSteps.length ? Math.max(...completedSteps) : 0)
               }
               onClick={() => {
                 setCurrentStep(step);
@@ -1472,12 +1503,9 @@ const AnganwadiApplicationForm = ({ account }) => {
                     <Button
                       variant="warning"
                       disabled={!confirmEdit || saving}
-                      onClick={() => {
-                        setConfirmEdit(false);
-                        setShowPreview(false);
-                        setCurrentStep(1);
-                      }}
+                      onClick={editApplication}
                     >
+                      {saving ? <Spinner size="sm" className="me-2" /> : null}
                       Edit Form
                     </Button>
                   </section>

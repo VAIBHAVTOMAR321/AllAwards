@@ -192,7 +192,7 @@ const normalizeStatus = (status) => {
   if (normalized === "step1") return "step1";
   if (normalized === "step2") return "step2";
   if (normalized === "step3") return "step3";
-  if (normalized === "final" || normalized === "approved") return "final";
+  if (normalized === "final" || normalized === "approved" || normalized === "final_submit") return "final";
   return "step0";
 };
 
@@ -238,29 +238,52 @@ export const getAnganwadiApplication = async (account) => {
     status: normalizeStatus(stepOneResponse.status),
   };
 
-  if (
-    ["step1", "step2", "step3", "final"].includes(application.status) &&
-    getMissingAnganwadiStepOneFields(application).length === 0
-  ) {
-    const stepTwoResponse = await requestApplication(2);
-    application = {
-      ...application,
-      ...normalizeApplicationData(stepTwoResponse.data || {}),
-      applicant_id: initialApplication.applicant_id,
-      status: normalizeStatus(stepTwoResponse.status || application.status),
-    };
+  if (getMissingAnganwadiStepOneFields(application).length === 0) {
+    try {
+      const stepTwoResponse = await requestApplication(2);
+      application = {
+        ...application,
+        ...normalizeApplicationData(stepTwoResponse.data || {}),
+        applicant_id: initialApplication.applicant_id,
+        status: normalizeStatus(stepTwoResponse.status || application.status),
+      };
+    } catch (stepTwoError) {
+      console.warn("Step 2 load failed:", stepTwoError);
+    }
   } else if (application.status === "step1") {
     application.status = "step0";
   }
 
-  if (["step2", "step3", "final"].includes(application.status)) {
-    const stepThreeResponse = await requestApplication(3);
-    application = {
-      ...application,
-      ...(stepThreeResponse.data || {}),
-      applicant_id: stepThreeResponse.form_id || application.applicant_id,
-      status: normalizeStatus(stepThreeResponse.status || application.status),
-    };
+  let stepTwoLoaded = false;
+  if (getMissingAnganwadiStepOneFields(application).length === 0) {
+    try {
+      const stepTwoResponse = await requestApplication(2);
+      stepTwoLoaded = true;
+      application = {
+        ...application,
+        ...normalizeApplicationData(stepTwoResponse.data || {}),
+        applicant_id: initialApplication.applicant_id,
+        status: normalizeStatus(stepTwoResponse.status || application.status),
+      };
+    } catch (stepTwoError) {
+      console.warn("Step 2 load failed:", stepTwoError);
+    }
+  } else if (application.status === "step1") {
+    application.status = "step0";
+  }
+
+  if (stepTwoLoaded || ["step2", "step3", "final"].includes(application.status)) {
+    try {
+      const stepThreeResponse = await requestApplication(3);
+      application = {
+        ...application,
+        ...(stepThreeResponse.data || {}),
+        applicant_id: stepThreeResponse.form_id || application.applicant_id,
+        status: normalizeStatus(stepThreeResponse.status || application.status),
+      };
+    } catch (stepThreeError) {
+      console.warn("Step 3 load failed:", stepThreeError);
+    }
   }
 
   return { key, application };
@@ -454,6 +477,62 @@ export const saveAnganwadiApplicationStep = async (
   throw new Error("इस चरण के लिए सेव API उपलब्ध नहीं है।");
 };
 
-export const submitAnganwadiApplication = async () => {
-  throw new Error("अंतिम आवेदन सबमिशन API अभी उपलब्ध नहीं है।");
+export const submitAnganwadiApplication = async (_key, application) => {
+  const response = await cookieFetch(
+    `${APPLICATION_API_BASE}/preview/`,
+    {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status: "final_submit" }),
+    },
+  );
+  const data = await readApiResponse(
+    response,
+    "अंतिम सबमिशन का उत्तर पढ़ा नहीं जा सका।",
+  );
+  if (!response.ok || data.success === false) {
+    throw new Error(
+      `${formatApiError(
+        data,
+        "आवेदन अंतिम रूप से जमा नहीं हो सका।",
+      )} (HTTP ${response.status})`,
+    );
+  }
+  return {
+    ...application,
+    ...(data.data || {}),
+    applicant_id: data.form_id || application.applicant_id,
+    status: normalizeStatus(data.status || "step3"),
+    editable: data.editable ?? false,
+  };
+};
+
+export const editAnganwadiApplication = async (_key, application) => {
+  const response = await cookieFetch(
+    `${APPLICATION_API_BASE}/preview/`,
+    {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status: "edit" }),
+    },
+  );
+  const data = await readApiResponse(
+    response,
+    "संपादन अनुरोध का उत्तर पढ़ा नहीं जा सका।",
+  );
+  if (!response.ok || data.success === false) {
+    throw new Error(
+      `${formatApiError(
+        data,
+        "आवेदन संपादन के लिए खोला नहीं जा सका।",
+      )} (HTTP ${response.status})`,
+    );
+  }
+  return {
+    ...application,
+    ...(data.data || {}),
+    applicant_id: data.form_id || application.applicant_id,
+    status: normalizeStatus(data.status || "step3"),
+    editable: data.editable ?? true,
+  };
 };
