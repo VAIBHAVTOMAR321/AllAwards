@@ -1271,6 +1271,12 @@ const AnganwadiApplicationForm = ({ account }) => {
       disabled: saving || submitted,
       readOnly: field.readOnly || (readOnlyFieldNames.has(field.name) && Boolean(value)),
       isInvalid: Boolean(fieldError),
+      onBlur: () => {
+        if (currentStep !== 2) return;
+        const formatErr = getStepTwoFormatErrors(formData);
+        const parsed = parseFieldErrors(formatErr);
+        setFieldErrors((previous) => ({ ...previous, ...parsed }));
+      },
       onChange: (event) => {
         const nextValue = event.target.value;
         if (field.name === "filer_adhar") {
@@ -1447,7 +1453,7 @@ const AnganwadiApplicationForm = ({ account }) => {
     const hasFields = group.fields && group.fields.length > 0;
     return (
       <Card className="anganwadi-form-section" key={group.title}>
-        <Card.Body className="anganwadi-assessment-group-body">
+        <div className="anganwadi-assessment-group-body">
           {group.description && (
             <p className="anganwadi-assessment-description">{group.description}</p>
           )}
@@ -1506,7 +1512,7 @@ const AnganwadiApplicationForm = ({ account }) => {
               )}
             </div>
           )}
-        </Card.Body>
+        </div>
       </Card>
     );
   };
