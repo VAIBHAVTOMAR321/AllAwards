@@ -20,6 +20,9 @@ import {
 import {
   getAnganwadiApplication,
   getMissingAnganwadiStepOneFields,
+  getStepOneFormatErrors,
+  getStepTwoFormatErrors,
+  getStepThreeFormatErrors,
   isAnganwadiApplicationDemoMode,
   saveAnganwadiApplicationStep,
   submitAnganwadiApplication,
@@ -728,6 +731,7 @@ const AnganwadiApplicationForm = ({ account }) => {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
+  const [fieldErrors, setFieldErrors] = useState({});
   const [showPreview, setShowPreview] = useState(false);
   const submitted =
     formData?.status === "final" || formData?.editable === false;
@@ -781,6 +785,11 @@ const AnganwadiApplicationForm = ({ account }) => {
   const updateField = (name, value) => {
     setFormData((previous) => ({ ...previous, [name]: value }));
     setNotice("");
+    setFieldErrors((previous) => {
+      const next = { ...previous };
+      delete next[name];
+      return next;
+    });
   };
 
   const selectFile = (name, file) => {
@@ -845,9 +854,27 @@ const AnganwadiApplicationForm = ({ account }) => {
     );
   };
 
+  const parseFieldErrors = (message) => {
+    const errors = {};
+    if (!message) return errors;
+    message.split(" | ").forEach((part) => {
+      const colon = part.indexOf(":");
+      if (colon > 0) {
+        const field = part.slice(0, colon).trim();
+        const msg = part.slice(colon + 1).trim();
+        if (field && msg) errors[field] = msg;
+      }
+    });
+    return errors;
+  };
+
   const saveStep = async (event) => {
     event.preventDefault();
     const isEditing = formData?.status === "step3" && formData?.editable !== false;
+    setFieldErrors({});
+    setError("");
+    setNotice("");
+
     if (currentStep === 1 && !isEditing) {
       const missingFields = getMissingAnganwadiStepOneFields(formData);
       if (missingFields.length) {
@@ -857,11 +884,33 @@ const AnganwadiApplicationForm = ({ account }) => {
         );
         return;
       }
+      const formatErr = getStepOneFormatErrors(formData);
+      if (formatErr) {
+        setFieldErrors(parseFieldErrors(formatErr));
+        setError("कृपया नीचे हाइलाइट किए गए फ़ील्ड सुधारें।");
+        return;
+      }
+    }
+
+    if (currentStep === 2 && !isEditing) {
+      const formatErr = getStepTwoFormatErrors(formData);
+      if (formatErr) {
+        setFieldErrors(parseFieldErrors(formatErr));
+        setError("कृपया नीचे हाइलाइट किए गए फ़ील्ड सुधारें।");
+        return;
+      }
+    }
+
+    if (currentStep === 3 && !isEditing) {
+      const formatErr = getStepThreeFormatErrors(formData);
+      if (formatErr) {
+        setFieldErrors(parseFieldErrors(formatErr));
+        setError("कृपया नीचे हाइलाइट किए गए फ़ील्ड सुधारें।");
+        return;
+      }
     }
 
     setSaving(true);
-    setError("");
-    setNotice("");
     try {
       const saved = await saveAnganwadiApplicationStep(
         applicationKey,
@@ -909,7 +958,13 @@ const AnganwadiApplicationForm = ({ account }) => {
       });
     } catch (saveError) {
       console.error("Anganwadi application save failed:", saveError);
-      setError(saveError.message || "जानकारी सेव नहीं हो सकी।");
+      const serverFieldErrors = parseFieldErrors(saveError.message);
+      if (Object.keys(serverFieldErrors).length > 0) {
+        setFieldErrors(serverFieldErrors);
+        setError("कृपया नीचे हाइलाइट किए गए फ़ील्ड सुधारें।");
+      } else {
+        setError(saveError.message || "जानकारी सेव नहीं हो सकी।");
+      }
     } finally {
       setSaving(false);
     }
@@ -963,6 +1018,7 @@ const AnganwadiApplicationForm = ({ account }) => {
       field.name === "age"
         ? calculateAge(formData.dob)
         : formData[field.name] ?? "";
+    const fieldError = fieldErrors[field.name];
     const commonProps = {
       id: `anganwadi-application-${field.name}`,
       name: field.name,
@@ -970,6 +1026,7 @@ const AnganwadiApplicationForm = ({ account }) => {
       required: field.required && !field.optional && !submitted,
       disabled: saving || submitted,
       readOnly: field.readOnly || (readOnlyFieldNames.has(field.name) && Boolean(value)),
+      isInvalid: Boolean(fieldError),
       onChange: (event) => {
         const nextValue = event.target.value;
         if (field.name === "filer_adhar") {
@@ -1004,12 +1061,18 @@ const AnganwadiApplicationForm = ({ account }) => {
             accept={field.accept}
             required={field.required && !value && !submitted}
             disabled={saving || submitted}
+            isInvalid={Boolean(fieldError)}
             onChange={(event) => {
               const file = event.target.files?.[0];
               if (file) selectFile(field.name, file);
             }}
           />
           {value && <Form.Text>चयनित फाइल: {value}</Form.Text>}
+          {fieldError && (
+            <Form.Text className="anganwadi-field-error" role="alert">
+              {fieldError}
+            </Form.Text>
+          )}
           {field.note && <Form.Text>{field.note}</Form.Text>}
         </Form.Group>
       );
@@ -1052,6 +1115,11 @@ const AnganwadiApplicationForm = ({ account }) => {
             pattern={field.pattern}
             min={field.type === "number" ? 0 : undefined}
           />
+        )}
+        {fieldError && (
+          <Form.Text className="anganwadi-field-error" role="alert">
+            {fieldError}
+          </Form.Text>
         )}
         {field.help && <Form.Text>{field.help}</Form.Text>}
       </Form.Group>
@@ -1104,6 +1172,7 @@ const AnganwadiApplicationForm = ({ account }) => {
                   label={label}
                   checked={checked}
                   disabled={saving || submitted}
+                  isInvalid={Boolean(fieldErrors.saaf_ans)}
                   onChange={(event) => {
                     const isChecked = event.target.checked;
                     setFormData((previous) => {
@@ -1120,6 +1189,11 @@ const AnganwadiApplicationForm = ({ account }) => {
                 />
               );
             })}
+            {fieldErrors.saaf_ans && (
+              <Form.Text className="anganwadi-field-error" role="alert">
+                {fieldErrors.saaf_ans}
+              </Form.Text>
+            )}
           </div>
         )}
       </Card.Body>
@@ -1151,6 +1225,7 @@ const AnganwadiApplicationForm = ({ account }) => {
                     accept={document.image ? "image/jpeg,image/png" : ".pdf,application/pdf"}
                     required={document.required && !formData[document.name] && !submitted}
                     disabled={saving || submitted}
+                    isInvalid={Boolean(fieldErrors[document.name])}
                     onChange={(event) => {
                       const file = event.target.files?.[0];
                       if (file) selectFile(document.name, file);
@@ -1158,6 +1233,11 @@ const AnganwadiApplicationForm = ({ account }) => {
                   />
                   {formData[document.name] && (
                     <Form.Text>चयनित फाइल: {formData[document.name]}</Form.Text>
+                  )}
+                  {fieldErrors[document.name] && (
+                    <Form.Text className="anganwadi-field-error" role="alert">
+                      {fieldErrors[document.name]}
+                    </Form.Text>
                   )}
                 </Col>
               </Row>
@@ -1173,11 +1253,17 @@ const AnganwadiApplicationForm = ({ account }) => {
             required={!submitted}
             disabled={saving || submitted}
             checked={Boolean(formData.declarationAccepted)}
+            isInvalid={Boolean(fieldErrors.declarationAccepted)}
             onChange={(event) =>
               updateField("declarationAccepted", event.target.checked)
             }
             label={`मैं ${formData.filer_name || "आवेदक"} घोषणा करती हूं कि मेरे विरुद्ध कोई विभागीय कार्यवाही, पुलिस केस, न्यायालयीय वाद, शिकायत या जांच लंबित नहीं है। यदि चयन के बाद ऐसा कोई प्रकरण संज्ञान में आता है, तो पुरस्कार हेतु मेरा चयन निरस्त किया जा सकता है।`}
           />
+          {fieldErrors.declarationAccepted && (
+            <Form.Text className="anganwadi-field-error" role="alert">
+              {fieldErrors.declarationAccepted}
+            </Form.Text>
+          )}
         </Card.Body>
       </Card>
     </>
