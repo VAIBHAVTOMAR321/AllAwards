@@ -203,6 +203,160 @@ const normalizeStatus = (status) => {
 const hasValue = (value) =>
   value !== undefined && value !== null && String(value).trim() !== "";
 
+const PATTERNS = {
+  name: /^[A-Za-zÀ-ÖØ-öø-ÿ\s\.']{2,100}$/,
+  mobile: /^[0-9]{10}$/,
+  adhar: /^[0-9]{12}$/,
+  pincode: /^[0-9]{6}$/,
+  ifsc: /^[A-Z]{4}0[A-Z0-9]{6}$/,
+  pancard: /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/,
+  email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+  date: /^\d{4}-\d{2}-\d{2}$/,
+  age: /^(?:[1-9]?\d|100)$/,
+  account: /^[0-9]{9,18}$/,
+  numeric: /^\d+(\.\d+)?$/,
+};
+
+const fieldPattern = (field) => {
+  switch (field) {
+    case "filer_name":
+    case "fath_husb_name":
+    case "awc_center":
+    case "district":
+    case "project":
+    case "village":
+    case "city":
+    case "address":
+    case "acc_holder":
+    case "bank_name":
+      return PATTERNS.name;
+    case "filer_mob":
+      return PATTERNS.mobile;
+    case "filer_adhar":
+      return PATTERNS.adhar;
+    case "pincode":
+      return PATTERNS.pincode;
+    case "acc_ifsc":
+      return PATTERNS.ifsc;
+    case "pancard":
+      return PATTERNS.pancard;
+    case "filer_email":
+      return PATTERNS.email;
+    case "dob":
+    case "joining_date":
+      return PATTERNS.date;
+    case "age":
+      return PATTERNS.age;
+    case "acc_no":
+      return PATTERNS.account;
+    default:
+      return null;
+  }
+};
+
+const formatValidationErrors = (errors) =>
+  errors.map(({ field, message }) => `${field}: ${message}`).join(" | ");
+
+export const getStepOneFormatErrors = (application) => {
+  const errors = [];
+  const check = (field, label) => {
+    const value = application?.[field];
+    if (!hasValue(value)) return;
+    const pattern = fieldPattern(field);
+    if (pattern && !pattern.test(String(value).trim())) {
+      errors.push({ field, message: label });
+    }
+  };
+  check("filer_name", "नाम केवल अक्षर और स्थान में होना चाहिए।");
+  check("fath_husb_name", "पिता/पति का नाम केवल अक्षर और स्थान में होना चाहिए।");
+  check("dob", "जन्म तिथि YYYY-MM-DD प्रारूप में होनी चाहिए।");
+  check("age", "आयु 1 से 100 के बीच होनी चाहिए।");
+  check("filer_mob", "मोबाइल नंबर 10 अंकों का होना चाहिए।");
+  check("filer_adhar", "आधार नंबर 12 अंकों का होना चाहिए।");
+  check("edu_qual", "शैक्षिक योग्यता चुनें।");
+  check("district", "जनपद चुनें।");
+  check("project", "परियोजना/ब्लॉक चुनें।");
+  check("awc_center", "आंगनवाड़ी केंद्र का नाम केवल अक्षर और स्थान में होना चाहिए।");
+  check("joining_date", "योगदान तिथि YYYY-MM-DD प्रारूप में होनी चाहिए।");
+  check("village", "गांव/क्षेत्र का नाम केवल अक्षर और स्थान में होना चाहिए।");
+  check("city", "शहर का नाम केवल अक्षर और स्थान में होना चाहिए।");
+  check("address", "पता केवल अक्षर, संख्या और स्थान में होना चाहिए।");
+  check("pincode", "पिन कोड 6 अंकों का होना चाहिए।");
+  check("acc_holder", "खाताधारक का नाम केवल अक्षर और स्थान में होना चाहिए।");
+  check("acc_no", "बैंक खाता संख्या 9 से 18 अंकों के बीच होनी चाहिए।");
+  check("acc_ifsc", "IFSC कोड SBIN0001234 प्रारूप में होना चाहिए।");
+  check("bank_name", "बैंक का नाम केवल अक्षर और स्थान में होना चाहिए।");
+  check("pancard", "पैन कार्ड ABCDE1234F प्रारूप में होना चाहिए।");
+  return formatValidationErrors(errors);
+};
+
+export const getStepTwoFormatErrors = (application) => {
+  const errors = [];
+  const checkNumeric = (field, label) => {
+    const value = application?.[field];
+    if (!hasValue(value)) return;
+    if (!PATTERNS.numeric.test(String(value).trim())) {
+      errors.push({ field, message: label });
+    }
+  };
+  checkNumeric("pmmvy_tot", "पात्र लाभार्थी संख्या केवल संख्या में होनी चाहिए।");
+  checkNumeric("pmmvy_obt", "आवेदन संख्या केवल संख्या में होनी चाहिए।");
+  checkNumeric("cmmk_tot", "पात्र लाभार्थी संख्या केवल संख्या में होनी चाहिए।");
+  checkNumeric("cmmk_obt", "लाभार्थी संख्या केवल संख्या में होनी चाहिए।");
+  checkNumeric("nanda1_tot", "जन्मी बालिकाओं की संख्या केवल संख्या में होनी चाहिए।");
+  checkNumeric("nanda1_obt", "भरे गए आवेदनों की संख्या केवल संख्या में होनी चाहिए।");
+  checkNumeric("nanda2_tot", "12वीं उत्तीर्ण लाभार्थियों की संख्या केवल संख्या में होनी चाहिए।");
+  checkNumeric("nanda2_obt", "भरे गए आवेदनों की संख्या केवल संख्या में होनी चाहिए।");
+  checkNumeric("pt_tot", "पंजीकृत बच्चों की संख्या केवल संख्या में होनी चाहिए।");
+  checkNumeric("pt_obt", "औसत उपस्थिति केवल संख्या में होनी चाहिए।");
+  checkNumeric("survey_obt", "गृह भ्रमण की संख्या केवल संख्या में होनी चाहिए।");
+  checkNumeric("ann_tot", "पात्र लाभार्थी संख्या केवल संख्या में होनी चाहिए।");
+  checkNumeric("ann_obt", "अन्नप्राशन लाभार्थी संख्या केवल संख्या में होनी चाहिए।");
+  checkNumeric("pt_group_obt", "समुदाय आधारित गतिविधियों की संख्या केवल संख्या में होनी चाहिए।");
+  checkNumeric("sandharbh_obt", "संदर्भित महिलाओं की संख्या केवल संख्या में होनी चाहिए।");
+  checkNumeric("sam_tot", "पंजीकृत लाभार्थियों की संख्या केवल संख्या में होनी चाहिए।");
+  checkNumeric("sam_obt", "कुपोषण मुक्त लाभार्थियों की संख्या केवल संख्या में होनी चाहिए।");
+  checkNumeric("vhsnd_obt", "VHSND की संख्या केवल संख्या में होनी चाहिए।");
+  checkNumeric("pt_ben_tot", "पंजीकृत लाभार्थियों की संख्या केवल संख्या में होनी चाहिए।");
+  checkNumeric("pt_ben_obt", "आधार नामांकित लाभार्थियों की संख्या केवल संख्या में होनी चाहिए।");
+  checkNumeric("abhilekh_tot", "अभिलेखों की संख्या केवल संख्या में होनी चाहिए।");
+  checkNumeric("abhilekh_obt", "भरे गए अभिलेखों की संख्या केवल संख्या में होनी चाहिए।");
+  checkNumeric("krimi_tot", "बच्चों की संख्या केवल संख्या में होनी चाहिए।");
+  checkNumeric("krimi_obt", "दवा खिलाए गए बच्चों की संख्या केवल संख्या में होनी चाहिए।");
+  checkNumeric("poshan_week_tot", "रैलियों की संख्या केवल संख्या में होनी चाहिए।");
+  checkNumeric("poshan_week_obt", "प्रतिभागियों की संख्या केवल संख्या में होनी चाहिए।");
+  checkNumeric("sam_6mon_tot", "बच्चों की संख्या केवल संख्या में होनी चाहिए।");
+  checkNumeric("sam_6yr_tot", "बच्चों की संख्या केवल संख्या में होनी चाहिए।");
+  checkNumeric("mam_6mon_tot", "बच्चों की संख्या केवल संख्या में होनी चाहिए।");
+  checkNumeric("gambhir_tot", "बच्चों की संख्या केवल संख्या में होनी चाहिए।");
+  checkNumeric("gambhir_detail", "उपचारित लाभार्थियों की संख्या केवल संख्या में होनी चाहिए।");
+  checkNumeric("rbsk_obt", "भ्रमणों की संख्या केवल संख्या में होनी चाहिए।");
+  checkNumeric("rbsk_surv_obt", "स्वास्थ्य जांच किए गए बच्चों की संख्या केवल संख्या में होनी चाहिए।");
+  return formatValidationErrors(errors);
+};
+
+export const getStepThreeFormatErrors = (application) => {
+  const errors = [];
+  const check = (field, label) => {
+    const value = application?.[field];
+    if (!hasValue(value)) return;
+    const str = String(value).trim();
+    if (str.startsWith("http://") || str.startsWith("https://")) return;
+    if (/^[^\s]+\.(jpg|jpeg|png|pdf)$/i.test(str)) return;
+    errors.push({ field, message: label });
+  };
+  check("aharta1", "प्रमाण-पत्र फाइल URL या पथ वैध होना चाहिए।");
+  check("aharta2", "प्रमाण-पत्र फाइल URL या पथ वैध होना चाहिए।");
+  check("aharta3", "प्रमाण-पत्र फाइल URL या पथ वैध होना चाहिए।");
+  check("aharta4", "प्रमाण-पत्र फाइल URL या पथ वैध होना चाहिए।");
+  check("photo_img", "फोटो फाइल URL या पथ वैध होना चाहिए।");
+  check("signature", "हस्ताक्षर फाइल URL या पथ वैध होना चाहिए।");
+  if (application.declarationAccepted !== true) {
+    errors.push({ field: "declarationAccepted", message: "घोषणा स्वीकार करें।" });
+  }
+  return formatValidationErrors(errors);
+};
+
 const STEP_ONE_REQUIRED_FIELDS = [
   "filer_name",
   "fath_husb_name",
@@ -382,6 +536,63 @@ const STEP_TWO_NUMERIC_FIELDS = STEP_TWO_FIELDS.filter(
   (field) => field !== "saaf_ans" && !field.endsWith("_detail") && field !== "ach_work",
 );
 
+const STEP_TWO_REQUIRED_FIELDS = [
+  "pmmvy_tot",
+  "pmmvy_obt",
+  "cmmk_tot",
+  "cmmk_obt",
+  "nanda1_tot",
+  "nanda1_obt",
+  "nanda2_tot",
+  "nanda2_obt",
+  "pt_tot",
+  "pt_obt",
+  "survey_obt",
+  "ann_tot",
+  "ann_obt",
+  "pt_group_obt",
+  "sandharbh_obt",
+  "sam_tot",
+  "sam_obt",
+  "sam_detail",
+  "vhsnd_obt",
+  "pt_ben_tot",
+  "pt_ben_obt",
+  "abhilekh_tot",
+  "abhilekh_obt",
+  "saaf_ans",
+  "krimi_tot",
+  "krimi_obt",
+  "poshan_week_tot",
+  "poshan_week_obt",
+  "sam_6mon_tot",
+  "sam_6yr_tot",
+  "mam_6mon_tot",
+  "gambhir_tot",
+  "gambhir_detail",
+  "rbsk_obt",
+  "rbsk_surv_obt",
+  "other_work_detail",
+  "dept_work_detail",
+  "per_work_detail",
+  "ach_work",
+];
+
+export const getMissingAnganwadiStepTwoFields = (application) =>
+  STEP_TWO_REQUIRED_FIELDS.filter((field) => !hasValue(application?.[field]));
+
+const STEP_THREE_REQUIRED_FIELDS = [
+  "aharta1",
+  "aharta2",
+  "aharta3",
+  "aharta4",
+  "photo_img",
+  "signature",
+];
+
+export const getMissingAnganwadiStepThreeFields = (application) =>
+  STEP_THREE_REQUIRED_FIELDS.filter((field) => !hasValue(application?.[field]));
+
 const buildStepTwoPayload = (application, files) => {
   const payload = Object.fromEntries(
     STEP_TWO_FIELDS.map((field) => [
@@ -444,6 +655,16 @@ export const saveAnganwadiApplicationStep = async (
   selectedFiles = {},
 ) => {
   if (step === 1) {
+    const missingStepOne = getMissingAnganwadiStepOneFields(application);
+    if (missingStepOne.length) {
+      throw new Error(
+        `चरण 1 के आवश्यक विवरण पूरे नहीं हैं: ${missingStepOne.join(", ")}`,
+      );
+    }
+    const formatErrorStepOne = getStepOneFormatErrors(application);
+    if (formatErrorStepOne) {
+      throw new Error(`चरण 1 प्रारूप त्रुटि: ${formatErrorStepOne}`);
+    }
     const response = await requestApplication(
       1,
       "PUT",
@@ -459,6 +680,16 @@ export const saveAnganwadiApplicationStep = async (
   }
 
   if (step === 2) {
+    const missingStepTwo = getMissingAnganwadiStepTwoFields(application);
+    if (missingStepTwo.length) {
+      throw new Error(
+        `चरण 2 के आवश्यक विवरण पूरे नहीं हैं: ${missingStepTwo.join(", ")}`,
+      );
+    }
+    const formatErrorStepTwo = getStepTwoFormatErrors(application);
+    if (formatErrorStepTwo) {
+      throw new Error(`चरण 2 प्रारूप त्रुटि: ${formatErrorStepTwo}`);
+    }
     const response = await sendStepPayload(
       2,
       buildStepTwoPayload(application, selectedFiles),
@@ -472,6 +703,16 @@ export const saveAnganwadiApplicationStep = async (
   }
 
   if (step === 3) {
+    const missingStepThree = getMissingAnganwadiStepThreeFields(application);
+    if (missingStepThree.length) {
+      throw new Error(
+        `चरण 3 के आवश्यक दस्तावेज़ पूरे नहीं हैं: ${missingStepThree.join(", ")}`,
+      );
+    }
+    const formatErrorStepThree = getStepThreeFormatErrors(application);
+    if (formatErrorStepThree) {
+      throw new Error(`चरण 3 प्रारूप त्रुटि: ${formatErrorStepThree}`);
+    }
     const response = await sendStepPayload(
       3,
       buildStepThreePayload(selectedFiles),
