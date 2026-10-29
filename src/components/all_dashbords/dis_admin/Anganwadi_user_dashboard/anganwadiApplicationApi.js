@@ -210,7 +210,7 @@ const PATTERNS = {
   pincode: /^[0-9]{6}$/,
   ifsc: /^[A-Z]{4}0[A-Z0-9]{6}$/,
   pancard: /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/,
-  email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+  email: /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/,
   date: /^\d{4}-\d{2}-\d{2}$/,
   age: /^(?:[1-9]?\d|100)$/,
   account: /^[0-9]{9,18}$/,
@@ -274,6 +274,7 @@ export const getStepOneFormatErrors = (application) => {
   check("filer_mob", "मोबाइल नंबर 10 अंकों का होना चाहिए।");
   check("filer_adhar", "आधार नंबर 12 अंकों का होना चाहिए।");
   check("edu_qual", "शैक्षिक योग्यता चुनें।");
+  check("filer_email", "ईमेल आईडी केवल छोटे अक्षरों में होनी चाहिए।");
   check("district", "जनपद चुनें।");
   check("project", "परियोजना/ब्लॉक चुनें।");
   check("awc_center", "आंगनवाड़ी केंद्र का नाम केवल अक्षर और स्थान में होना चाहिए।");
