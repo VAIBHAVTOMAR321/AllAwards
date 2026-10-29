@@ -158,6 +158,17 @@ const formatDate = (value) => {
   });
 };
 
+const calculateAgeFromDob = (value) => {
+  if (!value) return "—";
+  const dob = new Date(value);
+  if (Number.isNaN(dob.getTime())) return "—";
+  const today = new Date();
+  let age = today.getFullYear() - dob.getFullYear();
+  const monthDiff = today.getMonth() - dob.getMonth();
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) age--;
+  return age >= 0 ? age : "—";
+};
+
 const formatTableDate = (value) => {
   if (!value) return "—";
   const parsed = new Date(value);
@@ -816,7 +827,7 @@ const CDPOAnganwadi2026_27 = () => {
                 All Forms <span>{applications.length}</span>
               </Button>
               <Button type="button" variant={activeTab === "approved" ? "success" : "outline-success"} onClick={() => { setActiveTab("approved"); setStatusFilter("all"); }} role="tab" aria-selected={activeTab === "approved"}>
-                Approved By CDPO <span>{applications.filter((item) => String(item.status || "").toLowerCase() === "approved").length}</span>
+                Approved Forms <span>{applications.filter((item) => String(item.status || "").toLowerCase() === "approved").length}</span>
               </Button>
               <Button type="button" variant={activeTab === "report" ? "success" : "outline-success"} onClick={() => { setActiveTab("report"); setStatusFilter("all"); }} role="tab" aria-selected={activeTab === "report"}>
                 Report (All Forms) <span>{applications.length}</span>
@@ -849,96 +860,118 @@ const CDPOAnganwadi2026_27 = () => {
             </div>
 
             <div className="cdpo-anganwadi-table-wrap">
-              <Table hover className="cdpo-anganwadi-table">
+              <Table hover className={`cdpo-anganwadi-table ${activeTab === "report" ? "cdpo-anganwadi-report-table" : ""}`}>
                 <thead>
-                  <tr>
-                    <th>S.no</th>
-                    <th>Status</th>
-                    <th>Remark</th>
-                    <th>Merit</th>
-                    <th>Mobile No.</th>
-                    <th>Form ID</th>
-                    <th>Applicant Name</th>
-                    <th>DOB</th>
-                    <th>Father/Husband Name</th>
-                    <th>Education Qualification</th>
-                    <th>District</th>
-                    <th>Project</th>
-                    <th>AWC Name</th>
-                    <th>Join Date</th>
-                    <th>Actions</th>
-                  </tr>
+                  {activeTab === "report" ? (
+                    <tr>
+                      <th>क्रम संख्या</th>
+                      <th>जनपद</th>
+                      <th>परियोजना का नाम</th>
+                      <th>केंद्र का नाम</th>
+                      <th>कार्यकर्त्री का नाम</th>
+                      <th>कार्यकर्त्री मोबाइल नंबर</th>
+                      <th>खाता संख्या</th>
+                      <th>आईएफएससी कोड</th>
+                      <th>बैंक का नाम</th>
+                      <th>जन्म तिथि</th>
+                      <th>आयु</th>
+                      <th>शैक्षिक योग्यता</th>
+                      <th>कार्यकर्त्री पद पर योगदान तिथि</th>
+                      <th>विभाग से संबंधित कार्य का विवरण</th>
+                      <th>विशेष उपलब्धि</th>
+                      <th>परियोजना की टिप्पणियाँ</th>
+                      <th>पुरस्कार हेतु प्राप्तांक (CDPO द्वारा प्रदत्त)</th>
+                      <th>संबंधित आंगनवाड़ी केंद्र के बच्चों की प्रतिरक्षण दर राज्य स्तरीय दर से कम नहीं होने का प्रमाण-पत्र (हाँ/नहीं)</th>
+                    </tr>
+                  ) : (
+                    <tr>
+                      <th>S.no</th>
+                      <th>Status</th>
+                      <th>Remark</th>
+                      <th>Merit</th>
+                      <th>Mobile No.</th>
+                      <th>Form ID</th>
+                      <th>Applicant Name</th>
+                      <th>DOB</th>
+                      <th>Father/Husband Name</th>
+                      <th>Education Qualification</th>
+                      <th>District</th>
+                      <th>Project</th>
+                      <th>AWC Name</th>
+                      <th>Join Date</th>
+                      <th>Actions</th>
+                    </tr>
+                  )}
                 </thead>
                 <tbody>
                   {loading ? (
                     <tr>
-                      <td colSpan={15} className="cdpo-anganwadi-empty">
+                      <td colSpan={activeTab === "report" ? 18 : 15} className="cdpo-anganwadi-empty">
                         <Spinner animation="border" size="sm" /> Loading applications...
                       </td>
                     </tr>
                   ) : paginatedApplications.length === 0 ? (
                     <tr>
-                      <td colSpan={15} className="cdpo-anganwadi-empty">
+                      <td colSpan={activeTab === "report" ? 18 : 15} className="cdpo-anganwadi-empty">
                         No applications found.
                       </td>
                     </tr>
                   ) : (
                     paginatedApplications.map((application, index) => {
                       const status = String(application.status || "").toLowerCase();
-                      const isUpdating =
-                        updatingFormId === String(application.form_id || "");
+                      const isUpdating = updatingFormId === String(application.form_id || "");
                       return (
                         <tr key={application.form_id || application.id}>
-                          <td>{(currentPage - 1) * PAGE_SIZE + index + 1}</td>
-                          <td className="cdpo-anganwadi-status-cell">
-                            <Badge bg={getStatusVariant(status)}>
-                              {formatStatus(status)}
-                            </Badge>
-                          </td>
-                          <td className="cdpo-anganwadi-remark-cell">{displayValue(application.remark)}</td>
-                          <td><strong>{displayValue(application.merit)}</strong></td>
-                          <td>{displayValue(application.filer_mob)}</td>
-                          <td className="cdpo-anganwadi-form-id">{displayValue(application.form_id)}</td>
-                          <td>{displayValue(application.filer_name)}</td>
-                          <td>{formatTableDate(application.dob)}</td>
-                          <td>{displayValue(application.fath_husb_name)}</td>
-                          <td>{displayValue(application.edu_qual)}</td>
-                          <td>{displayValue(application.district)}</td>
-                          <td>{displayValue(application.project)}</td>
-                          <td>{displayValue(application.awc_name || application.awc_center)}</td>
-                          <td>{formatTableDate(application.joining_date)}</td>
-                          <td className="cdpo-anganwadi-actions-cell">
-                            <div className="cdpo-anganwadi-row-actions">
-                              <Button
-                                size="sm"
-                                variant="outline-primary"
-                                onClick={() => setSelectedApplication(application)}
-                                aria-label={`${application.form_id} Application View`}
-                              >
-                                <FaEye /> View
-                              </Button>
-                              {status !== "approved" && status !== "rejected" && (
-                                <>
-                                  <Button
-                                    size="sm"
-                                    variant="success"
-                                    disabled={isUpdating}
-                                    onClick={() => openDecision(application, "approved")}
-                                  >
-                                    {isUpdating ? <Spinner size="sm" animation="border" /> : <FaCheck />} Approve
-                                  </Button>
-                                  <Button
-                                    size="sm"
-                                    variant="outline-danger"
-                                    disabled={isUpdating}
-                                    onClick={() => openDecision(application, "rejected")}
-                                  >
-                                    <FaTimes /> Reject
-                                  </Button>
-                                </>
-                              )}
-                            </div>
-                          </td>
+                          {activeTab === "report" ? (
+                            <>
+                              <td>{(currentPage - 1) * PAGE_SIZE + index + 1}</td>
+                              <td>{displayValue(application.district)}</td>
+                              <td>{displayValue(application.project)}</td>
+                              <td>{displayValue(application.awc_name || application.awc_center)}</td>
+                              <td>{displayValue(application.filer_name)}</td>
+                              <td>{displayValue(application.filer_mob)}</td>
+                              <td>{displayValue(application.acc_no)}</td>
+                              <td>{displayValue(application.acc_ifsc)}</td>
+                              <td>{displayValue(application.bank_name)}</td>
+                              <td>{formatTableDate(application.dob)}</td>
+                              <td>{displayValue(application.age || calculateAgeFromDob(application.dob))}</td>
+                              <td>{displayValue(application.edu_qual)}</td>
+                              <td>{formatTableDate(application.joining_date)}</td>
+                              <td>{displayValue(application.dept_work_detail)}</td>
+                              <td>{displayValue(application.ach_work)}</td>
+                              <td>{displayValue(application.remark)}</td>
+                              <td>{displayValue(application.merit)}</td>
+                              <td>{(application.aharta4 || application.immunization_certificate) ? "हाँ" : "नहीं"}</td>
+                            </>
+                          ) : (
+                            <>
+                              <td>{(currentPage - 1) * PAGE_SIZE + index + 1}</td>
+                              <td className="cdpo-anganwadi-status-cell"><Badge bg={getStatusVariant(status)}>{formatStatus(status)}</Badge></td>
+                              <td className="cdpo-anganwadi-remark-cell">{displayValue(application.remark)}</td>
+                              <td><strong>{displayValue(application.merit)}</strong></td>
+                              <td>{displayValue(application.filer_mob)}</td>
+                              <td className="cdpo-anganwadi-form-id">{displayValue(application.form_id)}</td>
+                              <td>{displayValue(application.filer_name)}</td>
+                              <td>{formatTableDate(application.dob)}</td>
+                              <td>{displayValue(application.fath_husb_name)}</td>
+                              <td>{displayValue(application.edu_qual)}</td>
+                              <td>{displayValue(application.district)}</td>
+                              <td>{displayValue(application.project)}</td>
+                              <td>{displayValue(application.awc_name || application.awc_center)}</td>
+                              <td>{formatTableDate(application.joining_date)}</td>
+                              <td className="cdpo-anganwadi-actions-cell">
+                                <div className="cdpo-anganwadi-row-actions">
+                                  <Button size="sm" variant="outline-primary" onClick={() => setSelectedApplication(application)} aria-label={`${application.form_id} Application View`}><FaEye /> View</Button>
+                                  {status !== "approved" && status !== "rejected" && (
+                                    <>
+                                      <Button size="sm" variant="success" disabled={isUpdating} onClick={() => openDecision(application, "approved")}>{isUpdating ? <Spinner size="sm" animation="border" /> : <FaCheck />} Approve</Button>
+                                      <Button size="sm" variant="outline-danger" disabled={isUpdating} onClick={() => openDecision(application, "rejected")}><FaTimes /> Reject</Button>
+                                    </>
+                                  )}
+                                </div>
+                              </td>
+                            </>
+                          )}
                         </tr>
                       );
                     })
