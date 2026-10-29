@@ -290,9 +290,10 @@ const DPOAnganwadi2026_27 = () => {
   const [decisionStatus, setDecisionStatus] = useState("approved_by_dpo");
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedApplication, setSelectedApplication] = useState(null);
-  const [approvalApplication, setApprovalApplication] = useState(null);
+  const [approvalApplications, setApprovalApplications] = useState([]);
   const [remark, setRemark] = useState("");
-  const [updatingFormId, setUpdatingFormId] = useState("");
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [updatingSectorKey, setUpdatingSectorKey] = useState("");
 
   useEffect(() => {
     const handleResize = () => {
@@ -309,12 +310,12 @@ const DPOAnganwadi2026_27 = () => {
   useEffect(() => {
     document.body.classList.toggle(
       "dpo-anganwadi-modal-open",
-      Boolean(selectedApplication || approvalApplication)
+      Boolean(selectedApplication || approvalApplications.length > 0)
     );
     const onKeyDown = (event) => {
       if (event.key === "Escape") {
         setSelectedApplication(null);
-        setApprovalApplication(null);
+        setApprovalApplications([]);
       }
     };
     window.addEventListener("keydown", onKeyDown);
@@ -322,7 +323,7 @@ const DPOAnganwadi2026_27 = () => {
       document.body.classList.remove("dpo-anganwadi-modal-open");
       window.removeEventListener("keydown", onKeyDown);
     };
-  }, [selectedApplication, approvalApplication]);
+  }, [selectedApplication, approvalApplications]);
 
   const fetchApplications = useCallback(async () => {
     setLoading(true);
@@ -435,13 +436,7 @@ const DPOAnganwadi2026_27 = () => {
     for (const project of projectMap.values()) {
       let firstProjectRow = true;
       for (const sector of project.sectors.values()) {
-        const approvedForSector = applications.find((item) =>
-          String(item.project || "Unassigned Project").trim() === project.projectName &&
-          String(item.sector || "Unassigned Sector").trim() === sector.sectorName &&
-          isDpoApproved(item.status)
-        );
-        const sectorAlreadyApproved = Boolean(approvedForSector);
-        const selectedId = approvedForSector?.form_id || selectedAwardBySector[sector.sectorKey] || "";
+        const selectedFormIds = (selectedAwardBySector[sector.sectorKey] || []).slice();
         let firstSectorRow = true;
 
         for (const awc of sector.awcs.values()) {
@@ -460,9 +455,7 @@ const DPOAnganwadi2026_27 = () => {
               showSector: firstSectorRow,
               showAwc: firstAwcRow,
               showSectorActions: firstSectorRow,
-              sectorAlreadyApproved,
-              selectedId,
-              selectedFormId: selectedAwardBySector[sector.sectorKey] || approvedForSector?.form_id || "",
+              selectedFormIds,
             });
             firstProjectRow = false;
             firstSectorRow = false;
@@ -472,108 +465,124 @@ const DPOAnganwadi2026_27 = () => {
       }
     }
     return rows;
-  }, [filteredApplications, applications, selectedAwardBySector]);
+  }, [filteredApplications, selectedAwardBySector]);
+
+  const toggleSectorSelection = (sectorKey, formId) => {
+    setSelectedAwardBySector((current) => {
+      const selected = [...(current[sectorKey] || [])];
+      const id = String(formId);
+      const index = selected.indexOf(id);
+      if (index >= 0) selected.splice(index, 1);
+      else selected.push(id);
+      return { ...current, [sectorKey]: selected };
+    });
+  };
 
   const submitSectorSelection = (sectorKey, nextStatus = "approved_by_dpo") => {
-    const selectedFormId = selectedAwardBySector[sectorKey];
-    const selected = completedRows.find((row) => row.sectorKey === sectorKey && String(row.application.form_id) === String(selectedFormId))?.application;
-    if (!selected) {
-      setActionMessage({ type: "warning", text: "Please select one candidate for this sector first." });
+    const selectedFormIds = selectedAwardBySector[sectorKey] || [];
+    const selected = completedRows
+      .filter((row) => row.sectorKey === sectorKey && selectedFormIds.includes(String(row.application.form_id)))
+      .map((row) => row.application);
+    if (selected.length === 0) {
+      setActionMessage({ type: "warning", text: "Please select at least one candidate for this sector first." });
       return;
     }
-    if (applications.some((item) =>
-      String(item.project || "Unassigned Project").trim() === JSON.parse(sectorKey)[0] &&
-      String(item.sector || "Unassigned Sector").trim() === JSON.parse(sectorKey)[1] &&
-      isDpoApproved(item.status)
-    )) {
-      setActionMessage({ type: "warning", text: "A candidate has already been approved by DPO for this project and sector." });
+    if (selected.some((item) => isDpoApproved(item.status))) {
+      setActionMessage({ type: "warning", text: "One or more selected candidates are already approved by DPO." });
       return;
     }
+    setUpdatingSectorKey(sectorKey);
     openDecision(selected, nextStatus);
   };
 
-  const openDecision = (application, nextStatus) => {
-    setApprovalApplication(application);
+  const openDecision = (applications, nextStatus) => {
+    setApprovalApplications(Array.isArray(applications) ? applications : [applications]);
     setDecisionStatus(nextStatus);
-    setRemark(application.remark || "");
+    setRemark("");
     setActionMessage(null);
   };
 
   const updateApplicationStatus = async () => {
-    const formId = String(approvalApplication?.form_id || "").trim();
-    if (!formId) {
-      setActionMessage({
-        type: "danger",
-        text: "Application Form ID is not available.",
-      });
+    if (approvalApplications.length === 0) {
+      setActionMessage({ type: "danger", text: "No applications selected for forwarding." });
       return;
     }
 
-    setUpdatingFormId(formId);
+    const formIds = approvalApplications.map((app) => String(app.form_id || "").trim());
+    if (formIds.some((id) => !id)) {
+      setActionMessage({ type: "danger", text: "Application Form ID is not available for one or more applications." });
+      return;
+    }
+
+    setIsUpdating(true);
     setActionMessage(null);
     try {
-      const response = await cookieFetch(APPLICATIONS_URL, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          form_id: formId,
-          status: decisionStatus,
-          remark: remark.trim(),
-        }),
-      });
-      const payload = await readResponse(response);
-      if (!response.ok || payload.success === false) {
-        throw new Error(
-          getErrorMessage(
-            payload,
-            `Application could not be ${decisionStatus} (HTTP ${response.status}).`
+      for (const formId of formIds) {
+        const response = await cookieFetch(APPLICATIONS_URL, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            form_id: formId,
+            status: decisionStatus,
+            remark: remark.trim(),
+          }),
+        });
+        const payload = await readResponse(response);
+        if (!response.ok || payload.success === false) {
+          throw new Error(
+            getErrorMessage(
+              payload,
+              `Application ${formId} could not be ${decisionStatus} (HTTP ${response.status}).`
+            )
+          );
+        }
+
+        const returnedData = payload.data;
+        const returnedRecord = Array.isArray(returnedData)
+          ? returnedData.find((item) => String(item.form_id) === formId)
+          : returnedData && typeof returnedData === "object"
+            ? returnedData
+            : null;
+
+        setApplications((current) =>
+          current.map((item) =>
+            String(item.form_id) === formId
+              ? {
+                  ...item,
+                  ...(returnedRecord || {}),
+                  form_id: formId,
+                  status: returnedRecord?.status || payload.status || decisionStatus,
+                  remark: returnedRecord?.remark ?? payload.remark ?? remark.trim(),
+                }
+              : item
           )
         );
-      }
-
-      const returnedData = payload.data;
-      const returnedRecord = Array.isArray(returnedData)
-        ? returnedData.find((item) => String(item.form_id) === formId)
-        : returnedData && typeof returnedData === "object"
-          ? returnedData
-          : null;
-
-      setApplications((current) =>
-        current.map((item) =>
-          String(item.form_id) === formId
+        setSelectedApplication((current) =>
+          current && String(current.form_id) === formId
             ? {
-                ...item,
+                ...current,
                 ...(returnedRecord || {}),
-                form_id: formId,
                 status: returnedRecord?.status || payload.status || decisionStatus,
                 remark: returnedRecord?.remark ?? payload.remark ?? remark.trim(),
               }
-            : item
-        )
-      );
-      setSelectedApplication((current) =>
-        current && String(current.form_id) === formId
-          ? {
-              ...current,
-              ...(returnedRecord || {}),
-              status: returnedRecord?.status || payload.status || decisionStatus,
-              remark: returnedRecord?.remark ?? payload.remark ?? remark.trim(),
-            }
-          : current
-      );
+            : current
+        );
+      }
+
       setActionMessage({
         type: "success",
-        text: `Application ${formId} was ${decisionStatus} successfully.`,
+        text: `${formIds.length} application(s) were ${decisionStatus} successfully.`,
       });
-      setApprovalApplication(null);
+      setApprovalApplications([]);
     } catch (error) {
-      console.error(`Failed to set application ${formId} to ${decisionStatus}:`, error);
+      console.error(`Failed to set applications to ${decisionStatus}:`, error);
       setActionMessage({
         type: "danger",
-        text: error.message || `Application could not be ${decisionStatus}.`,
+        text: error.message || `Applications could not be ${decisionStatus}.`,
       });
     } finally {
-      setUpdatingFormId("");
+      setIsUpdating(false);
+      setUpdatingSectorKey("");
     }
   };
 
@@ -1039,8 +1048,10 @@ const DPOAnganwadi2026_27 = () => {
                   ) : activeTab === "cdpo-approved" ? completedRows.length === 0 ? (
                     <tr><td colSpan={10} className="dpo-anganwadi-empty">No applications approved by CDPO or already approved by DPO are available for verification.</td></tr>
                   ) : completedRows.map((row) => {
-                    const { application, projectName, sectorName, awcName, sectorKey, projectRowSpan, sectorRowSpan, awcRowSpan, showProject, showSector, showAwc, showSectorActions, sectorAlreadyApproved, selectedId, selectedFormId } = row;
-                    const isUpdating = updatingFormId === String(selectedFormId || "");
+                    const { application, projectName, sectorName, awcName, sectorKey, projectRowSpan, sectorRowSpan, awcRowSpan, showProject, showSector, showAwc, showSectorActions, selectedFormIds } = row;
+                    const isUpdating = updatingSectorKey === sectorKey;
+                    const isSelected = selectedFormIds.includes(String(application.form_id || ""));
+                    const isAlreadyApproved = isDpoApproved(application.status);
                     return (
                       <tr key={application.form_id || application.id}>
                         {showProject && <td rowSpan={projectRowSpan}>{displayValue(projectName)}</td>}
@@ -1057,25 +1068,21 @@ const DPOAnganwadi2026_27 = () => {
                         <td><strong>Total Marks: {displayValue(application.merit)}</strong></td>
                         <td className="dpo-anganwadi-select-cell">
                           <Form.Check
-                            type="radio"
+                            type="checkbox"
                             name={`award-sector-${sectorKey}`}
-                            checked={String(selectedId) === String(application.form_id)}
-                            disabled={sectorAlreadyApproved}
-                            onChange={() => setSelectedAwardBySector((current) => ({ ...current, [sectorKey]: application.form_id }))}
+                            checked={isSelected}
+                            disabled={isAlreadyApproved}
+                            onChange={() => toggleSectorSelection(sectorKey, application.form_id)}
                             aria-label={`Choose ${application.filer_name} for award in ${sectorName}`}
                           />
                         </td>
                         {showSectorActions && (
                           <td className="dpo-anganwadi-sector-actions" rowSpan={sectorRowSpan}>
                             <div className="dpo-anganwadi-sector-action-buttons">
-                              {sectorAlreadyApproved ? (
-                                <Badge bg="success">Award Already Approved</Badge>
-                              ) : (
-                                <>
-                                  <Button size="sm" variant="info" disabled={isUpdating} onClick={() => submitSectorSelection(sectorKey, "approved_by_dpo")}>Submit</Button>
-                                  <Button size="sm" variant="outline-danger" disabled={isUpdating} onClick={() => submitSectorSelection(sectorKey, "rejected_by_dpo")}>Reject Selected</Button>
-                                </>
-                              )}
+                              <>
+                                <Button size="sm" variant="info" disabled={isUpdating} onClick={() => submitSectorSelection(sectorKey, "approved_by_dpo")}>Submit</Button>
+                                <Button size="sm" variant="outline-danger" disabled={isUpdating} onClick={() => submitSectorSelection(sectorKey, "rejected_by_dpo")}>Reject Selected</Button>
+                              </>
                             </div>
                           </td>
                         )}
@@ -1090,7 +1097,6 @@ const DPOAnganwadi2026_27 = () => {
                   ) : (
                     paginatedApplications.map((application, index) => {
                       const status = String(application.status || "").toLowerCase();
-                      const isUpdating = updatingFormId === String(application.form_id || "");
                       return (
                         <tr key={application.form_id || application.id}>
                           {activeTab === "report" ? (
@@ -1311,7 +1317,7 @@ const DPOAnganwadi2026_27 = () => {
                       onClick={() => {
                         const application = selectedApplication;
                         setSelectedApplication(null);
-                        openDecision(application, "approved");
+                        openDecision([application], "approved");
                       }}
                     >
                       <FaCheck className="me-2" /> Approve
@@ -1321,7 +1327,7 @@ const DPOAnganwadi2026_27 = () => {
                     <Button variant="outline-danger" onClick={() => {
                       const application = selectedApplication;
                       setSelectedApplication(null);
-                      openDecision(application, "rejected");
+                      openDecision([application], "rejected");
                     }}>
                       <FaTimes className="me-2" /> Reject
                     </Button>
@@ -1337,20 +1343,21 @@ const DPOAnganwadi2026_27 = () => {
       )}
 
       <Modal
-        show={Boolean(approvalApplication)}
+        show={approvalApplications.length > 0}
         onHide={() => {
-          if (!updatingFormId) setApprovalApplication(null);
+          if (!isUpdating) setApprovalApplications([]);
         }}
         centered
         dialogClassName="dpo-anganwadi-approval-dialog"
       >
-        <Modal.Header closeButton={!updatingFormId}>
-          <Modal.Title>{decisionStatus === "approved_by_dpo" ? "Approve Application" : "Reject Application"}</Modal.Title>
+        <Modal.Header closeButton={!isUpdating}>
+          <Modal.Title>{decisionStatus === "approved_by_dpo" ? "Approve Applications" : "Reject Applications"}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <p>
-            Application <strong>{displayValue(approvalApplication?.form_id)}</strong>{" "}
-            {decisionStatus === "approved_by_dpo" ? "Confirm approval of this application." : "Confirm rejection of this application."}
+            Confirm {decisionStatus === "approved_by_dpo" ? "approval" : "rejection"} of{" "}
+            <strong>{approvalApplications.length}</strong> application(s):{" "}
+            {approvalApplications.map((app) => <span key={app.form_id}>{displayValue(app.form_id)}</span>).join(", ")}
           </p>
           <Form.Group>
             <Form.Label>Remark</Form.Label>
@@ -1360,33 +1367,33 @@ const DPOAnganwadi2026_27 = () => {
               value={remark}
               onChange={(event) => setRemark(event.target.value)}
               placeholder={decisionStatus === "approved_by_dpo" ? "Enter an approval remark" : "Enter the reason for rejection"}
-              disabled={Boolean(updatingFormId)}
+              disabled={isUpdating}
             />
           </Form.Group>
           <p className="dpo-anganwadi-confirm-note">
-            This will send status: {decisionStatus} and the entered remark to the DPO status API.
+            This will send status: {decisionStatus} and the entered remark to the DPO status API for each selected application.
           </p>
         </Modal.Body>
         <Modal.Footer>
           <Button
             variant="outline-secondary"
-            disabled={Boolean(updatingFormId)}
-            onClick={() => setApprovalApplication(null)}
+            disabled={isUpdating}
+            onClick={() => setApprovalApplications([])}
           >
             Cancel
           </Button>
           <Button
             variant={decisionStatus === "approved_by_dpo" ? "success" : "danger"}
-            disabled={Boolean(updatingFormId)}
+            disabled={isUpdating || approvalApplications.length === 0}
             onClick={updateApplicationStatus}
           >
-            {updatingFormId ? (
+            {isUpdating ? (
               <>
                 <Spinner size="sm" animation="border" /> Processing...
               </>
             ) : (
               <>
-                {decisionStatus === "approved_by_dpo" ? <><FaCheck /> Confirm and Approve</> : <><FaTimes /> Confirm and Reject</>}
+                {decisionStatus === "approved_by_dpo" ? <><FaCheck /> Confirm and Approve All</> : <><FaTimes /> Confirm and Reject All</>}
               </>
             )}
           </Button>

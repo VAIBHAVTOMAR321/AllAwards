@@ -344,7 +344,6 @@ const CDPOAnganwadi2026_27 = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [activeTab, setActiveTab] = useState("all");
-  const [selectedAwardBySector, setSelectedAwardBySector] = useState({});
   const [decisionStatus, setDecisionStatus] = useState("approved");
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedApplication, setSelectedApplication] = useState(null);
@@ -457,29 +456,25 @@ const CDPOAnganwadi2026_27 = () => {
     currentPage * PAGE_SIZE
   );
 
+  // Group by the actual sector field first, then show each AWC/application
+  // as its own row. This allows CDPOs to forward multiple applications from
+  // the same sector independently.
   const completedGroups = useMemo(() => {
     const groups = new Map();
     filteredApplications.forEach((application) => {
-      const sectorKey = String(
-        application.sector || application.awc_name || application.awc_center || application.project || "Unassigned Sector"
-      ).trim();
+      const sectorKey = String(application.sector || "Unassigned Sector").trim();
       if (!groups.has(sectorKey)) groups.set(sectorKey, []);
       groups.get(sectorKey).push(application);
     });
-    return Array.from(groups.entries()).map(([sectorKey, items]) => ({ sectorKey, items }));
+    return Array.from(groups.entries())
+      .map(([sectorKey, items]) => ({
+        sectorKey,
+        items: [...items].sort((a, b) =>
+          String(a.awc_name || a.awc_center || "").localeCompare(String(b.awc_name || b.awc_center || ""))
+        ),
+      }))
+      .sort((a, b) => a.sectorKey.localeCompare(b.sectorKey));
   }, [filteredApplications]);
-
-  const submitSectorSelection = (sectorKey, nextStatus = "approved") => {
-    const selectedFormId = selectedAwardBySector[sectorKey];
-    const selected = completedGroups
-      .find((group) => group.sectorKey === sectorKey)
-      ?.items.find((item) => String(item.form_id) === String(selectedFormId));
-    if (!selected) {
-      setActionMessage({ type: "warning", text: "Please select one candidate for this sector first." });
-      return;
-    }
-    openDecision(selected, nextStatus);
-  };
 
   const openDecision = (application, nextStatus) => {
     setApprovalApplication(application);
@@ -965,13 +960,13 @@ const CDPOAnganwadi2026_27 = () => {
                 <thead>
                   {activeTab === "completed" ? (
                     <tr>
+                      <th>Sector</th>
                       <th>Anganwadi Center</th>
-                      <th>Candidate name</th>
+                      <th>Candidate Name</th>
                       <th>Joining Date</th>
                       <th>Form ID</th>
                       <th>Remark</th>
                       <th>Merit / Total Marks</th>
-                      <th>Choose for AWARD</th>
                       <th>Actions</th>
                     </tr>
                   ) : activeTab === "report" ? (
@@ -1026,22 +1021,18 @@ const CDPOAnganwadi2026_27 = () => {
                   ) : activeTab === "completed" ? completedGroups.length === 0 ? (
                     <tr><td colSpan={8} className="cdpo-anganwadi-empty">No completed applications found.</td></tr>
                   ) : completedGroups.map(({ sectorKey, items }) => items.map((application, index) => {
-                    const selectedId = selectedAwardBySector[sectorKey] || "";
-                    const centerAlreadyApproved = applications.some((item) => {
-                      const itemSector = String(item.sector || item.awc_name || item.awc_center || item.project || "Unassigned Sector").trim();
-                      const centerKey = String(sectorKey || "").trim();
-                      return itemSector === centerKey && isApprovedStatus(item.status);
-                    });
-                    const selectedFormId = selectedAwardBySector[sectorKey];
-                    const isUpdating = updatingFormId === String(selectedFormId || "");
-                    const rowDisabled = centerAlreadyApproved;
+                    const formId = String(application.form_id || application.id || "");
+                    const isUpdating = updatingFormId === formId;
+                    const approved = isApprovedStatus(application.status);
+                    const rejected = isRejectedStatus(application.status);
                     return (
-                      <tr key={application.form_id || application.id} className={rowDisabled ? "cdpo-anganwadi-row-disabled" : ""}>
+                      <tr key={formId}>
                         {index === 0 && (
-                          <td rowSpan={items.length} className="cdpo-anganwadi-center-group-cell">
-                            {displayValue(application.awc_name || application.awc_center)}
+                          <td rowSpan={items.length} className="cdpo-anganwadi-sector-group-cell">
+                            {displayValue(sectorKey)}
                           </td>
                         )}
+                        <td>{displayValue(application.awc_name || application.awc_center)}</td>
                         <td>{displayValue(application.filer_name)}</td>
                         <td>{formatTableDate(application.joining_date)}</td>
                         <td className="cdpo-anganwadi-form-id">
@@ -1051,30 +1042,18 @@ const CDPOAnganwadi2026_27 = () => {
                         </td>
                         <td className="cdpo-anganwadi-remark-cell">{displayValue(application.remark)}</td>
                         <td><strong>Total Marks: {displayValue(getApplicationMerit(application))}</strong></td>
-                        <td className="cdpo-anganwadi-select-cell">
-                          <Form.Check
-                            type="radio"
-                            name={`award-sector-${sectorKey}`}
-                            checked={String(selectedId) === String(application.form_id)}
-                            disabled={rowDisabled}
-                            onChange={() => setSelectedAwardBySector((current) => ({ ...current, [sectorKey]: application.form_id }))}
-                            aria-label={`Choose ${application.filer_name} for award in ${sectorKey}`}
-                          />
-                        </td>
-                        {index === 0 && (
-                          <td className="cdpo-anganwadi-sector-actions" rowSpan={items.length}>
-                            <div className="cdpo-anganwadi-sector-action-buttons">
-                              {centerAlreadyApproved ? (
-                                <Badge bg="success">Forwarded to DPO / Approved</Badge>
-                              ) : (
-                                <>
-                                  <Button size="sm" variant="info" disabled={isUpdating} onClick={() => submitSectorSelection(sectorKey, "approved")}>Submit</Button>
-                                  <Button size="sm" variant="outline-danger" disabled={isUpdating} onClick={() => submitSectorSelection(sectorKey, "rejected")}>Reject Selected</Button>
-                                </>
-                              )}
+                        <td className="cdpo-anganwadi-row-actions-cell">
+                          {approved ? (
+                            <Badge bg="success">Forwarded to DPO</Badge>
+                          ) : rejected ? (
+                            <Badge bg="danger">Rejected</Badge>
+                          ) : (
+                            <div className="cdpo-anganwadi-row-actions">
+                              <Button size="sm" variant="info" disabled={isUpdating} onClick={() => openDecision(application, "approved")}>Forward to DPO</Button>
+                              <Button size="sm" variant="outline-danger" disabled={isUpdating} onClick={() => openDecision(application, "rejected")}>Reject</Button>
                             </div>
-                          </td>
-                        )}
+                          )}
+                        </td>
                       </tr>
                     );
                   })) : paginatedApplications.length === 0 ? (

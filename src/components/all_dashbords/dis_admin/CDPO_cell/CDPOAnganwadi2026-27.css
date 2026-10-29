@@ -1351,7 +1351,7 @@
   }
 }
 
-/* Completed Forms: sector-wise candidate selection table */
+/* Completed Forms: sector-first, AWC-second table with per-application decisions */
 .cdpo-anganwadi-completed-table {
   min-width: 1050px;
   width: 100%;
@@ -1497,11 +1497,30 @@
   vertical-align: top;
 }
 
-/* Completed Forms: show each Anganwadi Center once for its grouped rows */
-.cdpo-anganwadi-completed-table .cdpo-anganwadi-center-group-cell {
+/* Completed Forms: show each sector once, followed by each AWC/application row. */
+.cdpo-anganwadi-completed-table .cdpo-anganwadi-sector-group-cell {
   vertical-align: middle;
   text-align: center;
-  min-width: 105px;
+  min-width: 125px;
+  background: #f0fdf4;
+  color: #166534;
+  font-weight: 800;
   white-space: normal;
   overflow-wrap: anywhere;
+}
+
+.cdpo-anganwadi-completed-table .cdpo-anganwadi-row-actions-cell {
+  min-width: 190px;
+  vertical-align: middle;
+}
+
+.cdpo-anganwadi-completed-table .cdpo-anganwadi-row-actions {
+  min-width: 0;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.cdpo-anganwadi-completed-table .cdpo-anganwadi-row-actions .btn {
+  font-size: 11px;
+  padding: 5px 8px;
 }
