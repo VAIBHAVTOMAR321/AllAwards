@@ -276,6 +276,7 @@ const CDPOAnganwadi2026_27 = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [activeTab, setActiveTab] = useState("all");
+  const [selectedAwardBySector, setSelectedAwardBySector] = useState({});
   const [decisionStatus, setDecisionStatus] = useState("approved");
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedApplication, setSelectedApplication] = useState(null);
@@ -366,7 +367,12 @@ const CDPOAnganwadi2026_27 = () => {
         ].some((value) => String(value || "").toLowerCase().includes(query));
 
       const status = String(application.status || "").toLowerCase();
-      const matchesTab = activeTab !== "approved" || status === "approved";
+      const matchesTab =
+        activeTab === "approved"
+          ? status === "approved"
+          : activeTab === "completed"
+            ? status === "final_submit" || status === "submitted" || status === "completed"
+            : true;
       const matchesStatus =
         statusFilter === "all" ||
         (statusFilter === "submitted" && status === "final_submit") ||
@@ -382,6 +388,32 @@ const CDPOAnganwadi2026_27 = () => {
     (currentPage - 1) * PAGE_SIZE,
     currentPage * PAGE_SIZE
   );
+
+  // Group completed submissions by sector. The AWC name is shown in the table,
+  // while the API's sector value controls the one-candidate-per-sector selection.
+  const completedGroups = useMemo(() => {
+    const groups = new Map();
+    filteredApplications.forEach((application) => {
+      const sectorKey = String(
+        application.sector || application.project || application.awc_name || application.awc_center || "Unassigned Sector"
+      ).trim();
+      if (!groups.has(sectorKey)) groups.set(sectorKey, []);
+      groups.get(sectorKey).push(application);
+    });
+    return Array.from(groups.entries()).map(([sectorKey, items]) => ({ sectorKey, items }));
+  }, [filteredApplications]);
+
+  const submitSectorSelection = (sectorKey, nextStatus = "approved") => {
+    const selectedFormId = selectedAwardBySector[sectorKey];
+    const selected = completedGroups
+      .find((group) => group.sectorKey === sectorKey)
+      ?.items.find((item) => String(item.form_id) === String(selectedFormId));
+    if (!selected) {
+      setActionMessage({ type: "warning", text: "Please select one candidate for this sector first." });
+      return;
+    }
+    openDecision(selected, nextStatus);
+  };
 
   const openDecision = (application, nextStatus) => {
     setApprovalApplication(application);
@@ -826,8 +858,11 @@ const CDPOAnganwadi2026_27 = () => {
               <Button type="button" variant={activeTab === "all" ? "success" : "outline-success"} onClick={() => { setActiveTab("all"); setStatusFilter("all"); }} role="tab" aria-selected={activeTab === "all"}>
                 All Forms <span>{applications.length}</span>
               </Button>
+              <Button type="button" variant={activeTab === "completed" ? "success" : "outline-success"} onClick={() => { setActiveTab("completed"); setStatusFilter("all"); }} role="tab" aria-selected={activeTab === "completed"}>
+                Completed Forms <span>{applications.filter((item) => ["final_submit", "submitted", "completed"].includes(String(item.status || "").toLowerCase())).length}</span>
+              </Button>
               <Button type="button" variant={activeTab === "approved" ? "success" : "outline-success"} onClick={() => { setActiveTab("approved"); setStatusFilter("all"); }} role="tab" aria-selected={activeTab === "approved"}>
-                Approved Forms <span>{applications.filter((item) => String(item.status || "").toLowerCase() === "approved").length}</span>
+                Approved BY CDPO <span>{applications.filter((item) => String(item.status || "").toLowerCase() === "approved").length}</span>
               </Button>
               <Button type="button" variant={activeTab === "report" ? "success" : "outline-success"} onClick={() => { setActiveTab("report"); setStatusFilter("all"); }} role="tab" aria-selected={activeTab === "report"}>
                 Report (All Forms) <span>{applications.length}</span>
@@ -860,14 +895,26 @@ const CDPOAnganwadi2026_27 = () => {
             </div>
 
             <div className="cdpo-anganwadi-table-wrap">
-              <Table hover className={`cdpo-anganwadi-table ${activeTab === "report" ? "cdpo-anganwadi-report-table" : ""}`}>
+              <Table hover className={`cdpo-anganwadi-table ${activeTab === "report" ? "cdpo-anganwadi-report-table" : ""} ${activeTab === "completed" ? "cdpo-anganwadi-completed-table" : ""}`}>
                 <thead>
-                  {activeTab === "report" ? (
+                  {activeTab === "completed" ? (
+                    <tr>
+                      <th>Anganwadi Center</th>
+                      <th>Candidate name</th>
+                      <th>Joining Date</th>
+                      <th>Form ID</th>
+                      <th>Remark</th>
+                      <th>Merit</th>
+                      <th>Choose for AWARD</th>
+                      <th>Actions</th>
+                    </tr>
+                  ) : activeTab === "report" ? (
                     <tr>
                       <th>क्रम संख्या</th>
                       <th>जनपद</th>
                       <th>परियोजना का नाम</th>
                       <th>केंद्र का नाम</th>
+                      <th>Form ID</th>
                       <th>कार्यकर्त्री का नाम</th>
                       <th>कार्यकर्त्री मोबाइल नंबर</th>
                       <th>खाता संख्या</th>
@@ -906,13 +953,61 @@ const CDPOAnganwadi2026_27 = () => {
                 <tbody>
                   {loading ? (
                     <tr>
-                      <td colSpan={activeTab === "report" ? 18 : 15} className="cdpo-anganwadi-empty">
+                      <td colSpan={activeTab === "completed" ? 8 : activeTab === "report" ? 19 : 15} className="cdpo-anganwadi-empty">
                         <Spinner animation="border" size="sm" /> Loading applications...
                       </td>
                     </tr>
-                  ) : paginatedApplications.length === 0 ? (
+                  ) : activeTab === "completed" ? completedGroups.length === 0 ? (
+                    <tr><td colSpan={8} className="cdpo-anganwadi-empty">No completed applications found.</td></tr>
+                  ) : completedGroups.map(({ sectorKey, items }) => items.map((application, index) => {
+                    const selectedId = selectedAwardBySector[sectorKey] || "";
+                    const sectorAlreadyApproved = applications.some((item) => {
+                      const itemSector = String(item.sector || item.project || item.awc_name || item.awc_center || "Unassigned Sector").trim();
+                      return itemSector === sectorKey && String(item.status || "").toLowerCase() === "approved";
+                    });
+                    const selectedFormId = selectedAwardBySector[sectorKey];
+                    const isUpdating = updatingFormId === String(selectedFormId || "");
+                    return (
+                      <tr key={application.form_id || application.id}>
+                        <td>{displayValue(application.awc_name || application.awc_center)}</td>
+                        <td>{displayValue(application.filer_name)}</td>
+                        <td>{formatTableDate(application.joining_date)}</td>
+                        <td className="cdpo-anganwadi-form-id">
+                          <button type="button" className="cdpo-form-id-link" onClick={() => setSelectedApplication(application)} aria-label={`View application ${application.form_id}`}>
+                            {displayValue(application.form_id)}
+                          </button>
+                        </td>
+                        <td className="cdpo-anganwadi-remark-cell">{displayValue(application.remark)}</td>
+                        <td><strong>Total Marks: {displayValue(application.merit)}</strong></td>
+                        <td className="cdpo-anganwadi-select-cell">
+                          <Form.Check
+                            type="radio"
+                            name={`award-sector-${sectorKey}`}
+                            checked={String(selectedId) === String(application.form_id)}
+                            disabled={sectorAlreadyApproved}
+                            onChange={() => setSelectedAwardBySector((current) => ({ ...current, [sectorKey]: application.form_id }))}
+                            aria-label={`Choose ${application.filer_name} for award in ${sectorKey}`}
+                          />
+                        </td>
+                        {index === 0 && (
+                          <td className="cdpo-anganwadi-sector-actions" rowSpan={items.length}>
+                            <div className="cdpo-anganwadi-sector-action-buttons">
+                              {sectorAlreadyApproved ? (
+                                <Badge bg="success">Award Already Approved</Badge>
+                              ) : (
+                                <>
+                                  <Button size="sm" variant="info" disabled={isUpdating} onClick={() => submitSectorSelection(sectorKey, "approved")}>Submit</Button>
+                                  <Button size="sm" variant="outline-danger" disabled={isUpdating} onClick={() => submitSectorSelection(sectorKey, "rejected")}>Reject Selected</Button>
+                                </>
+                              )}
+                            </div>
+                          </td>
+                        )}
+                      </tr>
+                    );
+                  })) : paginatedApplications.length === 0 ? (
                     <tr>
-                      <td colSpan={activeTab === "report" ? 18 : 15} className="cdpo-anganwadi-empty">
+                      <td colSpan={activeTab === "report" ? 19 : 15} className="cdpo-anganwadi-empty">
                         No applications found.
                       </td>
                     </tr>
@@ -928,6 +1023,11 @@ const CDPOAnganwadi2026_27 = () => {
                               <td>{displayValue(application.district)}</td>
                               <td>{displayValue(application.project)}</td>
                               <td>{displayValue(application.awc_name || application.awc_center)}</td>
+                              <td className="cdpo-anganwadi-form-id">
+                                <button type="button" className="cdpo-form-id-link" onClick={() => setSelectedApplication(application)} aria-label={`View application ${application.form_id}`}>
+                                  {displayValue(application.form_id)}
+                                </button>
+                              </td>
                               <td>{displayValue(application.filer_name)}</td>
                               <td>{displayValue(application.filer_mob)}</td>
                               <td>{displayValue(application.acc_no)}</td>
@@ -950,7 +1050,11 @@ const CDPOAnganwadi2026_27 = () => {
                               <td className="cdpo-anganwadi-remark-cell">{displayValue(application.remark)}</td>
                               <td><strong>{displayValue(application.merit)}</strong></td>
                               <td>{displayValue(application.filer_mob)}</td>
-                              <td className="cdpo-anganwadi-form-id">{displayValue(application.form_id)}</td>
+                              <td className="cdpo-anganwadi-form-id">
+                                <button type="button" className="cdpo-form-id-link" onClick={() => setSelectedApplication(application)} aria-label={`View application ${application.form_id}`}>
+                                  {displayValue(application.form_id)}
+                                </button>
+                              </td>
                               <td>{displayValue(application.filer_name)}</td>
                               <td>{formatTableDate(application.dob)}</td>
                               <td>{displayValue(application.fath_husb_name)}</td>
@@ -962,12 +1066,7 @@ const CDPOAnganwadi2026_27 = () => {
                               <td className="cdpo-anganwadi-actions-cell">
                                 <div className="cdpo-anganwadi-row-actions">
                                   <Button size="sm" variant="outline-primary" onClick={() => setSelectedApplication(application)} aria-label={`${application.form_id} Application View`}><FaEye /> View</Button>
-                                  {status !== "approved" && status !== "rejected" && (
-                                    <>
-                                      <Button size="sm" variant="success" disabled={isUpdating} onClick={() => openDecision(application, "approved")}>{isUpdating ? <Spinner size="sm" animation="border" /> : <FaCheck />} Approve</Button>
-                                      <Button size="sm" variant="outline-danger" disabled={isUpdating} onClick={() => openDecision(application, "rejected")}><FaTimes /> Reject</Button>
-                                    </>
-                                  )}
+
                                 </div>
                               </td>
                             </>
