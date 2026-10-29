@@ -127,8 +127,6 @@ const STEP_ONE_GROUPS = [
         label: "सेक्टर",
         required: true,
         type: "sector-select",
-        readOnly: true,
-        disabled: true,
       },
       {
         name: "awc_center",
@@ -961,6 +959,9 @@ const AnganwadiApplicationForm = ({ account }) => {
       (item) => String(item.awc_code || "") === String(awcCode),
     );
     updateField("awc_name", match ? match.awc_name || match.display_name || "" : "");
+    if (match?.sector) updateField("sector", match.sector);
+    if (match?.project) updateField("project", match.project);
+    if (match?.district) updateField("district", match.district);
   };
 
   useEffect(() => {
@@ -1377,7 +1378,6 @@ const AnganwadiApplicationForm = ({ account }) => {
             {...commonProps}
             value={value}
             onChange={(event) => handleSectorChange(event.target.value)}
-            disabled={true}
           >
             <option value="">सेक्टर चुनें</option>
             {value && !dropdownData.sectors.includes(value) && (
@@ -1668,12 +1668,12 @@ const AnganwadiApplicationForm = ({ account }) => {
       className="anganwadi-application"
       aria-labelledby="anganwadi-form-title"
     >
-      {/* {isAnganwadiApplicationDemoMode && (
+      {isAnganwadiApplicationDemoMode && (
         <Alert variant="warning" className="anganwadi-demo-alert">
           व्यक्तिगत विवरण, मूल्यांकन और दस्तावेज़ चरण API के माध्यम से सर्वर पर
           सेव होते हैं।
         </Alert>
-      )} */}
+      )}
       <header className="anganwadi-application-header">
         <div>
           <span>आवेदक आईडी: {formData.applicant_id || "उपलब्ध नहीं"}</span>
