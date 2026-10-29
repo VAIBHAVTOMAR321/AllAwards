@@ -389,7 +389,9 @@ const DirectorAnganwadi2026_27 = () => {
       const status = normalizeStatus(application.status);
       const matchesTab =
         activeTab === "dpo-approved"
-          ? isDpoApproved(status) && !isDirectorApproved(status) && !isDirectorRejected(status)
+          // Keep Directorate-approved applications visible in this tab too, so
+          // the chosen AWC/candidate remains visible and locked after approval.
+          ? (isDpoApproved(status) || isDirectorApproved(status)) && !isDirectorRejected(status)
           : activeTab === "director-approved"
             ? isDirectorApproved(status)
             : true;
@@ -938,7 +940,7 @@ const DirectorAnganwadi2026_27 = () => {
                 All Forms <span>{applications.length}</span>
               </Button>
               <Button type="button" variant={activeTab === "dpo-approved" ? "success" : "outline-success"} onClick={() => { setActiveTab("dpo-approved"); setStatusFilter("all"); }} role="tab" aria-selected={activeTab === "dpo-approved"}>
-                Approved by DPO <span>{applications.filter((item) => isDpoApproved(item.status) && !isDirectorApproved(item.status) && !isDirectorRejected(item.status)).length}</span>
+                Approved by DPO <span>{applications.filter((item) => (isDpoApproved(item.status) || isDirectorApproved(item.status)) && !isDirectorRejected(item.status)).length}</span>
               </Button>
               <Button type="button" variant={activeTab === "director-approved" ? "success" : "outline-success"} onClick={() => { setActiveTab("director-approved"); setStatusFilter("all"); }} role="tab" aria-selected={activeTab === "director-approved"}>
                 Approved by Directorate <span>{applications.filter((item) => isDirectorApproved(item.status)).length}</span>

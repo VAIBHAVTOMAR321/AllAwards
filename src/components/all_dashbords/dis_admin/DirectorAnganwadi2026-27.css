@@ -946,7 +946,8 @@
   }
 
   body.director-anganwadi-modal-open .director-anganwadi-document-header,
-  body.director-anganwadi-modal-open .director-anganwadi-document-footer-actions {
+  body.director-anganwadi-modal-open
+    .director-anganwadi-document-footer-actions {
     display: none !important;
   }
 
@@ -967,7 +968,8 @@
     break-inside: avoid;
   }
 
-  body.director-anganwadi-modal-open .director-anganwadi-document-section-title {
+  body.director-anganwadi-modal-open
+    .director-anganwadi-document-section-title {
     break-after: avoid;
   }
 
@@ -1453,7 +1455,9 @@
   text-align: center;
 }
 
-.director-anganwadi-completed-table .director-anganwadi-select-cell .form-check {
+.director-anganwadi-completed-table
+  .director-anganwadi-select-cell
+  .form-check {
   display: flex;
   justify-content: center;
   margin: 0;
@@ -1659,7 +1663,6 @@
   gap: 6px;
 }
 
-
 /* DPO review table hierarchy: Project -> Sector -> Anganwadi Center */
 .director-anganwadi-completed-table {
   min-width: 1750px;
@@ -1701,11 +1704,33 @@
   overflow-wrap: anywhere;
 }
 
-.director-anganwadi-completed-table { min-width: 1500px; }
-.director-anganwadi-sector-actions { vertical-align: middle !important; }
-.director-form-id-link { border: 0; padding: 0; background: transparent; color: #166534; font-weight: 800; text-decoration: underline; cursor: pointer; white-space: nowrap; }
+.director-anganwadi-completed-table {
+  min-width: 1500px;
+}
+.director-anganwadi-sector-actions {
+  vertical-align: middle !important;
+}
+.director-form-id-link {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: #166534;
+  font-weight: 800;
+  text-decoration: underline;
+  cursor: pointer;
+  white-space: nowrap;
+}
 
-.director-anganwadi-dashboard { background: #fff8ed; }
-.director-anganwadi-heading { border-color: #fed7aa; background: linear-gradient(145deg, #fff1d6 0%, #ffffff 68%); }
-.director-anganwadi-heading h1 { color: #713f12; }
-.director-anganwadi-eyebrow { color: #b45309; }
+.director-anganwadi-dashboard {
+  background: #fff8ed;
+}
+.director-anganwadi-heading {
+  border-color: #fed7aa;
+  background: linear-gradient(145deg, #fff1d6 0%, #ffffff 68%);
+}
+.director-anganwadi-heading h1 {
+  color: #713f12;
+}
+.director-anganwadi-eyebrow {
+  color: #b45309;
+}
