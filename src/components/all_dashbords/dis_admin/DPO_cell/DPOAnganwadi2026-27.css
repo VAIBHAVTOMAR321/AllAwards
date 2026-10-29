@@ -1,58 +1,1702 @@
+/* DPO Anganwadi Award Dashboard — 2026-27 */
+
 .dpo-anganwadi-dashboard {
-  background: #eff8ff;
+  min-height: 100vh;
+  background: #f0fdf4;
+}
+
+.dpo-anganwadi-main {
+  min-width: 0;
 }
 
 .dpo-anganwadi-page {
+  box-sizing: border-box;
+  display: flex;
   flex: 1;
-  padding: 30px;
+  flex-direction: column;
+  gap: 22px;
+  width: 100%;
+  min-width: 0;
+  padding: 26px;
+  color: #14532d;
 }
 
 .dpo-anganwadi-heading {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 30px;
-  border: 1px solid #bfdbfe;
-  border-radius: 18px;
-  background: #fff;
-  box-shadow: 0 12px 30px rgba(30, 64, 175, 0.1);
-  color: #172554;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  width: 100%;
+  min-width: 0;
+  padding: clamp(22px, 3vw, 34px);
+  overflow: hidden;
+  border: 1px solid #bbf7d0;
+  border-radius: 8px 28px 8px 28px;
+  background:
+    radial-gradient(
+      circle at 94% 8%,
+      rgba(134, 239, 172, 0.28),
+      transparent 28%
+    ),
+    linear-gradient(145deg, #dcfce7 0%, #ffffff 68%);
+  box-shadow: 0 8px 24px rgba(20, 83, 45, 0.045);
 }
 
-.dpo-anganwadi-heading p,
-.dpo-anganwadi-heading h1,
-.dpo-anganwadi-heading span {
-  margin: 0;
+.dpo-anganwadi-heading-copy {
+  min-width: 0;
 }
 
-.dpo-anganwadi-heading p {
-  margin-bottom: 10px;
-  color: #2563eb;
+.dpo-anganwadi-eyebrow {
+  display: inline-block;
+  color: #15803d;
   font-size: 0.82rem;
   font-weight: 800;
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
+  letter-spacing: 0.045em;
+  line-height: 1.5;
 }
 
 .dpo-anganwadi-heading h1 {
-  font-size: clamp(1.25rem, 2.3vw, 1.85rem);
-  font-weight: 750;
+  margin: 12px 0 0;
+  color: #14532d;
+  font-size: clamp(1.3rem, 2.3vw, 1.85rem);
+  font-weight: 800;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.dpo-anganwadi-heading p {
+  margin: 12px 0 0;
+  color: #166534;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.dpo-anganwadi-heading-mark {
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-width: 112px;
+  min-height: 96px;
+  padding: 14px;
+  border: 1px solid rgba(22, 101, 52, 0.14);
+  border-radius: 18px 6px 18px 6px;
+  background: rgba(255, 255, 255, 0.72);
+  color: #166534;
+  text-align: center;
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.dpo-anganwadi-heading-year {
+  font-size: 1rem;
+  letter-spacing: 0.02em;
+}
+
+.dpo-anganwadi-alert {
+  margin: 0;
+  border-radius: 12px;
+}
+
+.dpo-anganwadi-error-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.dpo-anganwadi-content {
+  min-width: 0;
+  padding: clamp(18px, 2.4vw, 26px);
+  border: 1px solid #dcfce7;
+  border-radius: 18px;
+  background: #ffffff;
+  box-shadow: 0 8px 24px rgba(20, 83, 45, 0.04);
+}
+
+.dpo-anganwadi-list-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.dpo-anganwadi-list-heading h2 {
+  margin: 0;
+  color: #14532d;
+  font-size: clamp(1.05rem, 1.8vw, 1.3rem);
+  font-weight: 800;
   line-height: 1.45;
 }
 
-.dpo-anganwadi-heading span {
-  display: inline-block;
-  margin-top: 14px;
-  color: #475569;
+.dpo-anganwadi-list-heading p {
+  margin: 7px 0 0;
+  color: #64748b;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.dpo-anganwadi-refresh {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+.dpo-anganwadi-filters {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) minmax(180px, 250px);
+  gap: 16px;
+  align-items: end;
+  margin-bottom: 18px;
+}
+
+.dpo-anganwadi-search {
+  position: relative;
+  min-width: 0;
+}
+
+.dpo-anganwadi-search > svg {
+  position: absolute;
+  z-index: 1;
+  top: 50%;
+  left: 13px;
+  color: #64748b;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.dpo-anganwadi-search .form-control {
+  min-height: 42px;
+  padding-left: 38px;
+  border-color: #d1fae5;
+  border-radius: 10px;
+  box-shadow: none;
+}
+
+.dpo-anganwadi-search .form-control:focus,
+.dpo-anganwadi-status-filter .form-select:focus {
+  border-color: #4ade80;
+  box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.15);
+}
+
+.dpo-anganwadi-status-filter {
+  min-width: 0;
+}
+
+.dpo-anganwadi-status-filter .form-label {
+  margin-bottom: 6px;
+  color: #166534;
+  font-size: 0.82rem;
   font-weight: 700;
+}
+
+.dpo-anganwadi-status-filter .form-select {
+  min-height: 42px;
+  border-color: #d1fae5;
+  border-radius: 10px;
+  box-shadow: none;
+}
+
+.dpo-anganwadi-table-wrap,
+.dpo-anganwadi-detail-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid #dcfce7;
+  border-radius: 12px;
+  background: #ffffff;
+  -webkit-overflow-scrolling: touch;
+}
+
+.dpo-anganwadi-table {
+  width: 100%;
+  min-width: 1500px;
+  margin: 0;
+  border-collapse: separate;
+  border-spacing: 0;
+  vertical-align: middle;
+}
+
+.dpo-anganwadi-table > :not(caption) > * > * {
+  padding: 13px 14px;
+  vertical-align: middle;
+}
+
+.dpo-anganwadi-table thead th {
+  border-bottom: 1px solid #bbf7d0;
+  background: #f0fdf4;
+  color: #166534;
+  font-size: 0.81rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.dpo-anganwadi-table tbody td {
+  color: #334155;
+  font-size: 0.88rem;
+}
+
+.dpo-anganwadi-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.dpo-anganwadi-form-id {
+  color: #166534 !important;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.dpo-anganwadi-row-actions {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 190px;
+}
+
+.dpo-anganwadi-row-actions .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  white-space: nowrap;
+}
+
+.dpo-anganwadi-empty {
+  height: 120px;
+  color: #64748b !important;
+  text-align: center;
+  vertical-align: middle !important;
+}
+
+.dpo-anganwadi-empty .spinner-border {
+  margin-right: 8px;
+  color: #16a34a;
+}
+
+.dpo-anganwadi-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 14px;
+  margin-top: 18px;
+  color: #475569;
+  font-size: 0.88rem;
+}
+
+.dpo-anganwadi-pagination > div {
+  display: flex;
+  gap: 8px;
+}
+
+.dpo-anganwadi-preview-dialog,
+.dpo-anganwadi-approval-dialog {
+  max-width: calc(100vw - 24px);
+}
+
+.dpo-anganwadi-preview-dialog {
+  width: 1120px;
+}
+
+.dpo-anganwadi-modal-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #166534;
+  color: #ffffff;
+}
+
+.dpo-anganwadi-modal-header .modal-title {
+  color: #ffffff;
+  font-size: 1.2rem;
+  font-weight: 800;
+}
+
+.dpo-anganwadi-modal-header .btn-close {
+  filter: brightness(0) invert(1);
+}
+
+.dpo-anganwadi-modal-subtitle {
+  margin-top: 5px;
+  color: #dcfce7;
+  font-size: 0.85rem;
+}
+
+.dpo-anganwadi-print-button {
+  margin-left: auto;
+  white-space: nowrap;
+}
+
+.dpo-anganwadi-preview-body {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: clamp(16px, 3vw, 28px);
+  background: #f8fffa;
+}
+
+.dpo-anganwadi-preview-section {
+  min-width: 0;
+  padding: 18px;
+  border: 1px solid #dcfce7;
+  border-radius: 14px;
+  background: #ffffff;
+}
+
+.dpo-anganwadi-preview-section > h3,
+.dpo-anganwadi-mark-group > h3 {
+  margin: 0 0 14px;
+  color: #166534;
+  font-size: 1rem;
+  font-weight: 800;
+  line-height: 1.5;
+}
+
+.dpo-anganwadi-detail-table {
+  min-width: 540px;
+  margin: 0;
+}
+
+.dpo-anganwadi-detail-table th {
+  width: 35%;
+  background: #f0fdf4;
+  color: #166534;
+  font-weight: 700;
+}
+
+.dpo-anganwadi-detail-table th,
+.dpo-anganwadi-detail-table td {
+  padding: 10px 12px;
+  font-size: 0.88rem;
+  overflow-wrap: anywhere;
+}
+
+.dpo-anganwadi-mark-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.dpo-anganwadi-mark-group {
+  min-width: 0;
+}
+
+.dpo-anganwadi-mark-group .dpo-anganwadi-detail-table {
+  min-width: 480px;
+}
+
+.dpo-anganwadi-merit-total {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-top: 16px;
+  padding: 16px 18px;
+  border: 1px solid #bbf7d0;
+  border-radius: 12px;
+  background: #f0fdf4;
+  color: #166534;
+}
+
+.dpo-anganwadi-merit-total strong {
+  font-size: 1.3rem;
+}
+
+.dpo-anganwadi-documents {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+.dpo-anganwadi-document {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid #dcfce7;
+  border-radius: 10px;
+  background: #ffffff;
+}
+
+.dpo-anganwadi-document > a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 60px;
+  padding: 12px;
+  color: #166534;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+
+.dpo-anganwadi-document > a:hover {
+  background: #f0fdf4;
+  text-decoration: underline;
+}
+
+.dpo-anganwadi-document img {
+  display: block;
+  width: 100%;
+  height: 145px;
+  object-fit: contain;
+  background: #f8fafc;
+}
+
+.dpo-anganwadi-document:has(img) > a {
+  flex-direction: column;
+  align-items: stretch;
+  padding: 0;
+}
+
+.dpo-anganwadi-document:has(img) > a span {
+  padding: 10px 12px;
+}
+
+.dpo-anganwadi-document svg {
+  flex: 0 0 auto;
+  color: #dc2626;
+  font-size: 1.25rem;
+}
+
+.dpo-anganwadi-muted {
+  margin: 0;
+  color: #64748b;
+}
+
+.dpo-anganwadi-confirm-note {
+  margin: 12px 0 0;
+  color: #64748b;
+  font-size: 0.83rem;
+  line-height: 1.6;
+}
+
+/* Print only the application preview when the preview modal is open. */
+@media print {
+  body.dpo-anganwadi-modal-open * {
+    visibility: hidden !important;
+  }
+
+  body.dpo-anganwadi-modal-open .dpo-anganwadi-preview-dialog,
+  body.dpo-anganwadi-modal-open .dpo-anganwadi-preview-dialog * {
+    visibility: visible !important;
+  }
+
+  body.dpo-anganwadi-modal-open .dpo-anganwadi-preview-dialog {
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    transform: none !important;
+  }
+
+  body.dpo-anganwadi-modal-open .dpo-anganwadi-modal-header,
+  body.dpo-anganwadi-modal-open .modal-footer,
+  body.dpo-anganwadi-modal-open .btn-close,
+  body.dpo-anganwadi-modal-open .dpo-anganwadi-print-button {
+    display: none !important;
+  }
+
+  body.dpo-anganwadi-modal-open .modal,
+  body.dpo-anganwadi-modal-open .modal-dialog,
+  body.dpo-anganwadi-modal-open .modal-content,
+  body.dpo-anganwadi-modal-open .dpo-anganwadi-preview-body {
+    position: static !important;
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: none !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+    border: 0 !important;
+    background: #ffffff !important;
+    box-shadow: none !important;
+  }
+
+  body.dpo-anganwadi-modal-open .dpo-anganwadi-preview-section {
+    break-inside: avoid;
+    margin-bottom: 14px;
+  }
+
+  body.dpo-anganwadi-modal-open .dpo-anganwadi-detail-table-wrap {
+    overflow: visible !important;
+  }
+
+  body.dpo-anganwadi-modal-open .dpo-anganwadi-detail-table {
+    min-width: 0 !important;
+  }
+
+  body.dpo-anganwadi-modal-open .dpo-anganwadi-document img {
+    max-height: 120px;
+  }
+
+  @page {
+    size: A4;
+    margin: 12mm;
+  }
+}
+
+@media (max-width: 1023px) {
+  .dpo-anganwadi-page {
+    padding: 22px;
+  }
+
+  .dpo-anganwadi-heading {
+    gap: 18px;
+  }
 }
 
 @media (max-width: 767px) {
   .dpo-anganwadi-page {
+    gap: 16px;
     padding: 18px 14px;
   }
 
   .dpo-anganwadi-heading {
+    align-items: flex-start;
     padding: 22px 18px;
-    border-radius: 12px;
+    border-radius: 8px 22px 8px 22px;
   }
+
+  .dpo-anganwadi-eyebrow {
+    font-size: 0.75rem;
+  }
+
+  .dpo-anganwadi-heading h1 {
+    margin-top: 9px;
+    font-size: clamp(1.18rem, 5vw, 1.5rem);
+  }
+
+  .dpo-anganwadi-heading p {
+    margin-top: 9px;
+    font-size: 0.92rem;
+  }
+
+  .dpo-anganwadi-heading-mark {
+    display: none;
+  }
+
+  .dpo-anganwadi-content {
+    padding: 18px 14px;
+    border-radius: 14px;
+  }
+
+  .dpo-anganwadi-list-heading {
+    align-items: flex-start;
+    margin-bottom: 16px;
+  }
+
+  .dpo-anganwadi-list-heading p {
+    font-size: 0.84rem;
+  }
+
+  .dpo-anganwadi-filters {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .dpo-anganwadi-row-actions {
+    min-width: 180px;
+  }
+
+  .dpo-anganwadi-pagination {
+    align-items: flex-start;
+    justify-content: space-between;
+    flex-wrap: wrap;
+  }
+
+  .dpo-anganwadi-preview-section {
+    padding: 13px;
+  }
+
+  .dpo-anganwadi-documents {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .dpo-anganwadi-modal-header {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 420px) {
+  .dpo-anganwadi-page {
+    padding: 14px 10px;
+  }
+
+  .dpo-anganwadi-heading {
+    padding: 18px 14px;
+  }
+
+  .dpo-anganwadi-heading h1 {
+    font-size: 1.12rem;
+  }
+
+  .dpo-anganwadi-list-heading {
+    flex-direction: column;
+  }
+
+  .dpo-anganwadi-refresh {
+    align-self: flex-start;
+  }
+
+  .dpo-anganwadi-documents {
+    grid-template-columns: 1fr;
+  }
+
+  .dpo-anganwadi-error-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+/* Keep wide tables inside their own scroll area rather than widening the page. */
+.dpo-anganwadi-dashboard,
+.dpo-anganwadi-dashboard * {
+  box-sizing: border-box;
+}
+
+/* Reference-style application preview document */
+.dpo-anganwadi-preview-overlay {
+  position: fixed;
+  z-index: 1200;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(15, 23, 42, 0.68);
+}
+
+.dpo-anganwadi-preview-modal {
+  display: flex;
+  flex-direction: column;
+  width: min(1200px, 100%);
+  max-height: min(94vh, 1100px);
+  overflow: hidden;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 22px 65px rgba(0, 0, 0, 0.3);
+}
+
+.dpo-anganwadi-document-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 20px;
+  background: #166534;
+  color: #fff;
+}
+
+.dpo-anganwadi-document-header h2 {
+  margin: 0 0 4px;
+  color: #fff;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.dpo-anganwadi-document-header p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 12px;
+}
+
+.dpo-anganwadi-document-actions,
+.dpo-anganwadi-document-footer-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.dpo-anganwadi-document-content {
+  overflow: auto;
+  padding: 18px;
+}
+
+.dpo-anganwadi-print-area {
+  width: 100%;
+  max-width: 1050px;
+  margin: 0 auto;
+  padding: 28px 34px;
+  border: 1px solid #dfe3e8;
+  background: #fff;
+  color: #202124;
+  box-shadow: 0 3px 14px rgba(38, 50, 72, 0.07);
+}
+
+.dpo-anganwadi-document-department {
+  margin: 0 0 18px;
+  color: #202124;
+  font-size: 21px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.dpo-anganwadi-document-title {
+  margin: 0 0 22px;
+  color: #202124;
+  font-size: 17px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.dpo-anganwadi-document-section-title {
+  margin: 22px 0 10px;
+  color: #202124;
+  font-size: 15px;
+  font-weight: 700;
+  break-after: avoid;
+}
+
+.dpo-anganwadi-document-table-wrap {
+  width: 100%;
+  margin-bottom: 18px;
+  overflow: visible;
+}
+
+.dpo-anganwadi-document-table {
+  width: 100%;
+  margin: 0;
+  border-collapse: collapse;
+  color: #202124;
+  font-size: 12px;
+  vertical-align: top;
+}
+
+.dpo-anganwadi-document-table th,
+.dpo-anganwadi-document-table td {
+  padding: 9px 10px;
+  border: 1px solid #73777d;
+  background: #fff;
+  color: #202124;
+  text-align: left;
+  vertical-align: top;
+  overflow-wrap: anywhere;
+}
+
+.dpo-anganwadi-document-table thead th {
+  background: #f1f3f5;
+  font-weight: 700;
+}
+
+.dpo-anganwadi-document-table tbody > tr > td:first-child {
+  width: 42%;
+  font-weight: 600;
+}
+
+.dpo-anganwadi-assessment-preview-table tbody > tr > td:first-child {
+  width: 38%;
+}
+
+.dpo-anganwadi-document-table .cdpo-preview-group-row th {
+  background: #f1f3f5;
+  font-weight: 800;
+}
+
+.cdpo-preview-answer {
+  margin-bottom: 5px;
+  line-height: 1.55;
+}
+
+.cdpo-preview-file {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 5px;
+  margin: 4px 0;
+  overflow-wrap: anywhere;
+}
+
+.cdpo-preview-file img {
+  width: auto;
+  max-width: 100%;
+  max-height: 180px;
+  border: 1px solid #d7dce2;
+  object-fit: contain;
+}
+
+.cdpo-preview-file iframe {
+  width: min(500px, 100%);
+  height: 240px;
+  border: 1px solid #d7dce2;
+}
+
+.cdpo-preview-file a {
+  color: #166534;
+  text-decoration: underline;
+  overflow-wrap: anywhere;
+}
+
+.cdpo-preview-missing {
+  color: #b42318;
+  font-size: 11px;
+}
+
+.cdpo-preview-applicant-photo {
+  margin-top: 9px;
+}
+
+.dpo-anganwadi-document-status {
+  margin: 14px 0;
+  padding: 11px 14px;
+  border: 1px solid #d8dce2;
+  background: #f7f8fa;
+  color: #344054;
+  font-size: 12px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.dpo-anganwadi-document-status.is-approved {
+  border-color: #b7dfc2;
+  background: #eaf6ed;
+  color: #216e36;
+}
+
+.dpo-anganwadi-document-status-separator {
+  padding: 0 8px;
+}
+
+.dpo-anganwadi-document-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  max-width: 1050px;
+  margin: 16px auto 0;
+  color: #667085;
+  font-size: 12px;
+}
+
+@media (max-width: 767px) {
+  .dpo-anganwadi-preview-overlay {
+    padding: 8px;
+  }
+
+  .dpo-anganwadi-document-header {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 14px;
+  }
+
+  .dpo-anganwadi-document-actions {
+    justify-content: flex-start;
+  }
+
+  .dpo-anganwadi-document-content {
+    padding: 12px;
+  }
+
+  .dpo-anganwadi-print-area {
+    padding: 16px 12px;
+  }
+
+  .dpo-anganwadi-document-table {
+    font-size: 11px;
+  }
+
+  .dpo-anganwadi-document-table th,
+  .dpo-anganwadi-document-table td {
+    padding: 7px 6px;
+  }
+
+  .dpo-anganwadi-document-footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+@media print {
+  @page {
+    size: A4;
+    margin: 10mm;
+  }
+
+  body.dpo-anganwadi-modal-open * {
+    visibility: hidden !important;
+  }
+
+  body.dpo-anganwadi-modal-open .dpo-anganwadi-preview-overlay,
+  body.dpo-anganwadi-modal-open .dpo-anganwadi-preview-overlay * {
+    visibility: visible !important;
+  }
+
+  body.dpo-anganwadi-modal-open .dpo-anganwadi-preview-overlay {
+    position: absolute !important;
+    inset: 0 !important;
+    display: block !important;
+    padding: 0 !important;
+    background: #fff !important;
+    z-index: 99999 !important;
+  }
+
+  body.dpo-anganwadi-modal-open .dpo-anganwadi-preview-modal {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: none !important;
+    margin: 0 !important;
+    overflow: visible !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+
+  body.dpo-anganwadi-modal-open .dpo-anganwadi-document-header,
+  body.dpo-anganwadi-modal-open .dpo-anganwadi-document-footer-actions {
+    display: none !important;
+  }
+
+  body.dpo-anganwadi-modal-open .dpo-anganwadi-document-content {
+    overflow: visible !important;
+    padding: 0 !important;
+  }
+
+  body.dpo-anganwadi-modal-open .dpo-anganwadi-print-area {
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    box-shadow: none !important;
+  }
+
+  body.dpo-anganwadi-modal-open .dpo-anganwadi-document-table tr {
+    break-inside: avoid;
+  }
+
+  body.dpo-anganwadi-modal-open .dpo-anganwadi-document-section-title {
+    break-after: avoid;
+  }
+
+  body.dpo-anganwadi-modal-open .modal {
+    display: none !important;
+  }
+}
+
+/* Keep the application list readable with the expanded applicant columns. */
+.dpo-anganwadi-table thead th {
+  white-space: normal;
+  min-width: 92px;
+  line-height: 1.35;
+}
+.dpo-anganwadi-table thead th:nth-child(1) {
+  min-width: 58px;
+}
+.dpo-anganwadi-table thead th:nth-child(2) {
+  min-width: 190px;
+}
+.dpo-anganwadi-table thead th:nth-child(3) {
+  min-width: 70px;
+}
+.dpo-anganwadi-table thead th:nth-child(4),
+.dpo-anganwadi-table thead th:nth-child(5),
+.dpo-anganwadi-table thead th:nth-child(7),
+.dpo-anganwadi-table thead th:nth-child(13) {
+  min-width: 105px;
+}
+.dpo-anganwadi-table thead th:nth-child(6),
+.dpo-anganwadi-table thead th:nth-child(8),
+.dpo-anganwadi-table thead th:nth-child(9),
+.dpo-anganwadi-table thead th:nth-child(12) {
+  min-width: 150px;
+}
+.dpo-anganwadi-table tbody td {
+  vertical-align: top;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+.dpo-anganwadi-status-cell {
+  min-width: 190px;
+}
+
+/* Responsive applications list: scroll horizontally only when the columns need it. */
+.dpo-anganwadi-table-wrap {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+.dpo-anganwadi-table {
+  width: 100%;
+  min-width: 1250px;
+  table-layout: auto;
+}
+
+.dpo-anganwadi-table > :not(caption) > * > * {
+  padding: 6px 5px;
+  min-width: 0 !important;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+
+.dpo-anganwadi-table thead th {
+  font-size: 10px;
+  line-height: 1.2;
+  font-weight: 750;
+}
+
+.dpo-anganwadi-table tbody td {
+  font-size: 10px;
+  line-height: 1.3;
+  vertical-align: middle;
+}
+
+.dpo-anganwadi-table thead th:nth-child(1) {
+  width: 3.5%;
+}
+.dpo-anganwadi-table thead th:nth-child(2) {
+  width: 8%;
+}
+.dpo-anganwadi-table thead th:nth-child(3) {
+  width: 4%;
+}
+.dpo-anganwadi-table thead th:nth-child(4) {
+  width: 7%;
+}
+.dpo-anganwadi-table thead th:nth-child(5) {
+  width: 7%;
+}
+.dpo-anganwadi-table thead th:nth-child(6) {
+  width: 8%;
+}
+.dpo-anganwadi-table thead th:nth-child(7) {
+  width: 6%;
+}
+.dpo-anganwadi-table thead th:nth-child(8) {
+  width: 8%;
+}
+.dpo-anganwadi-table thead th:nth-child(9) {
+  width: 8%;
+}
+.dpo-anganwadi-table thead th:nth-child(10) {
+  width: 5%;
+}
+.dpo-anganwadi-table thead th:nth-child(11) {
+  width: 7%;
+}
+.dpo-anganwadi-table thead th:nth-child(12) {
+  width: 8%;
+}
+.dpo-anganwadi-table thead th:nth-child(13) {
+  width: 6%;
+}
+.dpo-anganwadi-table thead th:nth-child(14) {
+  width: 6%;
+}
+
+.dpo-anganwadi-status-cell {
+  min-width: 0 !important;
+}
+
+.dpo-anganwadi-table .badge {
+  display: inline-block;
+  max-width: 100%;
+  padding: 4px 5px;
+  font-size: 9px;
+  line-height: 1.2;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.dpo-anganwadi-row-actions {
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.dpo-anganwadi-row-actions .btn {
+  padding: 3px 5px;
+  font-size: 9px;
+  line-height: 1.2;
+}
+
+@media (max-width: 1200px) {
+  .dpo-anganwadi-table thead th {
+    font-size: 9px;
+  }
+  .dpo-anganwadi-table tbody td {
+    font-size: 9px;
+  }
+  .dpo-anganwadi-table > :not(caption) > * > * {
+    padding: 5px 3px;
+  }
+  .dpo-anganwadi-table .badge {
+    font-size: 8px;
+    padding: 3px 4px;
+  }
+}
+
+@media (max-width: 768px) {
+  .dpo-anganwadi-table thead th {
+    font-size: 8px;
+  }
+  .dpo-anganwadi-table tbody td {
+    font-size: 8px;
+  }
+  .dpo-anganwadi-table > :not(caption) > * > * {
+    padding: 4px 2px;
+  }
+  .dpo-anganwadi-table .badge {
+    font-size: 7px;
+    padding: 2px 3px;
+  }
+  .dpo-anganwadi-row-actions .btn {
+    font-size: 8px;
+    padding: 2px 3px;
+  }
+}
+
+/* Application tabs */
+.dpo-anganwadi-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 18px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #dcfce7;
+}
+
+.dpo-anganwadi-tabs .btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.dpo-anganwadi-tabs .btn span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.75);
+  color: #166534;
+  font-size: 0.72rem;
+}
+
+.dpo-anganwadi-row-actions {
+  flex-wrap: wrap;
+  min-width: 210px;
+}
+
+@media (max-width: 576px) {
+  .dpo-anganwadi-tabs {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .dpo-anganwadi-tabs .btn {
+    justify-content: space-between;
+  }
+}
+
+/* Keep status remarks readable in the applications table */
+.dpo-anganwadi-table .dpo-anganwadi-remark-cell {
+  min-width: 150px;
+  max-width: 240px;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: normal;
+  line-height: 1.35;
+}
+
+/* Center View and decision buttons in every row, including approved/rejected rows */
+.dpo-anganwadi-table .dpo-anganwadi-actions-cell {
+  text-align: center !important;
+  vertical-align: middle;
+}
+
+.dpo-anganwadi-table .dpo-anganwadi-row-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 4px;
+  min-width: 0;
+  width: 100%;
+}
+
+.dpo-anganwadi-table .dpo-anganwadi-row-actions .btn {
+  margin: 0;
+}
+
+/* Compact dashboard spacing: reclaim unused vertical space */
+.dpo-anganwadi-page {
+  gap: 14px;
+  padding: 16px;
+}
+
+.dpo-anganwadi-heading {
+  padding: 16px 22px;
+  gap: 16px;
+  border-radius: 8px 20px 8px 20px;
+}
+
+.dpo-anganwadi-eyebrow {
+  font-size: 0.75rem;
+  line-height: 1.3;
+}
+
+.dpo-anganwadi-heading h1 {
+  margin-top: 5px;
+  font-size: clamp(1.2rem, 2vw, 1.65rem);
+  line-height: 1.25;
+}
+
+.dpo-anganwadi-heading p {
+  margin-top: 6px;
+  font-size: 0.9rem;
+}
+
+.dpo-anganwadi-heading-mark {
+  min-width: 96px;
+  min-height: 70px;
+  padding: 9px 12px;
+  gap: 3px;
+  border-radius: 14px 6px 14px 6px;
+}
+
+.dpo-anganwadi-heading-year {
+  font-size: 0.9rem;
+}
+
+.dpo-anganwadi-content {
+  padding: 16px;
+  border-radius: 14px;
+}
+
+.dpo-anganwadi-list-heading {
+  margin-bottom: 12px;
+  gap: 12px;
+}
+
+.dpo-anganwadi-list-heading p {
+  margin-top: 4px;
+  font-size: 0.82rem;
+  line-height: 1.4;
+}
+
+.dpo-anganwadi-tabs {
+  gap: 7px;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+}
+
+.dpo-anganwadi-tabs .btn {
+  padding: 7px 12px;
+  font-size: 0.78rem;
+}
+
+.dpo-anganwadi-tabs .btn span {
+  min-width: 19px;
+  height: 19px;
+  font-size: 0.68rem;
+}
+
+.dpo-anganwadi-filters {
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+@media (max-width: 768px) {
+  .dpo-anganwadi-page {
+    gap: 10px;
+    padding: 10px;
+  }
+
+  .dpo-anganwadi-heading {
+    padding: 13px 14px;
+    gap: 10px;
+  }
+
+  .dpo-anganwadi-heading h1 {
+    font-size: 1.15rem;
+  }
+
+  .dpo-anganwadi-heading-mark {
+    min-width: 76px;
+    min-height: 58px;
+    padding: 7px;
+    font-size: 0.68rem;
+  }
+
+  .dpo-anganwadi-heading-year {
+    font-size: 0.78rem;
+  }
+
+  .dpo-anganwadi-content {
+    padding: 12px;
+  }
+
+  .dpo-anganwadi-list-heading {
+    margin-bottom: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .dpo-anganwadi-heading-mark {
+    display: none;
+  }
+
+  .dpo-anganwadi-list-heading {
+    align-items: flex-start;
+  }
+
+  .dpo-anganwadi-tabs {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .dpo-anganwadi-tabs .btn {
+    justify-content: space-between;
+    padding: 7px 9px;
+  }
+}
+
+/* Report tab: keep the supplied Hindi report columns readable and scroll only when needed */
+.dpo-anganwadi-table-wrap {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+.dpo-anganwadi-report-table {
+  min-width: 1900px;
+  table-layout: fixed;
+}
+
+.dpo-anganwadi-report-table th,
+.dpo-anganwadi-report-table td {
+  min-width: 90px;
+  max-width: 240px;
+  padding: 7px 6px !important;
+  font-size: 11px !important;
+  line-height: 1.45;
+  white-space: normal !important;
+  overflow-wrap: anywhere;
+  vertical-align: top;
+}
+
+.dpo-anganwadi-report-table th:nth-child(1) {
+  min-width: 55px;
+  width: 55px;
+}
+.dpo-anganwadi-report-table th:nth-child(2),
+.dpo-anganwadi-report-table th:nth-child(10),
+.dpo-anganwadi-report-table th:nth-child(11) {
+  min-width: 85px;
+  width: 85px;
+}
+.dpo-anganwadi-report-table th:nth-child(3),
+.dpo-anganwadi-report-table th:nth-child(4),
+.dpo-anganwadi-report-table th:nth-child(5),
+.dpo-anganwadi-report-table th:nth-child(9),
+.dpo-anganwadi-report-table th:nth-child(12) {
+  min-width: 130px;
+  width: 130px;
+}
+.dpo-anganwadi-report-table th:nth-child(13),
+.dpo-anganwadi-report-table th:nth-child(14),
+.dpo-anganwadi-report-table th:nth-child(15),
+.dpo-anganwadi-report-table th:nth-child(16),
+.dpo-anganwadi-report-table th:nth-child(17),
+.dpo-anganwadi-report-table th:nth-child(18) {
+  min-width: 170px;
+  width: 170px;
+}
+
+@media (max-width: 768px) {
+  .dpo-anganwadi-report-table th,
+  .dpo-anganwadi-report-table td {
+    padding: 5px 4px !important;
+    font-size: 10px !important;
+  }
+}
+
+/* Completed Forms: sector-wise candidate selection table */
+.dpo-anganwadi-completed-table {
+  min-width: 1050px;
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.dpo-anganwadi-completed-table th,
+.dpo-anganwadi-completed-table td {
+  border: 1px solid #d8d8d8 !important;
+  padding: 8px 9px !important;
+  vertical-align: middle;
+  font-size: 12px;
+  line-height: 1.35;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.dpo-anganwadi-completed-table thead th {
+  background: #f8fafc;
+  color: #263248;
+  font-weight: 700;
+  text-align: left;
+}
+
+.dpo-anganwadi-completed-table .dpo-anganwadi-select-cell {
+  width: 48px;
+  text-align: center;
+}
+
+.dpo-anganwadi-completed-table .dpo-anganwadi-select-cell .form-check {
+  display: flex;
+  justify-content: center;
+  margin: 0;
+  min-height: 0;
+  padding: 0;
+}
+
+.dpo-anganwadi-completed-table .dpo-anganwadi-sector-actions {
+  min-width: 135px;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.dpo-anganwadi-sector-action-buttons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+}
+
+.dpo-anganwadi-sector-action-buttons .btn {
+  min-width: 78px;
+  font-size: 11px;
+  padding: 5px 8px;
+  white-space: normal;
+}
+
+@media (max-width: 768px) {
+  .dpo-anganwadi-completed-table {
+    min-width: 950px;
+  }
+  .dpo-anganwadi-completed-table th,
+  .dpo-anganwadi-completed-table td {
+    font-size: 10px;
+    padding: 6px 5px !important;
+  }
+}
+
+/* Clickable Form ID opens the same application preview as the View action */
+.cdpo-form-id-link {
+  display: inline;
+  max-width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #1769aa;
+  font: inherit;
+  font-weight: 700;
+  text-align: left;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  overflow-wrap: anywhere;
+  cursor: pointer;
+}
+
+.cdpo-form-id-link:hover,
+.cdpo-form-id-link:focus-visible {
+  color: #0b4f83;
+}
+
+.cdpo-form-id-link:focus-visible {
+  outline: 2px solid #60a5fa;
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* Fix Report tab header wrapping: preserve Hindi words and give long headings enough width. */
+.dpo-anganwadi-report-table {
+  width: max-content !important;
+  min-width: 2300px !important;
+  table-layout: auto !important;
+}
+
+.dpo-anganwadi-report-table thead th {
+  height: auto !important;
+  min-height: 0 !important;
+  padding: 9px 8px !important;
+  vertical-align: middle !important;
+  text-align: center;
+  line-height: 1.35 !important;
+  word-break: normal !important;
+  overflow-wrap: normal !important;
+  white-space: normal !important;
+  writing-mode: horizontal-tb !important;
+}
+
+/* Report columns: widths account for Form ID being the fifth column. */
+.dpo-anganwadi-report-table th:nth-child(1) {
+  min-width: 60px !important;
+  width: 60px;
+}
+.dpo-anganwadi-report-table th:nth-child(2) {
+  min-width: 100px !important;
+  width: 100px;
+}
+.dpo-anganwadi-report-table th:nth-child(3) {
+  min-width: 145px !important;
+  width: 145px;
+}
+.dpo-anganwadi-report-table th:nth-child(4) {
+  min-width: 155px !important;
+  width: 155px;
+}
+.dpo-anganwadi-report-table th:nth-child(5) {
+  min-width: 145px !important;
+  width: 145px;
+}
+.dpo-anganwadi-report-table th:nth-child(6) {
+  min-width: 145px !important;
+  width: 145px;
+}
+.dpo-anganwadi-report-table th:nth-child(7) {
+  min-width: 150px !important;
+  width: 150px;
+}
+.dpo-anganwadi-report-table th:nth-child(8) {
+  min-width: 130px !important;
+  width: 130px;
+}
+.dpo-anganwadi-report-table th:nth-child(9) {
+  min-width: 135px !important;
+  width: 135px;
+}
+.dpo-anganwadi-report-table th:nth-child(10) {
+  min-width: 150px !important;
+  width: 150px;
+}
+.dpo-anganwadi-report-table th:nth-child(11) {
+  min-width: 105px !important;
+  width: 105px;
+}
+.dpo-anganwadi-report-table th:nth-child(12) {
+  min-width: 75px !important;
+  width: 75px;
+}
+.dpo-anganwadi-report-table th:nth-child(13) {
+  min-width: 135px !important;
+  width: 135px;
+}
+.dpo-anganwadi-report-table th:nth-child(14) {
+  min-width: 145px !important;
+  width: 145px;
+}
+.dpo-anganwadi-report-table th:nth-child(15) {
+  min-width: 240px !important;
+  width: 240px;
+}
+.dpo-anganwadi-report-table th:nth-child(16) {
+  min-width: 220px !important;
+  width: 220px;
+}
+.dpo-anganwadi-report-table th:nth-child(17) {
+  min-width: 190px !important;
+  width: 190px;
+}
+.dpo-anganwadi-report-table th:nth-child(18) {
+  min-width: 190px !important;
+  width: 190px;
+}
+.dpo-anganwadi-report-table th:nth-child(19) {
+  min-width: 300px !important;
+  width: 300px;
+}
+
+.dpo-anganwadi-report-table td {
+  word-break: normal !important;
+  overflow-wrap: anywhere;
+  vertical-align: top;
+}
+
+/* DPO report table: readable Hindi headings with horizontal scroll when needed */
+.dpo-anganwadi-report-table {
+  min-width: 1900px;
+  table-layout: auto;
+}
+.dpo-anganwadi-report-table thead th {
+  min-width: 105px;
+  white-space: normal;
+  word-break: keep-all;
+  overflow-wrap: normal;
+  line-height: 1.45;
+  vertical-align: middle;
+}
+.dpo-anganwadi-report-table thead th:last-child {
+  min-width: 230px;
+}
+.dpo-anganwadi-table-wrap {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+.dpo-anganwadi-sector-actions {
+  vertical-align: middle;
+  text-align: center;
+}
+.dpo-anganwadi-sector-action-buttons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+
+/* DPO review table hierarchy: Project -> Sector -> Anganwadi Center */
+.dpo-anganwadi-completed-table {
+  min-width: 1750px;
+}
+
+.dpo-anganwadi-completed-table thead th {
+  white-space: nowrap;
+}
+
+.dpo-anganwadi-completed-table td[rowspan] {
+  vertical-align: middle;
+  background: #fbfffc;
+  font-weight: 600;
+}
+
+.dpo-anganwadi-completed-table .dpo-anganwadi-sector-actions {
+  min-width: 155px;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.dpo-anganwadi-completed-table .dpo-anganwadi-sector-action-buttons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.dpo-anganwadi-completed-table .dpo-anganwadi-select-cell {
+  text-align: center;
+  vertical-align: middle;
+}
+
+.dpo-anganwadi-completed-table .dpo-anganwadi-remark-cell {
+  min-width: 180px;
+  max-width: 300px;
+  white-space: normal;
+  overflow-wrap: anywhere;
 }

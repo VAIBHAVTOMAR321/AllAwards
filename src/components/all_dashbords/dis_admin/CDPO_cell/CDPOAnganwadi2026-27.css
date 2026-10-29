@@ -34,11 +34,7 @@
   border: 1px solid #bbf7d0;
   border-radius: 8px 28px 8px 28px;
   background:
-    radial-gradient(
-      circle at 94% 8%,
-      rgba(134, 239, 172, 0.28),
-      transparent 28%
-    ),
+    radial-gradient(circle at 94% 8%, rgba(134, 239, 172, 0.28), transparent 28%),
     linear-gradient(145deg, #dcfce7 0%, #ffffff 68%);
   box-shadow: 0 8px 24px rgba(20, 83, 45, 0.045);
 }
@@ -658,6 +654,7 @@
   box-sizing: border-box;
 }
 
+
 /* Reference-style application preview document */
 .cdpo-anganwadi-preview-overlay {
   position: fixed;
@@ -699,7 +696,7 @@
 
 .cdpo-anganwadi-document-header p {
   margin: 0;
-  color: rgba(255, 255, 255, 0.82);
+  color: rgba(255,255,255,.82);
   font-size: 12px;
 }
 
@@ -725,7 +722,7 @@
   border: 1px solid #dfe3e8;
   background: #fff;
   color: #202124;
-  box-shadow: 0 3px 14px rgba(38, 50, 72, 0.07);
+  box-shadow: 0 3px 14px rgba(38, 50, 72, .07);
 }
 
 .cdpo-anganwadi-document-department {
@@ -976,41 +973,30 @@
   }
 }
 
+
 /* Keep the application list readable with the expanded applicant columns. */
 .cdpo-anganwadi-table thead th {
   white-space: normal;
   min-width: 92px;
   line-height: 1.35;
 }
-.cdpo-anganwadi-table thead th:nth-child(1) {
-  min-width: 58px;
-}
-.cdpo-anganwadi-table thead th:nth-child(2) {
-  min-width: 190px;
-}
-.cdpo-anganwadi-table thead th:nth-child(3) {
-  min-width: 70px;
-}
+.cdpo-anganwadi-table thead th:nth-child(1) { min-width: 58px; }
+.cdpo-anganwadi-table thead th:nth-child(2) { min-width: 190px; }
+.cdpo-anganwadi-table thead th:nth-child(3) { min-width: 70px; }
 .cdpo-anganwadi-table thead th:nth-child(4),
 .cdpo-anganwadi-table thead th:nth-child(5),
 .cdpo-anganwadi-table thead th:nth-child(7),
-.cdpo-anganwadi-table thead th:nth-child(13) {
-  min-width: 105px;
-}
+.cdpo-anganwadi-table thead th:nth-child(13) { min-width: 105px; }
 .cdpo-anganwadi-table thead th:nth-child(6),
 .cdpo-anganwadi-table thead th:nth-child(8),
 .cdpo-anganwadi-table thead th:nth-child(9),
-.cdpo-anganwadi-table thead th:nth-child(12) {
-  min-width: 150px;
-}
+.cdpo-anganwadi-table thead th:nth-child(12) { min-width: 150px; }
 .cdpo-anganwadi-table tbody td {
   vertical-align: top;
   line-height: 1.45;
   overflow-wrap: anywhere;
 }
-.cdpo-anganwadi-status-cell {
-  min-width: 190px;
-}
+.cdpo-anganwadi-status-cell { min-width: 190px; }
 
 /* Responsive applications list: scroll horizontally only when the columns need it. */
 .cdpo-anganwadi-table-wrap {
@@ -1047,48 +1033,20 @@
   vertical-align: middle;
 }
 
-.cdpo-anganwadi-table thead th:nth-child(1) {
-  width: 3.5%;
-}
-.cdpo-anganwadi-table thead th:nth-child(2) {
-  width: 8%;
-}
-.cdpo-anganwadi-table thead th:nth-child(3) {
-  width: 4%;
-}
-.cdpo-anganwadi-table thead th:nth-child(4) {
-  width: 7%;
-}
-.cdpo-anganwadi-table thead th:nth-child(5) {
-  width: 7%;
-}
-.cdpo-anganwadi-table thead th:nth-child(6) {
-  width: 8%;
-}
-.cdpo-anganwadi-table thead th:nth-child(7) {
-  width: 6%;
-}
-.cdpo-anganwadi-table thead th:nth-child(8) {
-  width: 8%;
-}
-.cdpo-anganwadi-table thead th:nth-child(9) {
-  width: 8%;
-}
-.cdpo-anganwadi-table thead th:nth-child(10) {
-  width: 5%;
-}
-.cdpo-anganwadi-table thead th:nth-child(11) {
-  width: 7%;
-}
-.cdpo-anganwadi-table thead th:nth-child(12) {
-  width: 8%;
-}
-.cdpo-anganwadi-table thead th:nth-child(13) {
-  width: 6%;
-}
-.cdpo-anganwadi-table thead th:nth-child(14) {
-  width: 6%;
-}
+.cdpo-anganwadi-table thead th:nth-child(1) { width: 3.5%; }
+.cdpo-anganwadi-table thead th:nth-child(2) { width: 8%; }
+.cdpo-anganwadi-table thead th:nth-child(3) { width: 4%; }
+.cdpo-anganwadi-table thead th:nth-child(4) { width: 7%; }
+.cdpo-anganwadi-table thead th:nth-child(5) { width: 7%; }
+.cdpo-anganwadi-table thead th:nth-child(6) { width: 8%; }
+.cdpo-anganwadi-table thead th:nth-child(7) { width: 6%; }
+.cdpo-anganwadi-table thead th:nth-child(8) { width: 8%; }
+.cdpo-anganwadi-table thead th:nth-child(9) { width: 8%; }
+.cdpo-anganwadi-table thead th:nth-child(10) { width: 5%; }
+.cdpo-anganwadi-table thead th:nth-child(11) { width: 7%; }
+.cdpo-anganwadi-table thead th:nth-child(12) { width: 8%; }
+.cdpo-anganwadi-table thead th:nth-child(13) { width: 6%; }
+.cdpo-anganwadi-table thead th:nth-child(14) { width: 6%; }
 
 .cdpo-anganwadi-status-cell {
   min-width: 0 !important;
@@ -1116,39 +1074,18 @@
 }
 
 @media (max-width: 1200px) {
-  .cdpo-anganwadi-table thead th {
-    font-size: 9px;
-  }
-  .cdpo-anganwadi-table tbody td {
-    font-size: 9px;
-  }
-  .cdpo-anganwadi-table > :not(caption) > * > * {
-    padding: 5px 3px;
-  }
-  .cdpo-anganwadi-table .badge {
-    font-size: 8px;
-    padding: 3px 4px;
-  }
+  .cdpo-anganwadi-table thead th { font-size: 9px; }
+  .cdpo-anganwadi-table tbody td { font-size: 9px; }
+  .cdpo-anganwadi-table > :not(caption) > * > * { padding: 5px 3px; }
+  .cdpo-anganwadi-table .badge { font-size: 8px; padding: 3px 4px; }
 }
 
 @media (max-width: 768px) {
-  .cdpo-anganwadi-table thead th {
-    font-size: 8px;
-  }
-  .cdpo-anganwadi-table tbody td {
-    font-size: 8px;
-  }
-  .cdpo-anganwadi-table > :not(caption) > * > * {
-    padding: 4px 2px;
-  }
-  .cdpo-anganwadi-table .badge {
-    font-size: 7px;
-    padding: 2px 3px;
-  }
-  .cdpo-anganwadi-row-actions .btn {
-    font-size: 8px;
-    padding: 2px 3px;
-  }
+  .cdpo-anganwadi-table thead th { font-size: 8px; }
+  .cdpo-anganwadi-table tbody td { font-size: 8px; }
+  .cdpo-anganwadi-table > :not(caption) > * > * { padding: 4px 2px; }
+  .cdpo-anganwadi-table .badge { font-size: 7px; padding: 2px 3px; }
+  .cdpo-anganwadi-row-actions .btn { font-size: 8px; padding: 2px 3px; }
 }
 
 /* Application tabs */
@@ -1199,6 +1136,7 @@
   }
 }
 
+
 /* Keep status remarks readable in the applications table */
 .cdpo-anganwadi-table .cdpo-anganwadi-remark-cell {
   min-width: 150px;
@@ -1208,6 +1146,7 @@
   word-break: normal;
   line-height: 1.35;
 }
+
 
 /* Center View and decision buttons in every row, including approved/rejected rows */
 .cdpo-anganwadi-table .cdpo-anganwadi-actions-cell {
@@ -1361,6 +1300,7 @@
   }
 }
 
+
 /* Report tab: keep the supplied Hindi report columns readable and scroll only when needed */
 .cdpo-anganwadi-table-wrap {
   width: 100%;
@@ -1387,33 +1327,21 @@
   vertical-align: top;
 }
 
-.cdpo-anganwadi-report-table th:nth-child(1) {
-  min-width: 55px;
-  width: 55px;
-}
+.cdpo-anganwadi-report-table th:nth-child(1) { min-width: 55px; width: 55px; }
 .cdpo-anganwadi-report-table th:nth-child(2),
 .cdpo-anganwadi-report-table th:nth-child(10),
-.cdpo-anganwadi-report-table th:nth-child(11) {
-  min-width: 85px;
-  width: 85px;
-}
+.cdpo-anganwadi-report-table th:nth-child(11) { min-width: 85px; width: 85px; }
 .cdpo-anganwadi-report-table th:nth-child(3),
 .cdpo-anganwadi-report-table th:nth-child(4),
 .cdpo-anganwadi-report-table th:nth-child(5),
 .cdpo-anganwadi-report-table th:nth-child(9),
-.cdpo-anganwadi-report-table th:nth-child(12) {
-  min-width: 130px;
-  width: 130px;
-}
+.cdpo-anganwadi-report-table th:nth-child(12) { min-width: 130px; width: 130px; }
 .cdpo-anganwadi-report-table th:nth-child(13),
 .cdpo-anganwadi-report-table th:nth-child(14),
 .cdpo-anganwadi-report-table th:nth-child(15),
 .cdpo-anganwadi-report-table th:nth-child(16),
 .cdpo-anganwadi-report-table th:nth-child(17),
-.cdpo-anganwadi-report-table th:nth-child(18) {
-  min-width: 170px;
-  width: 170px;
-}
+.cdpo-anganwadi-report-table th:nth-child(18) { min-width: 170px; width: 170px; }
 
 @media (max-width: 768px) {
   .cdpo-anganwadi-report-table th,
@@ -1493,6 +1421,7 @@
   }
 }
 
+
 /* Clickable Form ID opens the same application preview as the View action */
 .cdpo-form-id-link {
   display: inline;
@@ -1542,85 +1471,37 @@
 }
 
 /* Report columns: widths account for Form ID being the fifth column. */
-.cdpo-anganwadi-report-table th:nth-child(1) {
-  min-width: 60px !important;
-  width: 60px;
-}
-.cdpo-anganwadi-report-table th:nth-child(2) {
-  min-width: 100px !important;
-  width: 100px;
-}
-.cdpo-anganwadi-report-table th:nth-child(3) {
-  min-width: 145px !important;
-  width: 145px;
-}
-.cdpo-anganwadi-report-table th:nth-child(4) {
-  min-width: 155px !important;
-  width: 155px;
-}
-.cdpo-anganwadi-report-table th:nth-child(5) {
-  min-width: 145px !important;
-  width: 145px;
-}
-.cdpo-anganwadi-report-table th:nth-child(6) {
-  min-width: 145px !important;
-  width: 145px;
-}
-.cdpo-anganwadi-report-table th:nth-child(7) {
-  min-width: 150px !important;
-  width: 150px;
-}
-.cdpo-anganwadi-report-table th:nth-child(8) {
-  min-width: 130px !important;
-  width: 130px;
-}
-.cdpo-anganwadi-report-table th:nth-child(9) {
-  min-width: 135px !important;
-  width: 135px;
-}
-.cdpo-anganwadi-report-table th:nth-child(10) {
-  min-width: 150px !important;
-  width: 150px;
-}
-.cdpo-anganwadi-report-table th:nth-child(11) {
-  min-width: 105px !important;
-  width: 105px;
-}
-.cdpo-anganwadi-report-table th:nth-child(12) {
-  min-width: 75px !important;
-  width: 75px;
-}
-.cdpo-anganwadi-report-table th:nth-child(13) {
-  min-width: 135px !important;
-  width: 135px;
-}
-.cdpo-anganwadi-report-table th:nth-child(14) {
-  min-width: 145px !important;
-  width: 145px;
-}
-.cdpo-anganwadi-report-table th:nth-child(15) {
-  min-width: 240px !important;
-  width: 240px;
-}
-.cdpo-anganwadi-report-table th:nth-child(16) {
-  min-width: 220px !important;
-  width: 220px;
-}
-.cdpo-anganwadi-report-table th:nth-child(17) {
-  min-width: 190px !important;
-  width: 190px;
-}
-.cdpo-anganwadi-report-table th:nth-child(18) {
-  min-width: 190px !important;
-  width: 190px;
-}
-.cdpo-anganwadi-report-table th:nth-child(19) {
-  min-width: 300px !important;
-  width: 300px;
-}
+.cdpo-anganwadi-report-table th:nth-child(1) { min-width: 60px !important; width: 60px; }
+.cdpo-anganwadi-report-table th:nth-child(2) { min-width: 100px !important; width: 100px; }
+.cdpo-anganwadi-report-table th:nth-child(3) { min-width: 145px !important; width: 145px; }
+.cdpo-anganwadi-report-table th:nth-child(4) { min-width: 155px !important; width: 155px; }
+.cdpo-anganwadi-report-table th:nth-child(5) { min-width: 145px !important; width: 145px; }
+.cdpo-anganwadi-report-table th:nth-child(6) { min-width: 145px !important; width: 145px; }
+.cdpo-anganwadi-report-table th:nth-child(7) { min-width: 150px !important; width: 150px; }
+.cdpo-anganwadi-report-table th:nth-child(8) { min-width: 130px !important; width: 130px; }
+.cdpo-anganwadi-report-table th:nth-child(9) { min-width: 135px !important; width: 135px; }
+.cdpo-anganwadi-report-table th:nth-child(10) { min-width: 150px !important; width: 150px; }
+.cdpo-anganwadi-report-table th:nth-child(11) { min-width: 105px !important; width: 105px; }
+.cdpo-anganwadi-report-table th:nth-child(12) { min-width: 75px !important; width: 75px; }
+.cdpo-anganwadi-report-table th:nth-child(13) { min-width: 135px !important; width: 135px; }
+.cdpo-anganwadi-report-table th:nth-child(14) { min-width: 145px !important; width: 145px; }
+.cdpo-anganwadi-report-table th:nth-child(15) { min-width: 240px !important; width: 240px; }
+.cdpo-anganwadi-report-table th:nth-child(16) { min-width: 220px !important; width: 220px; }
+.cdpo-anganwadi-report-table th:nth-child(17) { min-width: 190px !important; width: 190px; }
+.cdpo-anganwadi-report-table th:nth-child(18) { min-width: 190px !important; width: 190px; }
+.cdpo-anganwadi-report-table th:nth-child(19) { min-width: 300px !important; width: 300px; }
 
 .cdpo-anganwadi-report-table td {
   word-break: normal !important;
   overflow-wrap: anywhere;
   vertical-align: top;
+}
+
+/* Completed Forms: show each Anganwadi Center once for its grouped rows */
+.cdpo-anganwadi-completed-table .cdpo-anganwadi-center-group-cell {
+  vertical-align: middle;
+  text-align: center;
+  min-width: 105px;
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
