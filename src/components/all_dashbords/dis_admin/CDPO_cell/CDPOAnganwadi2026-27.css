@@ -1422,3 +1422,205 @@
     font-size: 10px !important;
   }
 }
+
+/* Completed Forms: sector-wise candidate selection table */
+.cdpo-anganwadi-completed-table {
+  min-width: 1050px;
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.cdpo-anganwadi-completed-table th,
+.cdpo-anganwadi-completed-table td {
+  border: 1px solid #d8d8d8 !important;
+  padding: 8px 9px !important;
+  vertical-align: middle;
+  font-size: 12px;
+  line-height: 1.35;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.cdpo-anganwadi-completed-table thead th {
+  background: #f8fafc;
+  color: #263248;
+  font-weight: 700;
+  text-align: left;
+}
+
+.cdpo-anganwadi-completed-table .cdpo-anganwadi-select-cell {
+  width: 48px;
+  text-align: center;
+}
+
+.cdpo-anganwadi-completed-table .cdpo-anganwadi-select-cell .form-check {
+  display: flex;
+  justify-content: center;
+  margin: 0;
+  min-height: 0;
+  padding: 0;
+}
+
+.cdpo-anganwadi-completed-table .cdpo-anganwadi-sector-actions {
+  min-width: 135px;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.cdpo-anganwadi-sector-action-buttons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+}
+
+.cdpo-anganwadi-sector-action-buttons .btn {
+  min-width: 78px;
+  font-size: 11px;
+  padding: 5px 8px;
+  white-space: normal;
+}
+
+@media (max-width: 768px) {
+  .cdpo-anganwadi-completed-table {
+    min-width: 950px;
+  }
+  .cdpo-anganwadi-completed-table th,
+  .cdpo-anganwadi-completed-table td {
+    font-size: 10px;
+    padding: 6px 5px !important;
+  }
+}
+
+/* Clickable Form ID opens the same application preview as the View action */
+.cdpo-form-id-link {
+  display: inline;
+  max-width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #1769aa;
+  font: inherit;
+  font-weight: 700;
+  text-align: left;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  overflow-wrap: anywhere;
+  cursor: pointer;
+}
+
+.cdpo-form-id-link:hover,
+.cdpo-form-id-link:focus-visible {
+  color: #0b4f83;
+}
+
+.cdpo-form-id-link:focus-visible {
+  outline: 2px solid #60a5fa;
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* Fix Report tab header wrapping: preserve Hindi words and give long headings enough width. */
+.cdpo-anganwadi-report-table {
+  width: max-content !important;
+  min-width: 2300px !important;
+  table-layout: auto !important;
+}
+
+.cdpo-anganwadi-report-table thead th {
+  height: auto !important;
+  min-height: 0 !important;
+  padding: 9px 8px !important;
+  vertical-align: middle !important;
+  text-align: center;
+  line-height: 1.35 !important;
+  word-break: normal !important;
+  overflow-wrap: normal !important;
+  white-space: normal !important;
+  writing-mode: horizontal-tb !important;
+}
+
+/* Report columns: widths account for Form ID being the fifth column. */
+.cdpo-anganwadi-report-table th:nth-child(1) {
+  min-width: 60px !important;
+  width: 60px;
+}
+.cdpo-anganwadi-report-table th:nth-child(2) {
+  min-width: 100px !important;
+  width: 100px;
+}
+.cdpo-anganwadi-report-table th:nth-child(3) {
+  min-width: 145px !important;
+  width: 145px;
+}
+.cdpo-anganwadi-report-table th:nth-child(4) {
+  min-width: 155px !important;
+  width: 155px;
+}
+.cdpo-anganwadi-report-table th:nth-child(5) {
+  min-width: 145px !important;
+  width: 145px;
+}
+.cdpo-anganwadi-report-table th:nth-child(6) {
+  min-width: 145px !important;
+  width: 145px;
+}
+.cdpo-anganwadi-report-table th:nth-child(7) {
+  min-width: 150px !important;
+  width: 150px;
+}
+.cdpo-anganwadi-report-table th:nth-child(8) {
+  min-width: 130px !important;
+  width: 130px;
+}
+.cdpo-anganwadi-report-table th:nth-child(9) {
+  min-width: 135px !important;
+  width: 135px;
+}
+.cdpo-anganwadi-report-table th:nth-child(10) {
+  min-width: 150px !important;
+  width: 150px;
+}
+.cdpo-anganwadi-report-table th:nth-child(11) {
+  min-width: 105px !important;
+  width: 105px;
+}
+.cdpo-anganwadi-report-table th:nth-child(12) {
+  min-width: 75px !important;
+  width: 75px;
+}
+.cdpo-anganwadi-report-table th:nth-child(13) {
+  min-width: 135px !important;
+  width: 135px;
+}
+.cdpo-anganwadi-report-table th:nth-child(14) {
+  min-width: 145px !important;
+  width: 145px;
+}
+.cdpo-anganwadi-report-table th:nth-child(15) {
+  min-width: 240px !important;
+  width: 240px;
+}
+.cdpo-anganwadi-report-table th:nth-child(16) {
+  min-width: 220px !important;
+  width: 220px;
+}
+.cdpo-anganwadi-report-table th:nth-child(17) {
+  min-width: 190px !important;
+  width: 190px;
+}
+.cdpo-anganwadi-report-table th:nth-child(18) {
+  min-width: 190px !important;
+  width: 190px;
+}
+.cdpo-anganwadi-report-table th:nth-child(19) {
+  min-width: 300px !important;
+  width: 300px;
+}
+
+.cdpo-anganwadi-report-table td {
+  word-break: normal !important;
+  overflow-wrap: anywhere;
+  vertical-align: top;
+}
