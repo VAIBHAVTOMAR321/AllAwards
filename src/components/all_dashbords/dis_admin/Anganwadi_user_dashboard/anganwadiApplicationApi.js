@@ -462,24 +462,10 @@ export const getAnganwadiApplication = async (account) => {
     }
   }
 
-  if (getMissingAnganwadiStepOneFields(application).length === 0) {
-    try {
-      const stepTwoResponse = await requestApplication(2);
-      application = {
-        ...application,
-        ...normalizeApplicationData(stepTwoResponse.data || {}),
-        applicant_id: initialApplication.applicant_id,
-        status: normalizeStatus(stepTwoResponse.status || application.status),
-      };
-    } catch (stepTwoError) {
-      console.warn("Step 2 load failed:", stepTwoError);
-    }
-  } else if (application.status === "step1") {
-    application.status = "step0";
-  }
-
   let stepTwoLoaded = false;
-  if (getMissingAnganwadiStepOneFields(application).length === 0) {
+  const stepOneComplete = getMissingAnganwadiStepOneFields(application).length === 0;
+  const step2OrBeyond = ["step2", "step3", "final"].includes(application.status);
+  if (stepOneComplete || step2OrBeyond) {
     try {
       const stepTwoResponse = await requestApplication(2);
       stepTwoLoaded = true;
