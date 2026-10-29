@@ -136,11 +136,15 @@ const createInitialApplication = (account = {}) => ({
 
 const readApiResponse = async (response, fallback) => {
   const body = await response.text();
-  if (!body) return {};
+  const trimmed = body.trim();
+  if (!trimmed) return {};
+  if (trimmed[0] !== "{" && trimmed[0] !== "[") {
+    throw new Error(`${fallback} (HTTP ${response.status})`);
+  }
   try {
-    return JSON.parse(body);
+    return JSON.parse(trimmed);
   } catch {
-    throw new Error(fallback);
+    throw new Error(`${fallback} (HTTP ${response.status})`);
   }
 };
 
@@ -229,13 +233,20 @@ export const getAnganwadiApplication = async (account) => {
     getAccountField(account, "unique_id", "phone", "mobile_no") || "user",
   );
   const initialApplication = createInitialApplication(account);
-  const stepOneResponse = await requestApplication(1);
-  const stepOneData = stepOneResponse.data || {};
+  let stepOneData = {};
+  let stepOneStatus = "step0";
+  try {
+    const stepOneResponse = await requestApplication(1);
+    stepOneData = stepOneResponse.data || {};
+    stepOneStatus = normalizeStatus(stepOneResponse.status);
+  } catch (stepOneError) {
+    console.warn("Step 1 load failed, starting fresh:", stepOneError.message);
+  }
   let application = {
     ...initialApplication,
     ...normalizeApplicationData(stepOneData),
     applicant_id: initialApplication.applicant_id,
-    status: normalizeStatus(stepOneResponse.status),
+    status: stepOneStatus,
   };
 
   if (getMissingAnganwadiStepOneFields(application).length === 0) {
@@ -437,6 +448,7 @@ export const saveAnganwadiApplicationStep = async (
       1,
       "PUT",
       buildStepOnePayload(application),
+      "application/json",
     );
     return {
       ...application,
