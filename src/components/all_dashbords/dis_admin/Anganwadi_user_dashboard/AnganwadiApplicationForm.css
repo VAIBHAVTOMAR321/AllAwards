@@ -152,6 +152,7 @@
   color: var(--anganwadi-navy, #243b64);
   font-size: 14px;
   font-weight: 800;
+  text-align: justify;
 }
 
 .anganwadi-form-section > .card-body {
