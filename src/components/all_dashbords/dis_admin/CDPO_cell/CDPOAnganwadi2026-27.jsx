@@ -1037,7 +1037,11 @@ const CDPOAnganwadi2026_27 = () => {
                     const rowDisabled = centerAlreadyApproved;
                     return (
                       <tr key={application.form_id || application.id} className={rowDisabled ? "cdpo-anganwadi-row-disabled" : ""}>
-                        <td>{displayValue(application.awc_name || application.awc_center)}</td>
+                        {index === 0 && (
+                          <td rowSpan={items.length} className="cdpo-anganwadi-center-group-cell">
+                            {displayValue(application.awc_name || application.awc_center)}
+                          </td>
+                        )}
                         <td>{displayValue(application.filer_name)}</td>
                         <td>{formatTableDate(application.joining_date)}</td>
                         <td className="cdpo-anganwadi-form-id">

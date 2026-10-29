@@ -1496,3 +1496,12 @@
   overflow-wrap: anywhere;
   vertical-align: top;
 }
+
+/* Completed Forms: show each Anganwadi Center once for its grouped rows */
+.cdpo-anganwadi-completed-table .cdpo-anganwadi-center-group-cell {
+  vertical-align: middle;
+  text-align: center;
+  min-width: 105px;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
