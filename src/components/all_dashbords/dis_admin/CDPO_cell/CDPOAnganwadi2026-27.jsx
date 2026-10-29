@@ -204,11 +204,19 @@ const getStatusVariant = (status) => {
 const formatStatus = (status) => {
   const labels = {
     final_submit: "Final Submitted",
-    approved: "Approved",
+    submitted: "Submitted",
+    approved: "Approved by CDPO",
+    approved_by_cdpo: "Approved by CDPO",
+    approved_cdpo: "Approved by CDPO",
+    approved_by_dpo: "Approved by DPO",
+    approved_by_district: "Approved by District",
     rejected: "Rejected",
+    rejected_by_cdpo: "Rejected by CDPO",
+    rejected_by_dpo: "Rejected by DPO",
     pending: "Pending",
+    completed: "Completed",
   };
-  return labels[String(status || "").toLowerCase()] || displayValue(status);
+  return labels[normalizeStatus(status)] || displayValue(status);
 };
 
 const getMarkValue = (application, prefix) => {
@@ -260,6 +268,66 @@ const getMarkValue = (application, prefix) => {
     marks: application[`${prefix}_marks`],
     total: application[`${prefix}_tot`],
   };
+};
+
+const getApplicationMerit = (application) => {
+  if (!application) return null;
+
+  // Prefer the criterion marks returned by the API. This is important for the
+  // Completed Forms and Approved by CDPO tabs, which must show the same total
+  // as the marks visible in the application preview.
+  let calculatedTotal = 0;
+  let foundNumericMark = false;
+
+  Object.entries(application).forEach(([field, rawValue]) => {
+    if (!field.endsWith("_marks")) return;
+    if (rawValue === null || rawValue === undefined || String(rawValue).trim() === "") return;
+    const numericValue = Number(rawValue);
+    if (Number.isFinite(numericValue)) {
+      calculatedTotal += numericValue;
+      foundNumericMark = true;
+    }
+  });
+
+  const rawMerit = application.merit;
+  const apiMerit = rawMerit !== null && rawMerit !== undefined && String(rawMerit).trim() !== ""
+    ? Number(rawMerit)
+    : null;
+
+  // If actual criterion marks are available and add up to a positive value,
+  // use that total even when the API's stored merit is stale. If marks are
+  // absent or all zero, preserve a valid API merit as a fallback.
+  if (foundNumericMark && calculatedTotal > 0) return calculatedTotal;
+  if (apiMerit !== null && Number.isFinite(apiMerit)) return apiMerit;
+  return foundNumericMark ? calculatedTotal : null;
+};
+
+// Normalize records returned by the API once so every tab and the preview use
+// the same fields and numeric marks, regardless of whether the backend sends
+// numbers or numeric strings. Preserve all original API fields.
+const normalizeApplication = (record) => {
+  if (!record || typeof record !== "object") return record;
+  const normalized = { ...record };
+  Object.keys(normalized).forEach((key) => {
+    if (key.endsWith("_marks") || key === "merit" || key.endsWith("_tot") || key.endsWith("_obt")) {
+      const value = normalized[key];
+      if (value !== null && value !== undefined && String(value).trim() !== "" && Number.isFinite(Number(value))) {
+        normalized[key] = Number(value);
+      }
+    }
+  });
+  return normalized;
+};
+
+const normalizeStatus = (status) => String(status || "").trim().toLowerCase().replace(/[\s-]+/g, "_");
+const isApprovedStatus = (status) => {
+  const value = normalizeStatus(status);
+  return value === "approved" || value === "approved_by_cdpo" || value === "approved_cdpo" || value === "approved_by_dpo" || value === "approved_by_district";
+};
+const isRejectedStatus = (status) => normalizeStatus(status).includes("reject");
+const isCompletedStatus = (status) => {
+  const value = normalizeStatus(status);
+  return ["final_submit", "submitted", "completed"].includes(value) || isApprovedStatus(value) || isRejectedStatus(value);
 };
 
 const CDPOAnganwadi2026_27 = () => {
@@ -331,7 +399,7 @@ const CDPOAnganwadi2026_27 = () => {
       if (!Array.isArray(payload.data)) {
         throw new Error("The API response does not contain a valid data array.");
       }
-      setApplications(payload.data);
+      setApplications(payload.data.map(normalizeApplication));
       setProjectName(payload.project || "");
       setApiCount(Number.isFinite(Number(payload.count)) ? Number(payload.count) : payload.data.length);
     } catch (error) {
@@ -366,18 +434,18 @@ const CDPOAnganwadi2026_27 = () => {
           application.awc_center,
         ].some((value) => String(value || "").toLowerCase().includes(query));
 
-      const status = String(application.status || "").toLowerCase();
+      const status = normalizeStatus(application.status);
       const matchesTab =
         activeTab === "approved"
-          ? status === "approved"
+          ? isApprovedStatus(status)
           : activeTab === "completed"
-            ? status === "final_submit" || status === "submitted" || status === "completed"
+            ? isCompletedStatus(status)
             : true;
       const matchesStatus =
         statusFilter === "all" ||
-        (statusFilter === "submitted" && status === "final_submit") ||
-        (statusFilter === "approved" && status === "approved") ||
-        (statusFilter === "rejected" && status === "rejected");
+        (statusFilter === "submitted" && ["final_submit", "submitted"].includes(status)) ||
+        (statusFilter === "approved" && isApprovedStatus(status)) ||
+        (statusFilter === "rejected" && isRejectedStatus(status));
 
       return matchesSearch && matchesStatus && matchesTab;
     });
@@ -389,13 +457,11 @@ const CDPOAnganwadi2026_27 = () => {
     currentPage * PAGE_SIZE
   );
 
-  // Group completed submissions by sector. The AWC name is shown in the table,
-  // while the API's sector value controls the one-candidate-per-sector selection.
   const completedGroups = useMemo(() => {
     const groups = new Map();
     filteredApplications.forEach((application) => {
       const sectorKey = String(
-        application.sector || application.project || application.awc_name || application.awc_center || "Unassigned Sector"
+        application.sector || application.awc_name || application.awc_center || application.project || "Unassigned Sector"
       ).trim();
       if (!groups.has(sectorKey)) groups.set(sectorKey, []);
       groups.get(sectorKey).push(application);
@@ -685,7 +751,7 @@ const CDPOAnganwadi2026_27 = () => {
           <tr>
             <th>Merit Marks</th>
             <td>
-              <strong>{displayValue(application.merit)}</strong>
+              <strong>{displayValue(getApplicationMerit(application))}</strong>
             </td>
           </tr>
           <tr>
@@ -859,10 +925,10 @@ const CDPOAnganwadi2026_27 = () => {
                 All Forms <span>{applications.length}</span>
               </Button>
               <Button type="button" variant={activeTab === "completed" ? "success" : "outline-success"} onClick={() => { setActiveTab("completed"); setStatusFilter("all"); }} role="tab" aria-selected={activeTab === "completed"}>
-                Completed Forms <span>{applications.filter((item) => ["final_submit", "submitted", "completed"].includes(String(item.status || "").toLowerCase())).length}</span>
+                Completed Forms <span>{applications.filter((item) => isCompletedStatus(item.status)).length}</span>
               </Button>
               <Button type="button" variant={activeTab === "approved" ? "success" : "outline-success"} onClick={() => { setActiveTab("approved"); setStatusFilter("all"); }} role="tab" aria-selected={activeTab === "approved"}>
-                Approved BY CDPO <span>{applications.filter((item) => String(item.status || "").toLowerCase() === "approved").length}</span>
+                Approved BY CDPO <span>{applications.filter((item) => isApprovedStatus(item.status)).length}</span>
               </Button>
               <Button type="button" variant={activeTab === "report" ? "success" : "outline-success"} onClick={() => { setActiveTab("report"); setStatusFilter("all"); }} role="tab" aria-selected={activeTab === "report"}>
                 Report (All Forms) <span>{applications.length}</span>
@@ -904,7 +970,7 @@ const CDPOAnganwadi2026_27 = () => {
                       <th>Joining Date</th>
                       <th>Form ID</th>
                       <th>Remark</th>
-                      <th>Merit</th>
+                      <th>Merit / Total Marks</th>
                       <th>Choose for AWARD</th>
                       <th>Actions</th>
                     </tr>
@@ -935,7 +1001,7 @@ const CDPOAnganwadi2026_27 = () => {
                       <th>S.no</th>
                       <th>Status</th>
                       <th>Remark</th>
-                      <th>Merit</th>
+                      <th>Merit / Total Marks</th>
                       <th>Mobile No.</th>
                       <th>Form ID</th>
                       <th>Applicant Name</th>
@@ -961,14 +1027,16 @@ const CDPOAnganwadi2026_27 = () => {
                     <tr><td colSpan={8} className="cdpo-anganwadi-empty">No completed applications found.</td></tr>
                   ) : completedGroups.map(({ sectorKey, items }) => items.map((application, index) => {
                     const selectedId = selectedAwardBySector[sectorKey] || "";
-                    const sectorAlreadyApproved = applications.some((item) => {
-                      const itemSector = String(item.sector || item.project || item.awc_name || item.awc_center || "Unassigned Sector").trim();
-                      return itemSector === sectorKey && String(item.status || "").toLowerCase() === "approved";
+                    const centerAlreadyApproved = applications.some((item) => {
+                      const itemSector = String(item.sector || item.awc_name || item.awc_center || item.project || "Unassigned Sector").trim();
+                      const centerKey = String(sectorKey || "").trim();
+                      return itemSector === centerKey && isApprovedStatus(item.status);
                     });
                     const selectedFormId = selectedAwardBySector[sectorKey];
                     const isUpdating = updatingFormId === String(selectedFormId || "");
+                    const rowDisabled = centerAlreadyApproved;
                     return (
-                      <tr key={application.form_id || application.id}>
+                      <tr key={application.form_id || application.id} className={rowDisabled ? "cdpo-anganwadi-row-disabled" : ""}>
                         <td>{displayValue(application.awc_name || application.awc_center)}</td>
                         <td>{displayValue(application.filer_name)}</td>
                         <td>{formatTableDate(application.joining_date)}</td>
@@ -978,13 +1046,13 @@ const CDPOAnganwadi2026_27 = () => {
                           </button>
                         </td>
                         <td className="cdpo-anganwadi-remark-cell">{displayValue(application.remark)}</td>
-                        <td><strong>Total Marks: {displayValue(application.merit)}</strong></td>
+                        <td><strong>Total Marks: {displayValue(getApplicationMerit(application))}</strong></td>
                         <td className="cdpo-anganwadi-select-cell">
                           <Form.Check
                             type="radio"
                             name={`award-sector-${sectorKey}`}
                             checked={String(selectedId) === String(application.form_id)}
-                            disabled={sectorAlreadyApproved}
+                            disabled={rowDisabled}
                             onChange={() => setSelectedAwardBySector((current) => ({ ...current, [sectorKey]: application.form_id }))}
                             aria-label={`Choose ${application.filer_name} for award in ${sectorKey}`}
                           />
@@ -992,8 +1060,8 @@ const CDPOAnganwadi2026_27 = () => {
                         {index === 0 && (
                           <td className="cdpo-anganwadi-sector-actions" rowSpan={items.length}>
                             <div className="cdpo-anganwadi-sector-action-buttons">
-                              {sectorAlreadyApproved ? (
-                                <Badge bg="success">Award Already Approved</Badge>
+                              {centerAlreadyApproved ? (
+                                <Badge bg="success">Forwarded to DPO / Approved</Badge>
                               ) : (
                                 <>
                                   <Button size="sm" variant="info" disabled={isUpdating} onClick={() => submitSectorSelection(sectorKey, "approved")}>Submit</Button>
@@ -1040,7 +1108,7 @@ const CDPOAnganwadi2026_27 = () => {
                               <td>{displayValue(application.dept_work_detail)}</td>
                               <td>{displayValue(application.ach_work)}</td>
                               <td>{displayValue(application.remark)}</td>
-                              <td>{displayValue(application.merit)}</td>
+                              <td>{displayValue(getApplicationMerit(application))}</td>
                               <td>{(application.aharta4 || application.immunization_certificate) ? "हाँ" : "नहीं"}</td>
                             </>
                           ) : (
@@ -1048,7 +1116,7 @@ const CDPOAnganwadi2026_27 = () => {
                               <td>{(currentPage - 1) * PAGE_SIZE + index + 1}</td>
                               <td className="cdpo-anganwadi-status-cell"><Badge bg={getStatusVariant(status)}>{formatStatus(status)}</Badge></td>
                               <td className="cdpo-anganwadi-remark-cell">{displayValue(application.remark)}</td>
-                              <td><strong>{displayValue(application.merit)}</strong></td>
+                              <td><strong>{displayValue(getApplicationMerit(application))}</strong></td>
                               <td>{displayValue(application.filer_mob)}</td>
                               <td className="cdpo-anganwadi-form-id">
                                 <button type="button" className="cdpo-form-id-link" onClick={() => setSelectedApplication(application)} aria-label={`View application ${application.form_id}`}>
@@ -1153,7 +1221,7 @@ const CDPOAnganwadi2026_27 = () => {
                 <div className={`cdpo-anganwadi-document-status ${String(selectedApplication.status || "").toLowerCase() === "approved" ? "is-approved" : ""}`}>
                   <strong>आवेदन की स्थिति:</strong> {formatStatus(selectedApplication.status)}
                   <span className="cdpo-anganwadi-document-status-separator"> | </span>
-                  <strong>Merit Marks:</strong> {displayValue(selectedApplication.merit)}
+                  <strong>Merit Marks:</strong> {displayValue(getApplicationMerit(selectedApplication))}
                 </div>
 
                 <div className="cdpo-anganwadi-document-table-wrap">
@@ -1223,7 +1291,7 @@ const CDPOAnganwadi2026_27 = () => {
                 <div>
                   <strong>आवेदन फार्म संख्या:</strong> {displayValue(selectedApplication.form_id)}
                   <span> · </span>
-                  <strong>Merit Marks:</strong> {displayValue(selectedApplication.merit)}
+                  <strong>Merit Marks:</strong> {displayValue(getApplicationMerit(selectedApplication))}
                 </div>
                 <div className="cdpo-anganwadi-document-footer-actions">
                   <Button variant="secondary" onClick={() => setSelectedApplication(null)}>
