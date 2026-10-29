@@ -194,7 +194,7 @@ const getMediaUrl = (file) => {
 const getStatusVariant = (status) => {
   const normalized = String(status || "").toLowerCase();
   if (normalized === "approved" || normalized.includes("approv")) {
-    return "success";
+    return "primary";
   }
   if (normalized.includes("reject")) return "danger";
   if (normalized === "final_submit") return "primary";
@@ -546,7 +546,7 @@ const CDPOAnganwadi2026_27 = () => {
           : current
       );
       setActionMessage({
-        type: "success",
+        type: "primary",
         text: `Application ${formId} was ${decisionStatus} successfully.`,
       });
       setApprovalApplication(null);
@@ -902,7 +902,7 @@ const CDPOAnganwadi2026_27 = () => {
                 </p>
               </div>
               <Button
-                variant="outline-success"
+                variant="outline-primary"
                 onClick={fetchApplications}
                 disabled={loading}
                 className="cdpo-anganwadi-refresh"
@@ -916,16 +916,16 @@ const CDPOAnganwadi2026_27 = () => {
             </div>
 
             <div className="cdpo-anganwadi-tabs" role="tablist" aria-label="Application views">
-              <Button type="button" variant={activeTab === "all" ? "success" : "outline-success"} onClick={() => { setActiveTab("all"); setStatusFilter("all"); }} role="tab" aria-selected={activeTab === "all"}>
+              <Button type="button" variant={activeTab === "all" ? "primary" : "outline-primary"} onClick={() => { setActiveTab("all"); setStatusFilter("all"); }} role="tab" aria-selected={activeTab === "all"}>
                 All Forms <span>{applications.length}</span>
               </Button>
-              <Button type="button" variant={activeTab === "completed" ? "success" : "outline-success"} onClick={() => { setActiveTab("completed"); setStatusFilter("all"); }} role="tab" aria-selected={activeTab === "completed"}>
+              <Button type="button" variant={activeTab === "completed" ? "primary" : "outline-primary"} onClick={() => { setActiveTab("completed"); setStatusFilter("all"); }} role="tab" aria-selected={activeTab === "completed"}>
                 Completed Forms <span>{applications.filter((item) => isCompletedStatus(item.status)).length}</span>
               </Button>
-              <Button type="button" variant={activeTab === "approved" ? "success" : "outline-success"} onClick={() => { setActiveTab("approved"); setStatusFilter("all"); }} role="tab" aria-selected={activeTab === "approved"}>
+              <Button type="button" variant={activeTab === "approved" ? "primary" : "outline-primary"} onClick={() => { setActiveTab("approved"); setStatusFilter("all"); }} role="tab" aria-selected={activeTab === "approved"}>
                 Approved BY CDPO <span>{applications.filter((item) => isApprovedStatus(item.status)).length}</span>
               </Button>
-              <Button type="button" variant={activeTab === "report" ? "success" : "outline-success"} onClick={() => { setActiveTab("report"); setStatusFilter("all"); }} role="tab" aria-selected={activeTab === "report"}>
+              <Button type="button" variant={activeTab === "report" ? "primary" : "outline-primary"} onClick={() => { setActiveTab("report"); setStatusFilter("all"); }} role="tab" aria-selected={activeTab === "report"}>
                 Report (All Forms) <span>{applications.length}</span>
               </Button>
             </div>
@@ -1044,7 +1044,7 @@ const CDPOAnganwadi2026_27 = () => {
                         <td><strong>Total Marks: {displayValue(getApplicationMerit(application))}</strong></td>
                         <td className="cdpo-anganwadi-row-actions-cell">
                           {approved ? (
-                            <Badge bg="success">Forwarded to DPO</Badge>
+                            <Badge bg="primary">Forwarded to DPO</Badge>
                           ) : rejected ? (
                             <Badge bg="danger">Rejected</Badge>
                           ) : (
@@ -1282,7 +1282,7 @@ const CDPOAnganwadi2026_27 = () => {
                   </Button>
                   {!["approved", "rejected"].includes(String(selectedApplication.status || "").toLowerCase()) && (
                     <Button
-                      variant="success"
+                      variant="primary"
                       onClick={() => {
                         const application = selectedApplication;
                         setSelectedApplication(null);
