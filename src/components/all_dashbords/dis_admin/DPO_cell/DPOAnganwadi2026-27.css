@@ -1658,3 +1658,45 @@
   justify-content: center;
   gap: 6px;
 }
+
+
+/* DPO review table hierarchy: Project -> Sector -> Anganwadi Center */
+.dpo-anganwadi-completed-table {
+  min-width: 1750px;
+}
+
+.dpo-anganwadi-completed-table thead th {
+  white-space: nowrap;
+}
+
+.dpo-anganwadi-completed-table td[rowspan] {
+  vertical-align: middle;
+  background: #fbfffc;
+  font-weight: 600;
+}
+
+.dpo-anganwadi-completed-table .dpo-anganwadi-sector-actions {
+  min-width: 155px;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.dpo-anganwadi-completed-table .dpo-anganwadi-sector-action-buttons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.dpo-anganwadi-completed-table .dpo-anganwadi-select-cell {
+  text-align: center;
+  vertical-align: middle;
+}
+
+.dpo-anganwadi-completed-table .dpo-anganwadi-remark-cell {
+  min-width: 180px;
+  max-width: 300px;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}

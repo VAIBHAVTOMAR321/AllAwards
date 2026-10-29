@@ -379,7 +379,7 @@ const DPOAnganwadi2026_27 = () => {
       const status = normalizeStatus(application.status);
       const matchesTab =
         activeTab === "cdpo-approved"
-          ? isCdpoApproved(status)
+          ? (isCdpoApproved(status) || isDpoApproved(status))
           : activeTab === "dpo-approved"
             ? isDpoApproved(status)
             : true;
@@ -399,27 +399,94 @@ const DPOAnganwadi2026_27 = () => {
     currentPage * PAGE_SIZE
   );
 
-  // Group completed submissions by sector. The AWC name is shown in the table,
-  // while the API's sector value controls the one-candidate-per-sector selection.
-  const completedGroups = useMemo(() => {
-    const groups = new Map();
+  // Group the CDPO-review table hierarchically: Project -> Sector -> AWC.
+  // The approval lock applies to a project + sector pair, not just a sector label.
+  const completedRows = useMemo(() => {
+    const projectMap = new Map();
+
     filteredApplications.forEach((application) => {
-      const sectorKey = String(
-        application.sector || application.project || application.awc_name || application.awc_center || "Unassigned Sector"
-      ).trim();
-      if (!groups.has(sectorKey)) groups.set(sectorKey, []);
-      groups.get(sectorKey).push(application);
+      const projectName = String(application.project || "Unassigned Project").trim();
+      const sectorName = String(application.sector || "Unassigned Sector").trim();
+      const awcName = String(application.awc_name || application.awc_center || "Unassigned Center").trim();
+      const sectorKey = JSON.stringify([projectName, sectorName]);
+
+      if (!projectMap.has(projectName)) {
+        projectMap.set(projectName, { projectName, sectors: new Map(), itemCount: 0 });
+      }
+      const project = projectMap.get(projectName);
+      if (!project.sectors.has(sectorKey)) {
+        project.sectors.set(sectorKey, {
+          sectorKey,
+          sectorName,
+          awcs: new Map(),
+          items: [],
+          itemCount: 0,
+        });
+      }
+      const sector = project.sectors.get(sectorKey);
+      if (!sector.awcs.has(awcName)) sector.awcs.set(awcName, { awcName, items: [] });
+      sector.awcs.get(awcName).items.push(application);
+      sector.items.push(application);
+      sector.itemCount += 1;
+      project.itemCount += 1;
     });
-    return Array.from(groups.entries()).map(([sectorKey, items]) => ({ sectorKey, items }));
-  }, [filteredApplications]);
+
+    const rows = [];
+    for (const project of projectMap.values()) {
+      let firstProjectRow = true;
+      for (const sector of project.sectors.values()) {
+        const approvedForSector = applications.find((item) =>
+          String(item.project || "Unassigned Project").trim() === project.projectName &&
+          String(item.sector || "Unassigned Sector").trim() === sector.sectorName &&
+          isDpoApproved(item.status)
+        );
+        const sectorAlreadyApproved = Boolean(approvedForSector);
+        const selectedId = approvedForSector?.form_id || selectedAwardBySector[sector.sectorKey] || "";
+        let firstSectorRow = true;
+
+        for (const awc of sector.awcs.values()) {
+          let firstAwcRow = true;
+          for (const application of awc.items) {
+            rows.push({
+              application,
+              projectName: project.projectName,
+              sectorName: sector.sectorName,
+              awcName: awc.awcName,
+              sectorKey: sector.sectorKey,
+              projectRowSpan: project.itemCount,
+              sectorRowSpan: sector.itemCount,
+              awcRowSpan: awc.items.length,
+              showProject: firstProjectRow,
+              showSector: firstSectorRow,
+              showAwc: firstAwcRow,
+              showSectorActions: firstSectorRow,
+              sectorAlreadyApproved,
+              selectedId,
+              selectedFormId: selectedAwardBySector[sector.sectorKey] || approvedForSector?.form_id || "",
+            });
+            firstProjectRow = false;
+            firstSectorRow = false;
+            firstAwcRow = false;
+          }
+        }
+      }
+    }
+    return rows;
+  }, [filteredApplications, applications, selectedAwardBySector]);
 
   const submitSectorSelection = (sectorKey, nextStatus = "approved_by_dpo") => {
     const selectedFormId = selectedAwardBySector[sectorKey];
-    const selected = completedGroups
-      .find((group) => group.sectorKey === sectorKey)
-      ?.items.find((item) => String(item.form_id) === String(selectedFormId));
+    const selected = completedRows.find((row) => row.sectorKey === sectorKey && String(row.application.form_id) === String(selectedFormId))?.application;
     if (!selected) {
       setActionMessage({ type: "warning", text: "Please select one candidate for this sector first." });
+      return;
+    }
+    if (applications.some((item) =>
+      String(item.project || "Unassigned Project").trim() === JSON.parse(sectorKey)[0] &&
+      String(item.sector || "Unassigned Sector").trim() === JSON.parse(sectorKey)[1] &&
+      isDpoApproved(item.status)
+    )) {
+      setActionMessage({ type: "warning", text: "A candidate has already been approved by DPO for this project and sector." });
       return;
     }
     openDecision(selected, nextStatus);
@@ -869,7 +936,7 @@ const DPOAnganwadi2026_27 = () => {
                 All Forms <span>{applications.length}</span>
               </Button>
               <Button type="button" variant={activeTab === "cdpo-approved" ? "success" : "outline-success"} onClick={() => { setActiveTab("cdpo-approved"); setStatusFilter("all"); }} role="tab" aria-selected={activeTab === "cdpo-approved"}>
-                Approved by CDPO <span>{applications.filter((item) => isCdpoApproved(item.status)).length}</span>
+                Approved by CDPO <span>{applications.filter((item) => isCdpoApproved(item.status) || isDpoApproved(item.status)).length}</span>
               </Button>
               <Button type="button" variant={activeTab === "dpo-approved" ? "success" : "outline-success"} onClick={() => { setActiveTab("dpo-approved"); setStatusFilter("all"); }} role="tab" aria-selected={activeTab === "dpo-approved"}>
                 Approved by DPO <span>{applications.filter((item) => isDpoApproved(item.status)).length}</span>
@@ -909,6 +976,8 @@ const DPOAnganwadi2026_27 = () => {
                 <thead>
                   {activeTab === "cdpo-approved" ? (
                     <tr>
+                      <th>Project</th>
+                      <th>Sector</th>
                       <th>Anganwadi Center</th>
                       <th>Candidate name</th>
                       <th>Joining Date</th>
@@ -963,23 +1032,20 @@ const DPOAnganwadi2026_27 = () => {
                 <tbody>
                   {loading ? (
                     <tr>
-                      <td colSpan={activeTab === "cdpo-approved" ? 8 : activeTab === "report" ? 19 : 15} className="dpo-anganwadi-empty">
+                      <td colSpan={activeTab === "cdpo-approved" ? 10 : activeTab === "report" ? 19 : 15} className="dpo-anganwadi-empty">
                         <Spinner animation="border" size="sm" /> Loading applications...
                       </td>
                     </tr>
-                  ) : activeTab === "cdpo-approved" ? completedGroups.length === 0 ? (
-                    <tr><td colSpan={8} className="dpo-anganwadi-empty">No applications approved by CDPO are available for DPO verification.</td></tr>
-                  ) : completedGroups.map(({ sectorKey, items }) => items.map((application, index) => {
-                    const selectedId = selectedAwardBySector[sectorKey] || "";
-                    const sectorAlreadyApproved = applications.some((item) => {
-                      const itemSector = String(item.sector || item.project || item.awc_name || item.awc_center || "Unassigned Sector").trim();
-                      return itemSector === sectorKey && isDpoApproved(item.status);
-                    });
-                    const selectedFormId = selectedAwardBySector[sectorKey];
+                  ) : activeTab === "cdpo-approved" ? completedRows.length === 0 ? (
+                    <tr><td colSpan={10} className="dpo-anganwadi-empty">No applications approved by CDPO or already approved by DPO are available for verification.</td></tr>
+                  ) : completedRows.map((row) => {
+                    const { application, projectName, sectorName, awcName, sectorKey, projectRowSpan, sectorRowSpan, awcRowSpan, showProject, showSector, showAwc, showSectorActions, sectorAlreadyApproved, selectedId, selectedFormId } = row;
                     const isUpdating = updatingFormId === String(selectedFormId || "");
                     return (
                       <tr key={application.form_id || application.id}>
-                        <td>{displayValue(application.awc_name || application.awc_center)}</td>
+                        {showProject && <td rowSpan={projectRowSpan}>{displayValue(projectName)}</td>}
+                        {showSector && <td rowSpan={sectorRowSpan}>{displayValue(sectorName)}</td>}
+                        {showAwc && <td rowSpan={awcRowSpan}>{displayValue(awcName)}</td>}
                         <td>{displayValue(application.filer_name)}</td>
                         <td>{formatTableDate(application.joining_date)}</td>
                         <td className="dpo-anganwadi-form-id">
@@ -996,11 +1062,11 @@ const DPOAnganwadi2026_27 = () => {
                             checked={String(selectedId) === String(application.form_id)}
                             disabled={sectorAlreadyApproved}
                             onChange={() => setSelectedAwardBySector((current) => ({ ...current, [sectorKey]: application.form_id }))}
-                            aria-label={`Choose ${application.filer_name} for award in ${sectorKey}`}
+                            aria-label={`Choose ${application.filer_name} for award in ${sectorName}`}
                           />
                         </td>
-                        {index === 0 && (
-                          <td className="dpo-anganwadi-sector-actions" rowSpan={items.length}>
+                        {showSectorActions && (
+                          <td className="dpo-anganwadi-sector-actions" rowSpan={sectorRowSpan}>
                             <div className="dpo-anganwadi-sector-action-buttons">
                               {sectorAlreadyApproved ? (
                                 <Badge bg="success">Award Already Approved</Badge>
@@ -1015,7 +1081,7 @@ const DPOAnganwadi2026_27 = () => {
                         )}
                       </tr>
                     );
-                  })) : paginatedApplications.length === 0 ? (
+                  }) : paginatedApplications.length === 0 ? (
                     <tr>
                       <td colSpan={activeTab === "report" ? 19 : 15} className="dpo-anganwadi-empty">
                         No applications found.
