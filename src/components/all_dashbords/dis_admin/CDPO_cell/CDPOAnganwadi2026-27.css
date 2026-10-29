@@ -1,48 +1,1301 @@
+/* CDPO Anganwadi Award Dashboard — 2026-27 */
+
 .cdpo-anganwadi-dashboard {
+  min-height: 100vh;
   background: #f0fdf4;
 }
 
-.cdpo-anganwadi-page {
-  flex: 1;
-  padding: 26px;
+.cdpo-anganwadi-main {
+  min-width: 0;
 }
 
-.cdpo-anganwadi-heading {
-  padding: 32px;
-  border: 1px solid #bbf7d0;
-  border-radius: 8px 28px 8px 28px;
-  background: linear-gradient(145deg, #dcfce7, #ffffff 68%);
+.cdpo-anganwadi-page {
+  box-sizing: border-box;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 22px;
+  width: 100%;
+  min-width: 0;
+  padding: 26px;
   color: #14532d;
 }
 
-.cdpo-anganwadi-heading span {
+.cdpo-anganwadi-heading {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  width: 100%;
+  min-width: 0;
+  padding: clamp(22px, 3vw, 34px);
+  overflow: hidden;
+  border: 1px solid #bbf7d0;
+  border-radius: 8px 28px 8px 28px;
+  background:
+    radial-gradient(circle at 94% 8%, rgba(134, 239, 172, 0.28), transparent 28%),
+    linear-gradient(145deg, #dcfce7 0%, #ffffff 68%);
+  box-shadow: 0 8px 24px rgba(20, 83, 45, 0.045);
+}
+
+.cdpo-anganwadi-heading-copy {
+  min-width: 0;
+}
+
+.cdpo-anganwadi-eyebrow {
+  display: inline-block;
   color: #15803d;
   font-size: 0.82rem;
   font-weight: 800;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  letter-spacing: 0.045em;
+  line-height: 1.5;
 }
 
 .cdpo-anganwadi-heading h1 {
   margin: 12px 0 0;
-  font-size: clamp(1.25rem, 2.3vw, 1.8rem);
+  color: #14532d;
+  font-size: clamp(1.3rem, 2.3vw, 1.85rem);
   font-weight: 800;
   line-height: 1.45;
+  overflow-wrap: anywhere;
 }
 
 .cdpo-anganwadi-heading p {
-  margin: 14px 0 0;
+  margin: 12px 0 0;
   color: #166534;
   font-size: 1rem;
   font-weight: 700;
 }
 
+.cdpo-anganwadi-heading-mark {
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-width: 112px;
+  min-height: 96px;
+  padding: 14px;
+  border: 1px solid rgba(22, 101, 52, 0.14);
+  border-radius: 18px 6px 18px 6px;
+  background: rgba(255, 255, 255, 0.72);
+  color: #166534;
+  text-align: center;
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.cdpo-anganwadi-heading-year {
+  font-size: 1rem;
+  letter-spacing: 0.02em;
+}
+
+.cdpo-anganwadi-alert {
+  margin: 0;
+  border-radius: 12px;
+}
+
+.cdpo-anganwadi-error-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.cdpo-anganwadi-content {
+  min-width: 0;
+  padding: clamp(18px, 2.4vw, 26px);
+  border: 1px solid #dcfce7;
+  border-radius: 18px;
+  background: #ffffff;
+  box-shadow: 0 8px 24px rgba(20, 83, 45, 0.04);
+}
+
+.cdpo-anganwadi-list-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.cdpo-anganwadi-list-heading h2 {
+  margin: 0;
+  color: #14532d;
+  font-size: clamp(1.05rem, 1.8vw, 1.3rem);
+  font-weight: 800;
+  line-height: 1.45;
+}
+
+.cdpo-anganwadi-list-heading p {
+  margin: 7px 0 0;
+  color: #64748b;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.cdpo-anganwadi-refresh {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+.cdpo-anganwadi-filters {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) minmax(180px, 250px);
+  gap: 16px;
+  align-items: end;
+  margin-bottom: 18px;
+}
+
+.cdpo-anganwadi-search {
+  position: relative;
+  min-width: 0;
+}
+
+.cdpo-anganwadi-search > svg {
+  position: absolute;
+  z-index: 1;
+  top: 50%;
+  left: 13px;
+  color: #64748b;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.cdpo-anganwadi-search .form-control {
+  min-height: 42px;
+  padding-left: 38px;
+  border-color: #d1fae5;
+  border-radius: 10px;
+  box-shadow: none;
+}
+
+.cdpo-anganwadi-search .form-control:focus,
+.cdpo-anganwadi-status-filter .form-select:focus {
+  border-color: #4ade80;
+  box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.15);
+}
+
+.cdpo-anganwadi-status-filter {
+  min-width: 0;
+}
+
+.cdpo-anganwadi-status-filter .form-label {
+  margin-bottom: 6px;
+  color: #166534;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.cdpo-anganwadi-status-filter .form-select {
+  min-height: 42px;
+  border-color: #d1fae5;
+  border-radius: 10px;
+  box-shadow: none;
+}
+
+.cdpo-anganwadi-table-wrap,
+.cdpo-anganwadi-detail-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid #dcfce7;
+  border-radius: 12px;
+  background: #ffffff;
+  -webkit-overflow-scrolling: touch;
+}
+
+.cdpo-anganwadi-table {
+  width: 100%;
+  min-width: 1500px;
+  margin: 0;
+  border-collapse: separate;
+  border-spacing: 0;
+  vertical-align: middle;
+}
+
+.cdpo-anganwadi-table > :not(caption) > * > * {
+  padding: 13px 14px;
+  vertical-align: middle;
+}
+
+.cdpo-anganwadi-table thead th {
+  border-bottom: 1px solid #bbf7d0;
+  background: #f0fdf4;
+  color: #166534;
+  font-size: 0.81rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.cdpo-anganwadi-table tbody td {
+  color: #334155;
+  font-size: 0.88rem;
+}
+
+.cdpo-anganwadi-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.cdpo-anganwadi-form-id {
+  color: #166534 !important;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.cdpo-anganwadi-row-actions {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 190px;
+}
+
+.cdpo-anganwadi-row-actions .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  white-space: nowrap;
+}
+
+.cdpo-anganwadi-empty {
+  height: 120px;
+  color: #64748b !important;
+  text-align: center;
+  vertical-align: middle !important;
+}
+
+.cdpo-anganwadi-empty .spinner-border {
+  margin-right: 8px;
+  color: #16a34a;
+}
+
+.cdpo-anganwadi-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 14px;
+  margin-top: 18px;
+  color: #475569;
+  font-size: 0.88rem;
+}
+
+.cdpo-anganwadi-pagination > div {
+  display: flex;
+  gap: 8px;
+}
+
+.cdpo-anganwadi-preview-dialog,
+.cdpo-anganwadi-approval-dialog {
+  max-width: calc(100vw - 24px);
+}
+
+.cdpo-anganwadi-preview-dialog {
+  width: 1120px;
+}
+
+.cdpo-anganwadi-modal-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #166534;
+  color: #ffffff;
+}
+
+.cdpo-anganwadi-modal-header .modal-title {
+  color: #ffffff;
+  font-size: 1.2rem;
+  font-weight: 800;
+}
+
+.cdpo-anganwadi-modal-header .btn-close {
+  filter: brightness(0) invert(1);
+}
+
+.cdpo-anganwadi-modal-subtitle {
+  margin-top: 5px;
+  color: #dcfce7;
+  font-size: 0.85rem;
+}
+
+.cdpo-anganwadi-print-button {
+  margin-left: auto;
+  white-space: nowrap;
+}
+
+.cdpo-anganwadi-preview-body {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: clamp(16px, 3vw, 28px);
+  background: #f8fffa;
+}
+
+.cdpo-anganwadi-preview-section {
+  min-width: 0;
+  padding: 18px;
+  border: 1px solid #dcfce7;
+  border-radius: 14px;
+  background: #ffffff;
+}
+
+.cdpo-anganwadi-preview-section > h3,
+.cdpo-anganwadi-mark-group > h3 {
+  margin: 0 0 14px;
+  color: #166534;
+  font-size: 1rem;
+  font-weight: 800;
+  line-height: 1.5;
+}
+
+.cdpo-anganwadi-detail-table {
+  min-width: 540px;
+  margin: 0;
+}
+
+.cdpo-anganwadi-detail-table th {
+  width: 35%;
+  background: #f0fdf4;
+  color: #166534;
+  font-weight: 700;
+}
+
+.cdpo-anganwadi-detail-table th,
+.cdpo-anganwadi-detail-table td {
+  padding: 10px 12px;
+  font-size: 0.88rem;
+  overflow-wrap: anywhere;
+}
+
+.cdpo-anganwadi-mark-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.cdpo-anganwadi-mark-group {
+  min-width: 0;
+}
+
+.cdpo-anganwadi-mark-group .cdpo-anganwadi-detail-table {
+  min-width: 480px;
+}
+
+.cdpo-anganwadi-merit-total {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-top: 16px;
+  padding: 16px 18px;
+  border: 1px solid #bbf7d0;
+  border-radius: 12px;
+  background: #f0fdf4;
+  color: #166534;
+}
+
+.cdpo-anganwadi-merit-total strong {
+  font-size: 1.3rem;
+}
+
+.cdpo-anganwadi-documents {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+.cdpo-anganwadi-document {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid #dcfce7;
+  border-radius: 10px;
+  background: #ffffff;
+}
+
+.cdpo-anganwadi-document > a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 60px;
+  padding: 12px;
+  color: #166534;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+
+.cdpo-anganwadi-document > a:hover {
+  background: #f0fdf4;
+  text-decoration: underline;
+}
+
+.cdpo-anganwadi-document img {
+  display: block;
+  width: 100%;
+  height: 145px;
+  object-fit: contain;
+  background: #f8fafc;
+}
+
+.cdpo-anganwadi-document:has(img) > a {
+  flex-direction: column;
+  align-items: stretch;
+  padding: 0;
+}
+
+.cdpo-anganwadi-document:has(img) > a span {
+  padding: 10px 12px;
+}
+
+.cdpo-anganwadi-document svg {
+  flex: 0 0 auto;
+  color: #dc2626;
+  font-size: 1.25rem;
+}
+
+.cdpo-anganwadi-muted {
+  margin: 0;
+  color: #64748b;
+}
+
+.cdpo-anganwadi-confirm-note {
+  margin: 12px 0 0;
+  color: #64748b;
+  font-size: 0.83rem;
+  line-height: 1.6;
+}
+
+/* Print only the application preview when the preview modal is open. */
+@media print {
+  body.cdpo-anganwadi-modal-open * {
+    visibility: hidden !important;
+  }
+
+  body.cdpo-anganwadi-modal-open .cdpo-anganwadi-preview-dialog,
+  body.cdpo-anganwadi-modal-open .cdpo-anganwadi-preview-dialog * {
+    visibility: visible !important;
+  }
+
+  body.cdpo-anganwadi-modal-open .cdpo-anganwadi-preview-dialog {
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    transform: none !important;
+  }
+
+  body.cdpo-anganwadi-modal-open .cdpo-anganwadi-modal-header,
+  body.cdpo-anganwadi-modal-open .modal-footer,
+  body.cdpo-anganwadi-modal-open .btn-close,
+  body.cdpo-anganwadi-modal-open .cdpo-anganwadi-print-button {
+    display: none !important;
+  }
+
+  body.cdpo-anganwadi-modal-open .modal,
+  body.cdpo-anganwadi-modal-open .modal-dialog,
+  body.cdpo-anganwadi-modal-open .modal-content,
+  body.cdpo-anganwadi-modal-open .cdpo-anganwadi-preview-body {
+    position: static !important;
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: none !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+    border: 0 !important;
+    background: #ffffff !important;
+    box-shadow: none !important;
+  }
+
+  body.cdpo-anganwadi-modal-open .cdpo-anganwadi-preview-section {
+    break-inside: avoid;
+    margin-bottom: 14px;
+  }
+
+  body.cdpo-anganwadi-modal-open .cdpo-anganwadi-detail-table-wrap {
+    overflow: visible !important;
+  }
+
+  body.cdpo-anganwadi-modal-open .cdpo-anganwadi-detail-table {
+    min-width: 0 !important;
+  }
+
+  body.cdpo-anganwadi-modal-open .cdpo-anganwadi-document img {
+    max-height: 120px;
+  }
+
+  @page {
+    size: A4;
+    margin: 12mm;
+  }
+}
+
+@media (max-width: 1023px) {
+  .cdpo-anganwadi-page {
+    padding: 22px;
+  }
+
+  .cdpo-anganwadi-heading {
+    gap: 18px;
+  }
+}
+
 @media (max-width: 767px) {
   .cdpo-anganwadi-page {
+    gap: 16px;
     padding: 18px 14px;
   }
 
   .cdpo-anganwadi-heading {
+    align-items: flex-start;
     padding: 22px 18px;
+    border-radius: 8px 22px 8px 22px;
+  }
+
+  .cdpo-anganwadi-eyebrow {
+    font-size: 0.75rem;
+  }
+
+  .cdpo-anganwadi-heading h1 {
+    margin-top: 9px;
+    font-size: clamp(1.18rem, 5vw, 1.5rem);
+  }
+
+  .cdpo-anganwadi-heading p {
+    margin-top: 9px;
+    font-size: 0.92rem;
+  }
+
+  .cdpo-anganwadi-heading-mark {
+    display: none;
+  }
+
+  .cdpo-anganwadi-content {
+    padding: 18px 14px;
+    border-radius: 14px;
+  }
+
+  .cdpo-anganwadi-list-heading {
+    align-items: flex-start;
+    margin-bottom: 16px;
+  }
+
+  .cdpo-anganwadi-list-heading p {
+    font-size: 0.84rem;
+  }
+
+  .cdpo-anganwadi-filters {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .cdpo-anganwadi-row-actions {
+    min-width: 180px;
+  }
+
+  .cdpo-anganwadi-pagination {
+    align-items: flex-start;
+    justify-content: space-between;
+    flex-wrap: wrap;
+  }
+
+  .cdpo-anganwadi-preview-section {
+    padding: 13px;
+  }
+
+  .cdpo-anganwadi-documents {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .cdpo-anganwadi-modal-header {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 420px) {
+  .cdpo-anganwadi-page {
+    padding: 14px 10px;
+  }
+
+  .cdpo-anganwadi-heading {
+    padding: 18px 14px;
+  }
+
+  .cdpo-anganwadi-heading h1 {
+    font-size: 1.12rem;
+  }
+
+  .cdpo-anganwadi-list-heading {
+    flex-direction: column;
+  }
+
+  .cdpo-anganwadi-refresh {
+    align-self: flex-start;
+  }
+
+  .cdpo-anganwadi-documents {
+    grid-template-columns: 1fr;
+  }
+
+  .cdpo-anganwadi-error-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+/* Keep wide tables inside their own scroll area rather than widening the page. */
+.cdpo-anganwadi-dashboard,
+.cdpo-anganwadi-dashboard * {
+  box-sizing: border-box;
+}
+
+
+/* Reference-style application preview document */
+.cdpo-anganwadi-preview-overlay {
+  position: fixed;
+  z-index: 1200;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(15, 23, 42, 0.68);
+}
+
+.cdpo-anganwadi-preview-modal {
+  display: flex;
+  flex-direction: column;
+  width: min(1200px, 100%);
+  max-height: min(94vh, 1100px);
+  overflow: hidden;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 22px 65px rgba(0, 0, 0, 0.3);
+}
+
+.cdpo-anganwadi-document-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 20px;
+  background: #166534;
+  color: #fff;
+}
+
+.cdpo-anganwadi-document-header h2 {
+  margin: 0 0 4px;
+  color: #fff;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.cdpo-anganwadi-document-header p {
+  margin: 0;
+  color: rgba(255,255,255,.82);
+  font-size: 12px;
+}
+
+.cdpo-anganwadi-document-actions,
+.cdpo-anganwadi-document-footer-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.cdpo-anganwadi-document-content {
+  overflow: auto;
+  padding: 18px;
+}
+
+.cdpo-anganwadi-print-area {
+  width: 100%;
+  max-width: 1050px;
+  margin: 0 auto;
+  padding: 28px 34px;
+  border: 1px solid #dfe3e8;
+  background: #fff;
+  color: #202124;
+  box-shadow: 0 3px 14px rgba(38, 50, 72, .07);
+}
+
+.cdpo-anganwadi-document-department {
+  margin: 0 0 18px;
+  color: #202124;
+  font-size: 21px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.cdpo-anganwadi-document-title {
+  margin: 0 0 22px;
+  color: #202124;
+  font-size: 17px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.cdpo-anganwadi-document-section-title {
+  margin: 22px 0 10px;
+  color: #202124;
+  font-size: 15px;
+  font-weight: 700;
+  break-after: avoid;
+}
+
+.cdpo-anganwadi-document-table-wrap {
+  width: 100%;
+  margin-bottom: 18px;
+  overflow: visible;
+}
+
+.cdpo-anganwadi-document-table {
+  width: 100%;
+  margin: 0;
+  border-collapse: collapse;
+  color: #202124;
+  font-size: 12px;
+  vertical-align: top;
+}
+
+.cdpo-anganwadi-document-table th,
+.cdpo-anganwadi-document-table td {
+  padding: 9px 10px;
+  border: 1px solid #73777d;
+  background: #fff;
+  color: #202124;
+  text-align: left;
+  vertical-align: top;
+  overflow-wrap: anywhere;
+}
+
+.cdpo-anganwadi-document-table thead th {
+  background: #f1f3f5;
+  font-weight: 700;
+}
+
+.cdpo-anganwadi-document-table tbody > tr > td:first-child {
+  width: 42%;
+  font-weight: 600;
+}
+
+.cdpo-anganwadi-assessment-preview-table tbody > tr > td:first-child {
+  width: 38%;
+}
+
+.cdpo-anganwadi-document-table .cdpo-preview-group-row th {
+  background: #f1f3f5;
+  font-weight: 800;
+}
+
+.cdpo-preview-answer {
+  margin-bottom: 5px;
+  line-height: 1.55;
+}
+
+.cdpo-preview-file {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 5px;
+  margin: 4px 0;
+  overflow-wrap: anywhere;
+}
+
+.cdpo-preview-file img {
+  width: auto;
+  max-width: 100%;
+  max-height: 180px;
+  border: 1px solid #d7dce2;
+  object-fit: contain;
+}
+
+.cdpo-preview-file iframe {
+  width: min(500px, 100%);
+  height: 240px;
+  border: 1px solid #d7dce2;
+}
+
+.cdpo-preview-file a {
+  color: #166534;
+  text-decoration: underline;
+  overflow-wrap: anywhere;
+}
+
+.cdpo-preview-missing {
+  color: #b42318;
+  font-size: 11px;
+}
+
+.cdpo-preview-applicant-photo {
+  margin-top: 9px;
+}
+
+.cdpo-anganwadi-document-status {
+  margin: 14px 0;
+  padding: 11px 14px;
+  border: 1px solid #d8dce2;
+  background: #f7f8fa;
+  color: #344054;
+  font-size: 12px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.cdpo-anganwadi-document-status.is-approved {
+  border-color: #b7dfc2;
+  background: #eaf6ed;
+  color: #216e36;
+}
+
+.cdpo-anganwadi-document-status-separator {
+  padding: 0 8px;
+}
+
+.cdpo-anganwadi-document-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  max-width: 1050px;
+  margin: 16px auto 0;
+  color: #667085;
+  font-size: 12px;
+}
+
+@media (max-width: 767px) {
+  .cdpo-anganwadi-preview-overlay {
+    padding: 8px;
+  }
+
+  .cdpo-anganwadi-document-header {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 14px;
+  }
+
+  .cdpo-anganwadi-document-actions {
+    justify-content: flex-start;
+  }
+
+  .cdpo-anganwadi-document-content {
+    padding: 12px;
+  }
+
+  .cdpo-anganwadi-print-area {
+    padding: 16px 12px;
+  }
+
+  .cdpo-anganwadi-document-table {
+    font-size: 11px;
+  }
+
+  .cdpo-anganwadi-document-table th,
+  .cdpo-anganwadi-document-table td {
+    padding: 7px 6px;
+  }
+
+  .cdpo-anganwadi-document-footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+@media print {
+  @page {
+    size: A4;
+    margin: 10mm;
+  }
+
+  body.cdpo-anganwadi-modal-open * {
+    visibility: hidden !important;
+  }
+
+  body.cdpo-anganwadi-modal-open .cdpo-anganwadi-preview-overlay,
+  body.cdpo-anganwadi-modal-open .cdpo-anganwadi-preview-overlay * {
+    visibility: visible !important;
+  }
+
+  body.cdpo-anganwadi-modal-open .cdpo-anganwadi-preview-overlay {
+    position: absolute !important;
+    inset: 0 !important;
+    display: block !important;
+    padding: 0 !important;
+    background: #fff !important;
+    z-index: 99999 !important;
+  }
+
+  body.cdpo-anganwadi-modal-open .cdpo-anganwadi-preview-modal {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: none !important;
+    margin: 0 !important;
+    overflow: visible !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+
+  body.cdpo-anganwadi-modal-open .cdpo-anganwadi-document-header,
+  body.cdpo-anganwadi-modal-open .cdpo-anganwadi-document-footer-actions {
+    display: none !important;
+  }
+
+  body.cdpo-anganwadi-modal-open .cdpo-anganwadi-document-content {
+    overflow: visible !important;
+    padding: 0 !important;
+  }
+
+  body.cdpo-anganwadi-modal-open .cdpo-anganwadi-print-area {
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    box-shadow: none !important;
+  }
+
+  body.cdpo-anganwadi-modal-open .cdpo-anganwadi-document-table tr {
+    break-inside: avoid;
+  }
+
+  body.cdpo-anganwadi-modal-open .cdpo-anganwadi-document-section-title {
+    break-after: avoid;
+  }
+
+  body.cdpo-anganwadi-modal-open .modal {
+    display: none !important;
+  }
+}
+
+
+/* Keep the application list readable with the expanded applicant columns. */
+.cdpo-anganwadi-table thead th {
+  white-space: normal;
+  min-width: 92px;
+  line-height: 1.35;
+}
+.cdpo-anganwadi-table thead th:nth-child(1) { min-width: 58px; }
+.cdpo-anganwadi-table thead th:nth-child(2) { min-width: 190px; }
+.cdpo-anganwadi-table thead th:nth-child(3) { min-width: 70px; }
+.cdpo-anganwadi-table thead th:nth-child(4),
+.cdpo-anganwadi-table thead th:nth-child(5),
+.cdpo-anganwadi-table thead th:nth-child(7),
+.cdpo-anganwadi-table thead th:nth-child(13) { min-width: 105px; }
+.cdpo-anganwadi-table thead th:nth-child(6),
+.cdpo-anganwadi-table thead th:nth-child(8),
+.cdpo-anganwadi-table thead th:nth-child(9),
+.cdpo-anganwadi-table thead th:nth-child(12) { min-width: 150px; }
+.cdpo-anganwadi-table tbody td {
+  vertical-align: top;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+.cdpo-anganwadi-status-cell { min-width: 190px; }
+
+/* Responsive applications list: scroll horizontally only when the columns need it. */
+.cdpo-anganwadi-table-wrap {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+.cdpo-anganwadi-table {
+  width: 100%;
+  min-width: 1250px;
+  table-layout: auto;
+}
+
+.cdpo-anganwadi-table > :not(caption) > * > * {
+  padding: 6px 5px;
+  min-width: 0 !important;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+
+.cdpo-anganwadi-table thead th {
+  font-size: 10px;
+  line-height: 1.2;
+  font-weight: 750;
+}
+
+.cdpo-anganwadi-table tbody td {
+  font-size: 10px;
+  line-height: 1.3;
+  vertical-align: middle;
+}
+
+.cdpo-anganwadi-table thead th:nth-child(1) { width: 3.5%; }
+.cdpo-anganwadi-table thead th:nth-child(2) { width: 8%; }
+.cdpo-anganwadi-table thead th:nth-child(3) { width: 4%; }
+.cdpo-anganwadi-table thead th:nth-child(4) { width: 7%; }
+.cdpo-anganwadi-table thead th:nth-child(5) { width: 7%; }
+.cdpo-anganwadi-table thead th:nth-child(6) { width: 8%; }
+.cdpo-anganwadi-table thead th:nth-child(7) { width: 6%; }
+.cdpo-anganwadi-table thead th:nth-child(8) { width: 8%; }
+.cdpo-anganwadi-table thead th:nth-child(9) { width: 8%; }
+.cdpo-anganwadi-table thead th:nth-child(10) { width: 5%; }
+.cdpo-anganwadi-table thead th:nth-child(11) { width: 7%; }
+.cdpo-anganwadi-table thead th:nth-child(12) { width: 8%; }
+.cdpo-anganwadi-table thead th:nth-child(13) { width: 6%; }
+.cdpo-anganwadi-table thead th:nth-child(14) { width: 6%; }
+
+.cdpo-anganwadi-status-cell {
+  min-width: 0 !important;
+}
+
+.cdpo-anganwadi-table .badge {
+  display: inline-block;
+  max-width: 100%;
+  padding: 4px 5px;
+  font-size: 9px;
+  line-height: 1.2;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.cdpo-anganwadi-row-actions {
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.cdpo-anganwadi-row-actions .btn {
+  padding: 3px 5px;
+  font-size: 9px;
+  line-height: 1.2;
+}
+
+@media (max-width: 1200px) {
+  .cdpo-anganwadi-table thead th { font-size: 9px; }
+  .cdpo-anganwadi-table tbody td { font-size: 9px; }
+  .cdpo-anganwadi-table > :not(caption) > * > * { padding: 5px 3px; }
+  .cdpo-anganwadi-table .badge { font-size: 8px; padding: 3px 4px; }
+}
+
+@media (max-width: 768px) {
+  .cdpo-anganwadi-table thead th { font-size: 8px; }
+  .cdpo-anganwadi-table tbody td { font-size: 8px; }
+  .cdpo-anganwadi-table > :not(caption) > * > * { padding: 4px 2px; }
+  .cdpo-anganwadi-table .badge { font-size: 7px; padding: 2px 3px; }
+  .cdpo-anganwadi-row-actions .btn { font-size: 8px; padding: 2px 3px; }
+}
+
+/* Application tabs */
+.cdpo-anganwadi-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 18px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #dcfce7;
+}
+
+.cdpo-anganwadi-tabs .btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.cdpo-anganwadi-tabs .btn span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.75);
+  color: #166534;
+  font-size: 0.72rem;
+}
+
+.cdpo-anganwadi-row-actions {
+  flex-wrap: wrap;
+  min-width: 210px;
+}
+
+@media (max-width: 576px) {
+  .cdpo-anganwadi-tabs {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .cdpo-anganwadi-tabs .btn {
+    justify-content: space-between;
+  }
+}
+
+
+/* Keep status remarks readable in the applications table */
+.cdpo-anganwadi-table .cdpo-anganwadi-remark-cell {
+  min-width: 150px;
+  max-width: 240px;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: normal;
+  line-height: 1.35;
+}
+
+
+/* Center View and decision buttons in every row, including approved/rejected rows */
+.cdpo-anganwadi-table .cdpo-anganwadi-actions-cell {
+  text-align: center !important;
+  vertical-align: middle;
+}
+
+.cdpo-anganwadi-table .cdpo-anganwadi-row-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 4px;
+  min-width: 0;
+  width: 100%;
+}
+
+.cdpo-anganwadi-table .cdpo-anganwadi-row-actions .btn {
+  margin: 0;
+}
+
+/* Compact dashboard spacing: reclaim unused vertical space */
+.cdpo-anganwadi-page {
+  gap: 14px;
+  padding: 16px;
+}
+
+.cdpo-anganwadi-heading {
+  padding: 16px 22px;
+  gap: 16px;
+  border-radius: 8px 20px 8px 20px;
+}
+
+.cdpo-anganwadi-eyebrow {
+  font-size: 0.75rem;
+  line-height: 1.3;
+}
+
+.cdpo-anganwadi-heading h1 {
+  margin-top: 5px;
+  font-size: clamp(1.2rem, 2vw, 1.65rem);
+  line-height: 1.25;
+}
+
+.cdpo-anganwadi-heading p {
+  margin-top: 6px;
+  font-size: 0.9rem;
+}
+
+.cdpo-anganwadi-heading-mark {
+  min-width: 96px;
+  min-height: 70px;
+  padding: 9px 12px;
+  gap: 3px;
+  border-radius: 14px 6px 14px 6px;
+}
+
+.cdpo-anganwadi-heading-year {
+  font-size: 0.9rem;
+}
+
+.cdpo-anganwadi-content {
+  padding: 16px;
+  border-radius: 14px;
+}
+
+.cdpo-anganwadi-list-heading {
+  margin-bottom: 12px;
+  gap: 12px;
+}
+
+.cdpo-anganwadi-list-heading p {
+  margin-top: 4px;
+  font-size: 0.82rem;
+  line-height: 1.4;
+}
+
+.cdpo-anganwadi-tabs {
+  gap: 7px;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+}
+
+.cdpo-anganwadi-tabs .btn {
+  padding: 7px 12px;
+  font-size: 0.78rem;
+}
+
+.cdpo-anganwadi-tabs .btn span {
+  min-width: 19px;
+  height: 19px;
+  font-size: 0.68rem;
+}
+
+.cdpo-anganwadi-filters {
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+@media (max-width: 768px) {
+  .cdpo-anganwadi-page {
+    gap: 10px;
+    padding: 10px;
+  }
+
+  .cdpo-anganwadi-heading {
+    padding: 13px 14px;
+    gap: 10px;
+  }
+
+  .cdpo-anganwadi-heading h1 {
+    font-size: 1.15rem;
+  }
+
+  .cdpo-anganwadi-heading-mark {
+    min-width: 76px;
+    min-height: 58px;
+    padding: 7px;
+    font-size: 0.68rem;
+  }
+
+  .cdpo-anganwadi-heading-year {
+    font-size: 0.78rem;
+  }
+
+  .cdpo-anganwadi-content {
+    padding: 12px;
+  }
+
+  .cdpo-anganwadi-list-heading {
+    margin-bottom: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .cdpo-anganwadi-heading-mark {
+    display: none;
+  }
+
+  .cdpo-anganwadi-list-heading {
+    align-items: flex-start;
+  }
+
+  .cdpo-anganwadi-tabs {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .cdpo-anganwadi-tabs .btn {
+    justify-content: space-between;
+    padding: 7px 9px;
   }
 }
