@@ -20,6 +20,7 @@ import {
 import {
   getAnganwadiApplication,
   getMissingAnganwadiStepOneFields,
+  getMissingAnganwadiStepTwoFields,
   getStepOneFormatErrors,
   getStepTwoFormatErrors,
   getStepThreeFormatErrors,
@@ -27,6 +28,8 @@ import {
   saveAnganwadiApplicationStep,
   submitAnganwadiApplication,
   editAnganwadiApplication,
+  fetchAnganwadiDropdown,
+  getAccountField,
 } from "./anganwadiApplicationApi";
 import "./AnganwadiApplicationForm.css";
 
@@ -110,15 +113,32 @@ const STEP_ONE_GROUPS = [
   {
     title: "कार्य विवरण",
     fields: [
+      { name: "district", label: "जनपद", required: true, type: "district-select", readOnly: true, disabled: true },
+      {
+        name: "project",
+        label: "विकासखंड / परियोजना",
+        required: true,
+        type: "project-select",
+        readOnly: true,
+        disabled: true,
+      },
+      {
+        name: "sector",
+        label: "सेक्टर",
+        required: true,
+        type: "sector-select",
+        readOnly: true,
+        disabled: true,
+      },
       {
         name: "awc_center",
         label: "आंगनवाड़ी केंद्र / केंद्र कोड",
         required: true,
+        type: "awc-select",
       },
-      { name: "district", label: "जनपद", readOnly: true, required: true },
       {
-        name: "project",
-        label: "विकासखंड / परियोजना",
+        name: "awc_name",
+        label: "आंगनवाड़ी केंद्र का नाम",
         readOnly: true,
         required: true,
       },
@@ -496,6 +516,8 @@ const readOnlyFieldNames = new Set([
   "filer_mob",
   "district",
   "project",
+  "sector",
+  "awc_name",
 ]);
 
 const PREVIEW_ASSESSMENT_ROWS = [
@@ -733,6 +755,13 @@ const AnganwadiApplicationForm = ({ account }) => {
   const [notice, setNotice] = useState("");
   const [fieldErrors, setFieldErrors] = useState({});
   const [showPreview, setShowPreview] = useState(false);
+  const [dropdownData, setDropdownData] = useState({
+    districts: [],
+    projects: [],
+    sectors: [],
+    awcs: [],
+  });
+  const [dropdownLoading, setDropdownLoading] = useState(false);
   const submitted =
     formData?.status === "final" || formData?.editable === false;
 
@@ -758,6 +787,7 @@ const AnganwadiApplicationForm = ({ account }) => {
           setCurrentStep(3);
         }
         if (status === "step3" || status === "final") setShowPreview(true);
+        loadDropdowns(application.district, application.project, application.sector);
       })
       .catch((loadError) => {
         console.error("Anganwadi application load failed:", loadError);
@@ -771,6 +801,211 @@ const AnganwadiApplicationForm = ({ account }) => {
       active = false;
     };
   }, [account]);
+
+  const loadDropdowns = async (district, project, sector) => {
+    setDropdownLoading(true);
+    try {
+      const allItems = await fetchAnganwadiDropdown("", "", "");
+      const uniqueDistricts = [
+        ...new Set(allItems.map((item) => item.district).filter(Boolean)),
+      ];
+      if (district && !uniqueDistricts.includes(district)) {
+        uniqueDistricts.push(district);
+      }
+      setDropdownData((previous) => ({
+        ...previous,
+        districts: uniqueDistricts,
+      }));
+      if (district) {
+        const projectItems = await fetchAnganwadiDropdown(district, "", "");
+        const uniqueProjects = [
+          ...new Set(projectItems.map((item) => item.project).filter(Boolean)),
+        ];
+        if (project && !uniqueProjects.includes(project)) {
+          uniqueProjects.push(project);
+        }
+        setDropdownData((previous) => ({
+          ...previous,
+          projects: uniqueProjects,
+        }));
+        if (project) {
+          const sectorItems = await fetchAnganwadiDropdown(
+            district,
+            project,
+            "",
+          );
+          const uniqueSectors = [
+            ...new Set(sectorItems.map((item) => item.sector).filter(Boolean)),
+          ];
+          if (sector && !uniqueSectors.includes(sector)) {
+            uniqueSectors.push(sector);
+          }
+          setDropdownData((previous) => ({
+            ...previous,
+            sectors: uniqueSectors,
+          }));
+          if (sector) {
+            const awcItems = await fetchAnganwadiDropdown(
+              district,
+              project,
+              sector,
+            );
+            setDropdownData((previous) => ({
+              ...previous,
+              awcs: awcItems,
+            }));
+          }
+        }
+      }
+    } catch (err) {
+      console.warn("Dropdown load failed:", err.message);
+    } finally {
+      setDropdownLoading(false);
+    }
+  };
+
+  const loadProjectsForDistrict = async (districtValue) => {
+    if (!districtValue) return;
+    try {
+      const projectItems = await fetchAnganwadiDropdown(districtValue, "", "");
+      const uniqueProjects = [
+        ...new Set(projectItems.map((item) => item.project).filter(Boolean)),
+      ];
+      setDropdownData((previous) => ({
+        ...previous,
+        projects: uniqueProjects,
+      }));
+    } catch (err) {
+      console.warn("Project load failed:", err.message);
+    }
+  };
+
+  const loadSectorsForProject = async (districtValue, projectValue) => {
+    if (!districtValue || !projectValue) return;
+    try {
+      const sectorItems = await fetchAnganwadiDropdown(
+        districtValue,
+        projectValue,
+        "",
+      );
+      const uniqueSectors = [
+        ...new Set(sectorItems.map((item) => item.sector).filter(Boolean)),
+      ];
+      setDropdownData((previous) => ({
+        ...previous,
+        sectors: uniqueSectors,
+      }));
+    } catch (err) {
+      console.warn("Sector load failed:", err.message);
+    }
+  };
+
+  const loadAwcsForSector = async (districtValue, projectValue, sectorValue) => {
+    if (!districtValue || !projectValue || !sectorValue) return;
+    try {
+      const awcItems = await fetchAnganwadiDropdown(
+        districtValue,
+        projectValue,
+        sectorValue,
+      );
+      setDropdownData((previous) => ({
+        ...previous,
+        awcs: awcItems,
+      }));
+    } catch (err) {
+      console.warn("AWC load failed:", err.message);
+    }
+  };
+
+  const handleDistrictChange = async (districtValue) => {
+    updateField("district", districtValue);
+    updateField("project", "");
+    updateField("sector", "");
+    updateField("awc_center", "");
+    updateField("awc_name", "");
+    setDropdownData((previous) => ({
+      ...previous,
+      projects: [],
+      sectors: [],
+      awcs: [],
+    }));
+    if (!districtValue) return;
+    loadProjectsForDistrict(districtValue);
+  };
+
+  const handleProjectChange = async (projectValue) => {
+    updateField("project", projectValue);
+    updateField("sector", "");
+    updateField("awc_center", "");
+    updateField("awc_name", "");
+    setDropdownData((previous) => ({ ...previous, sectors: [], awcs: [] }));
+    const districtValue = formData.district;
+    if (!districtValue || !projectValue) return;
+    loadSectorsForProject(districtValue, projectValue);
+  };
+
+  const handleSectorChange = async (sectorValue) => {
+    updateField("sector", sectorValue);
+    updateField("awc_center", "");
+    updateField("awc_name", "");
+    setDropdownData((previous) => ({ ...previous, awcs: [] }));
+    const districtValue = formData.district;
+    const projectValue = formData.project;
+    if (!districtValue || !projectValue || !sectorValue) return;
+    loadAwcsForSector(districtValue, projectValue, sectorValue);
+  };
+
+  const handleAwcChange = (awcCode) => {
+    updateField("awc_center", awcCode);
+    const match = dropdownData.awcs.find(
+      (item) => String(item.awc_code || "") === String(awcCode),
+    );
+    updateField("awc_name", match ? match.awc_name || match.display_name || "" : "");
+  };
+
+  useEffect(() => {
+    if (!formData) return;
+    const autoDistrict = getAccountField(account, "district");
+    const autoProject = getAccountField(account, "project");
+    const autoSector = getAccountField(account, "sector");
+    let changed = false;
+    const updates = {};
+    if (autoDistrict && !formData.district) {
+      updates.district = autoDistrict;
+      changed = true;
+    }
+    if (autoProject && !formData.project) {
+      updates.project = autoProject;
+      changed = true;
+    }
+    if (autoSector && !formData.sector) {
+      updates.sector = autoSector;
+      changed = true;
+    }
+    if (changed) {
+      setFormData((previous) => ({ ...previous, ...updates }));
+    }
+  }, [account, formData]);
+
+  useEffect(() => {
+    if (!formData?.district) return;
+    const autoProject = getAccountField(account, "project");
+    if (formData.project || autoProject) return;
+    loadProjectsForDistrict(formData.district);
+  }, [formData?.district, account]);
+
+  useEffect(() => {
+    if (!formData?.district || !formData?.project) return;
+    const autoSector = getAccountField(account, "sector");
+    if (formData.sector || autoSector) return;
+    loadSectorsForProject(formData.district, formData.project);
+  }, [formData?.district, formData?.project, account]);
+
+  useEffect(() => {
+    if (!formData?.district || !formData?.project || !formData?.sector) return;
+    if (formData.awc_center) return;
+    loadAwcsForSector(formData.district, formData.project, formData.sector);
+  }, [formData?.district, formData?.project, formData?.sector, account]);
 
   const currentTitle = PROGRESS_STEPS[currentStep - 1];
   const completedSteps = useMemo(() => {
@@ -893,6 +1128,14 @@ const AnganwadiApplicationForm = ({ account }) => {
     }
 
     if (currentStep === 2 && !isEditing) {
+      const missingFields = getMissingAnganwadiStepTwoFields(formData);
+      if (missingFields.length) {
+        missingFields.forEach((field) => {
+          setFieldErrors((previous) => ({ ...previous, [field]: "यह आवश्यक विवरण भरें।" }));
+        });
+        setError("कृपया नीचे हाइलाइट किए गए फ़ील्ड सुधारें।");
+        return;
+      }
       const formatErr = getStepTwoFormatErrors(formData);
       if (formatErr) {
         setFieldErrors(parseFieldErrors(formatErr));
@@ -1099,6 +1342,65 @@ const AnganwadiApplicationForm = ({ account }) => {
               <option value={option} key={option}>{option}</option>
             ))}
           </Form.Select>
+        )         : field.type === "district-select" ? (
+          <Form.Select
+            {...commonProps}
+            value={value}
+            onChange={(event) => handleDistrictChange(event.target.value)}
+            disabled={true}
+          >
+            <option value="">जनपद चुनें</option>
+            {value && !dropdownData.districts.includes(value) && (
+              <option value={value}>{value}</option>
+            )}
+            {dropdownData.districts.map((district) => (
+              <option value={district} key={district}>{district}</option>
+            ))}
+          </Form.Select>
+        )         : field.type === "project-select" ? (
+          <Form.Select
+            {...commonProps}
+            value={value}
+            onChange={(event) => handleProjectChange(event.target.value)}
+            disabled={true}
+          >
+            <option value="">विकासखंड / परियोजना चुनें</option>
+            {value && !dropdownData.projects.includes(value) && (
+              <option value={value}>{value}</option>
+            )}
+            {dropdownData.projects.map((project) => (
+              <option value={project} key={project}>{project}</option>
+            ))}
+          </Form.Select>
+        )         : field.type === "sector-select" ? (
+          <Form.Select
+            {...commonProps}
+            value={value}
+            onChange={(event) => handleSectorChange(event.target.value)}
+            disabled={true}
+          >
+            <option value="">सेक्टर चुनें</option>
+            {value && !dropdownData.sectors.includes(value) && (
+              <option value={value}>{value}</option>
+            )}
+            {dropdownData.sectors.map((sector) => (
+              <option value={sector} key={sector}>{sector}</option>
+            ))}
+          </Form.Select>
+        ) : field.type === "awc-select" ? (
+          <Form.Select
+            {...commonProps}
+            value={value}
+            onChange={(event) => handleAwcChange(event.target.value)}
+            disabled={saving || submitted || dropdownLoading || !formData.district || !formData.project}
+          >
+            <option value="">आंगनवाड़ी केंद्र चुनें</option>
+            {dropdownData.awcs.map((item) => (
+              <option value={item.awc_code} key={item.id || item.awc_code}>
+                {item.display_name || `${item.awc_name} (${item.awc_code})`}
+              </option>
+            ))}
+          </Form.Select>
         ) : field.type === "textarea" ? (
           <Form.Control
             {...commonProps}
@@ -1141,64 +1443,73 @@ const AnganwadiApplicationForm = ({ account }) => {
     </>
   );
 
-  const renderAssessmentGroup = (group) => (
-    <Card className="anganwadi-form-section" key={group.title}>
-      <Card.Header>{group.title}</Card.Header>
-      <Card.Body>
-        {group.description && (
-          <p className="anganwadi-assessment-description">{group.description}</p>
-        )}
-        {group.fields && (
-          <Row className="g-3">
-            {group.fields.map((field) =>
-              renderField({
-                ...field,
-                type: field.type || "number",
-                fullWidth: field.type === "textarea",
-                required: !field.readOnly && field.type !== "file",
-              }),
-            )}
-          </Row>
-        )}
-        {group.checkboxes && (
-          <div className="anganwadi-checklist">
-            {group.checkboxes.map(({ label, value }) => {
-              const checked = (formData.saaf_ans || []).includes(value);
-              return (
-                <Form.Check
-                  key={label}
-                  id={`anganwadi-clean-${value}`}
-                  type="checkbox"
-                  label={label}
-                  checked={checked}
-                  disabled={saving || submitted}
-                  isInvalid={Boolean(fieldErrors.saaf_ans)}
-                  onChange={(event) => {
-                    const isChecked = event.target.checked;
-                    setFormData((previous) => {
-                      const selected = normalizeSelectedValues(previous.saaf_ans);
-                      return {
-                        ...previous,
-                        saaf_ans: isChecked
-                          ? [...new Set([...selected, value])]
-                          : selected.filter((item) => item !== value),
-                      };
-                    });
-                    setNotice("");
-                  }}
-                />
-              );
-            })}
-            {fieldErrors.saaf_ans && (
-              <Form.Text className="anganwadi-field-error" role="alert">
-                {fieldErrors.saaf_ans}
-              </Form.Text>
-            )}
-          </div>
-        )}
-      </Card.Body>
-    </Card>
-  );
+  const renderAssessmentGroup = (group) => {
+    const hasFields = group.fields && group.fields.length > 0;
+    return (
+      <Card className="anganwadi-form-section" key={group.title}>
+        <Card.Body className="anganwadi-assessment-group-body">
+          {group.description && (
+            <p className="anganwadi-assessment-description">{group.description}</p>
+          )}
+          {hasFields && (
+            <div className="anganwadi-assessment-row">
+              <div className="anganwadi-assessment-heading">
+                <strong>{group.title}</strong>
+              </div>
+              <div className="anganwadi-assessment-fields">
+                <Row className="g-3">
+                  {group.fields.map((field) =>
+                    renderField({
+                      ...field,
+                      type: field.type || "number",
+                      fullWidth: field.type === "textarea",
+                      required: !field.readOnly && field.type !== "file",
+                    }),
+                  )}
+                </Row>
+              </div>
+            </div>
+          )}
+          {group.checkboxes && (
+            <div className="anganwadi-checklist">
+              {group.checkboxes.map(({ label, value }) => {
+                const checked = (formData.saaf_ans || []).includes(value);
+                return (
+                  <Form.Check
+                    key={label}
+                    id={`anganwadi-clean-${value}`}
+                    type="checkbox"
+                    label={label}
+                    checked={checked}
+                    disabled={saving || submitted}
+                    isInvalid={Boolean(fieldErrors.saaf_ans)}
+                    onChange={(event) => {
+                      const isChecked = event.target.checked;
+                      setFormData((previous) => {
+                        const selected = normalizeSelectedValues(previous.saaf_ans);
+                        return {
+                          ...previous,
+                          saaf_ans: isChecked
+                            ? [...new Set([...selected, value])]
+                            : selected.filter((item) => item !== value),
+                        };
+                      });
+                      setNotice("");
+                    }}
+                  />
+                );
+              })}
+              {fieldErrors.saaf_ans && (
+                <Form.Text className="anganwadi-field-error" role="alert">
+                  {fieldErrors.saaf_ans}
+                </Form.Text>
+              )}
+            </div>
+          )}
+        </Card.Body>
+      </Card>
+    );
+  };
 
   const renderStepThree = () => (
     <>
@@ -1275,7 +1586,7 @@ const AnganwadiApplicationForm = ({ account }) => {
       ["आवेदक का नाम कु0 / श्रीमती", formData.filer_name || "—"],
       ["पिता / पति का नाम", formData.fath_husb_name],
       ["जन्म तिथि", formatPreviewDate(formData.dob)],
-      ["वर्तमान में तैनात आंगनबाड़ी / मिनी आंगनबाड़ी केंद्र का नाम", formData.awc_center],
+      ["वर्तमान में तैनात आंगनबाड़ी / मिनी आंगनबाड़ी केंद्र का नाम", formData.awc_name ? `${formData.awc_name} (${formData.awc_center || ""})` : formData.awc_center],
       ["योगदान तिथि", formatPreviewDate(formData.joining_date)],
       ["शैक्षिक योग्यता", formData.edu_qual],
       ["गांव / क्षेत्र का नाम", formData.village],
@@ -1357,12 +1668,12 @@ const AnganwadiApplicationForm = ({ account }) => {
       className="anganwadi-application"
       aria-labelledby="anganwadi-form-title"
     >
-      {isAnganwadiApplicationDemoMode && (
+      {/* {isAnganwadiApplicationDemoMode && (
         <Alert variant="warning" className="anganwadi-demo-alert">
           व्यक्तिगत विवरण, मूल्यांकन और दस्तावेज़ चरण API के माध्यम से सर्वर पर
           सेव होते हैं।
         </Alert>
-      )}
+      )} */}
       <header className="anganwadi-application-header">
         <div>
           <span>आवेदक आईडी: {formData.applicant_id || "उपलब्ध नहीं"}</span>

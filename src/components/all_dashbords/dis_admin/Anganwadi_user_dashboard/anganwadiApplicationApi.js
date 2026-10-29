@@ -3,6 +3,9 @@ import { cookieFetch } from "../../../login/AuthContext";
 const APPLICATION_API_BASE =
   "https://mahadevaaya.com/wecdallaward/wecdallaward_backend/api/ang-puruskar-2026";
 
+const ANGANWADI_DROPDOWN_BASE =
+  "https://mahadevaaya.com/wecdallaward/wecdallaward_backend/api/anganwadi-dropdown";
+
 export const isAnganwadiApplicationDemoMode = true;
 
 const FIXED_ASSESSMENT_TARGETS = {
@@ -26,7 +29,39 @@ const normalizeApplicationData = (data = {}) => ({
   saaf_ans: normalizeMultiSelect(data.saaf_ans),
 });
 
-const getAccountField = (account, ...fieldNames) => {
+export const fetchAnganwadiDropdown = async (district, project, sector) => {
+  const params = new URLSearchParams();
+  if (district) params.set("district", district);
+  if (project) params.set("project", project);
+  if (sector) params.set("sector", sector);
+  const response = await cookieFetch(
+    `${ANGANWADI_DROPDOWN_BASE}/?${params.toString()}`,
+    { method: "GET" },
+  );
+  const body = await response.text();
+  const trimmed = body.trim();
+  if (!trimmed) return [];
+  if (trimmed[0] !== "{" && trimmed[0] !== "[") {
+    throw new Error(`आंगनवाड़ी सूची उत्तर पढ़ा नहीं जा सका (HTTP ${response.status})`);
+  }
+  try {
+    const data = JSON.parse(trimmed);
+    return Array.isArray(data) ? data : data.data || [];
+  } catch {
+    throw new Error(`आंगनवाड़ी सूची उत्तर पढ़ा नहीं जा सका (HTTP ${response.status})`);
+  }
+};
+
+const resolveAwcName = async (awcCenter, district, project, sector) => {
+  if (!awcCenter) return "";
+  const list = await fetchAnganwadiDropdown(district, project, sector);
+  const match = list.find(
+    (item) => String(item.awc_code || "") === String(awcCenter),
+  );
+  return match ? match.awc_name || match.display_name || "" : "";
+};
+
+export const getAccountField = (account, ...fieldNames) => {
   const profiles = [account, account?.profile, account?.user, account?.data];
   for (const profile of profiles) {
     for (const fieldName of fieldNames) {
@@ -58,7 +93,9 @@ const createInitialApplication = (account = {}) => ({
   edu_qual: "",
   district: getAccountField(account, "district"),
   project: getAccountField(account, "project"),
+  sector: getAccountField(account, "sector"),
   awc_center: getAccountField(account, "awc_center"),
+  awc_name: "",
   joining_date: getAccountField(account, "joining_date"),
   village: "",
   address: "",
@@ -221,7 +258,6 @@ const fieldPattern = (field) => {
   switch (field) {
     case "filer_name":
     case "fath_husb_name":
-    case "awc_center":
     case "district":
     case "project":
     case "village":
@@ -230,6 +266,9 @@ const fieldPattern = (field) => {
     case "acc_holder":
     case "bank_name":
       return PATTERNS.name;
+    case "awc_center":
+    case "awc_name":
+      return null;
     case "filer_mob":
       return PATTERNS.mobile;
     case "filer_adhar":
@@ -278,6 +317,7 @@ export const getStepOneFormatErrors = (application) => {
   check("district", "जनपद चुनें।");
   check("project", "परियोजना/ब्लॉक चुनें।");
   check("awc_center", "आंगनवाड़ी केंद्र का नाम केवल अक्षर और स्थान में होना चाहिए।");
+  check("awc_name", "आंगनवाड़ी केंद्र का नाम केवल अक्षर और स्थान में होना चाहिए।");
   check("joining_date", "योगदान तिथि YYYY-MM-DD प्रारूप में होनी चाहिए।");
   check("village", "गांव/क्षेत्र का नाम केवल अक्षर और स्थान में होना चाहिए।");
   check("city", "शहर का नाम केवल अक्षर और स्थान में होना चाहिए।");
@@ -367,7 +407,9 @@ const STEP_ONE_REQUIRED_FIELDS = [
   "edu_qual",
   "district",
   "project",
+  "sector",
   "awc_center",
+  "awc_name",
   "joining_date",
   "village",
   "address",
@@ -403,6 +445,22 @@ export const getAnganwadiApplication = async (account) => {
     applicant_id: initialApplication.applicant_id,
     status: stepOneStatus,
   };
+
+  const district = application.district || getAccountField(account, "district");
+  const project = application.project || getAccountField(account, "project");
+  const sector = getAccountField(account, "sector");
+  if (application.awc_center && !application.awc_name) {
+    try {
+      application.awc_name = await resolveAwcName(
+        application.awc_center,
+        district,
+        project,
+        sector,
+      );
+    } catch (resolveError) {
+      console.warn("AWC name resolution failed:", resolveError.message);
+    }
+  }
 
   if (getMissingAnganwadiStepOneFields(application).length === 0) {
     try {
@@ -456,13 +514,19 @@ export const getAnganwadiApplication = async (account) => {
 };
 
 const buildStepOnePayload = (application) => ({
+  filer_name: application.filer_name,
   fath_husb_name: application.fath_husb_name,
   dob: application.dob,
   age: application.age === "" ? "" : Number(application.age),
+  filer_mob: application.filer_mob,
   filer_email: application.filer_email,
+  filer_adhar: application.filer_adhar,
   edu_qual: application.edu_qual,
-  awc_name: application.filer_name,
+  awc_name: application.awc_name || application.filer_name,
   awc_center: application.awc_center,
+  district: application.district,
+  project: application.project,
+  sector: application.sector || "",
   joining_date: application.joining_date,
   village: application.village,
   address: application.address,
