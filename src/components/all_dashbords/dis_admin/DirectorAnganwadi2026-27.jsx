@@ -24,6 +24,8 @@ import "./DirectorAnganwadi2026-27.css";
 
 const APPLICATIONS_URL =
   "https://mahadevaaya.com/wecdallaward/wecdallaward_backend/api/ang-puruskar/itcell/director/status/";
+const DISTRICTS_URL =
+  "https://mahadevaaya.com/wecdallaward/wecdallaward_backend/api/districts/list/";
 const MEDIA_BASE_URL =
   "https://mahadevaaya.com/wecdallaward/wecdallaward_backend";
 const PAGE_SIZE = 10;
@@ -304,6 +306,11 @@ const DirectorAnganwadi2026_27 = () => {
   const [remark, setRemark] = useState("");
   const [updatingFormId, setUpdatingFormId] = useState("");
 
+  const [districts, setDistricts] = useState([]);
+  const [districtsLoading, setDistrictsLoading] = useState(true);
+  const [districtsError, setDistrictsError] = useState("");
+  const [selectedDistrict, setSelectedDistrict] = useState("");
+
   useEffect(() => {
     const handleResize = () => {
       const width = window.innerWidth;
@@ -366,9 +373,37 @@ const DirectorAnganwadi2026_27 = () => {
     fetchApplications();
   }, [fetchApplications]);
 
+  const fetchDistricts = useCallback(async () => {
+    setDistrictsLoading(true);
+    setDistrictsError("");
+    try {
+      const response = await cookieFetch(DISTRICTS_URL, { method: "GET" });
+      const payload = await readResponse(response);
+      if (!response.ok || payload.success === false) {
+        throw new Error(
+          getErrorMessage(
+            payload,
+            `Failed to load districts (HTTP ${response.status}).`
+          )
+        );
+      }
+      const data = Array.isArray(payload.data) ? payload.data : payload.districts || [];
+      setDistricts(data);
+    } catch (error) {
+      console.error("Failed to load districts:", error);
+      setDistrictsError(error.message || "Failed to load districts.");
+    } finally {
+      setDistrictsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchDistricts();
+  }, [fetchDistricts]);
+
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchQuery, statusFilter, activeTab]);
+  }, [searchQuery, statusFilter, activeTab, selectedDistrict]);
 
   const filteredApplications = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
@@ -395,21 +430,38 @@ const DirectorAnganwadi2026_27 = () => {
           : activeTab === "director-approved"
             ? isDirectorApproved(status)
             : true;
+      const matchesDistrict =
+        !selectedDistrict ||
+        String(application.district || "").trim().toLowerCase() ===
+          selectedDistrict.trim().toLowerCase();
       const matchesStatus =
         statusFilter === "all" ||
         (statusFilter === "submitted" && ["final_submit", "submitted", "completed"].includes(status)) ||
         (statusFilter === "approved" && (isCdpoApproved(status) || isDpoApproved(status) || isDirectorApproved(status))) ||
         (statusFilter === "rejected" && (status.includes("reject")));
 
-      return matchesSearch && matchesStatus && matchesTab;
+      return matchesSearch && matchesStatus && matchesTab && matchesDistrict;
     });
-  }, [applications, searchQuery, statusFilter, activeTab]);
+  }, [applications, searchQuery, statusFilter, activeTab, selectedDistrict]);
 
   const totalPages = Math.max(1, Math.ceil(filteredApplications.length / PAGE_SIZE));
   const paginatedApplications = filteredApplications.slice(
     (currentPage - 1) * PAGE_SIZE,
     currentPage * PAGE_SIZE
   );
+
+  // Count of DPO-approved applications per district (DPO approved tab scope).
+  const districtCounts = useMemo(() => {
+    const counts = new Map();
+    districts.forEach(({ district }) => counts.set(String(district || "").trim(), 0));
+    applications.forEach((application) => {
+      if (isDpoApproved(application.status)) {
+        const district = String(application.district || "").trim();
+        counts.set(district, (counts.get(district) || 0) + 1);
+      }
+    });
+    return counts;
+  }, [applications, districts]);
 
   // Directorate review table hierarchy: District -> Project -> Sector -> Anganwadi Center.
   // One candidate can be approved for each district/project/sector combination.
@@ -910,6 +962,71 @@ const DirectorAnganwadi2026_27 = () => {
             </Alert>
           )}
 
+          {districtsError && (
+            <Alert variant="danger" className="director-anganwadi-alert">
+              <div className="director-anganwadi-error-row">
+                <span>{districtsError}</span>
+                <Button
+                  variant="outline-danger"
+                  size="sm"
+                  onClick={fetchDistricts}
+                  disabled={districtsLoading}
+                >
+                  Retry
+                </Button>
+              </div>
+            </Alert>
+          )}
+          {!districtsLoading && districts.length > 0 && (
+            <div className="director-anganwadi-table-wrap">
+              <Table hover className="director-anganwadi-table director-anganwadi-district-table">
+                <thead>
+                  <tr>
+                    <th>District</th>
+                    {districts.map(({ district }) => (
+                      <th key={district}>{district}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>DPO-approved applications</td>
+                    {districts.map(({ district }) => {
+                      const count = districtCounts.get(String(district || "").trim()) || 0;
+                      const isActive = selectedDistrict.trim().toLowerCase() === String(district || "").trim().toLowerCase();
+                      return (
+                        <td
+                          key={district}
+                          className={`director-anganwadi-district-count${isActive ? " director-anganwadi-district-active" : ""}`}
+                          onClick={() => {
+                            setSelectedDistrict(district);
+                            setActiveTab("dpo-approved");
+                            setSearchQuery("");
+                            setStatusFilter("all");
+                          }}
+                          role="button"
+                          tabIndex={0}
+                          onKeyDown={(event) => {
+                            if (event.key === "Enter" || event.key === " ") {
+                              event.preventDefault();
+                              setSelectedDistrict(district);
+                              setActiveTab("dpo-approved");
+                              setSearchQuery("");
+                              setStatusFilter("all");
+                            }
+                          }}
+                          title={`View ${count} DPO-approved application(s) in ${district}`}
+                        >
+                          <span className="district-count-value">{count}</span>
+                        </td>
+                      );
+                    })}
+                  </tr>
+                </tbody>
+              </Table>
+            </div>
+          )}
+
           <section className="director-anganwadi-content">
             <div className="director-anganwadi-list-heading">
               <div>
@@ -920,6 +1037,23 @@ const DirectorAnganwadi2026_27 = () => {
                     ? "Loading applications..."
                     : `Total applications: ${apiCount} · After filters: ${filteredApplications.length}`}
                 </p>
+                {selectedDistrict && (
+                  <div className="director-anganwadi-active-district">
+                    <strong>District:</strong> {selectedDistrict}{" "}
+                    <Button
+                      size="sm"
+                      variant="outline-danger"
+                      onClick={() => {
+                        setSelectedDistrict("");
+                        setActiveTab("all");
+                        setSearchQuery("");
+                        setStatusFilter("all");
+                      }}
+                    >
+                      Clear
+                    </Button>
+                  </div>
+                )}
               </div>
               <Button
                 variant="outline-success"
@@ -1075,10 +1209,10 @@ const DirectorAnganwadi2026_27 = () => {
                           <td className="director-anganwadi-sector-actions" rowSpan={sectorRowSpan}>
                             <div className="director-anganwadi-sector-action-buttons">
                               {sectorAlreadyApproved ? (
-                                <Badge bg="success">Award Already Approved by Directorate</Badge>
+                                <Badge bg="primary">Award Already Approved by Directorate</Badge>
                               ) : (
                                 <>
-                                  <Button size="sm" variant="success" disabled={isUpdating} onClick={() => submitSectorSelection(sectorKey, "approved")}>Approve Selected</Button>
+                                  <Button size="sm" variant="primary" disabled={isUpdating} onClick={() => submitSectorSelection(sectorKey, "approved")}>Approve Selected</Button>
                                   <Button size="sm" variant="outline-danger" disabled={isUpdating} onClick={() => submitSectorSelection(sectorKey, "rejected_by_director")}>Reject Selected</Button>
                                 </>
                               )}

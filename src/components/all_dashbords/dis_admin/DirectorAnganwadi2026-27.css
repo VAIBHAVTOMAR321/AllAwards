@@ -2,7 +2,7 @@
 
 .director-anganwadi-dashboard {
   min-height: 100vh;
-  background: #f0fdf4;
+  background: #e3f2fd;
 }
 
 .director-anganwadi-main {
@@ -18,7 +18,7 @@
   width: 100%;
   min-width: 0;
   padding: 26px;
-  color: #14532d;
+  color: #0d47a1;
 }
 
 .director-anganwadi-heading {
@@ -31,7 +31,7 @@
   min-width: 0;
   padding: clamp(22px, 3vw, 34px);
   overflow: hidden;
-  border: 1px solid #bbf7d0;
+  border: 1px solid #bbdefb;
   border-radius: 8px 28px 8px 28px;
   background:
     radial-gradient(
@@ -39,7 +39,7 @@
       rgba(134, 239, 172, 0.28),
       transparent 28%
     ),
-    linear-gradient(145deg, #dcfce7 0%, #ffffff 68%);
+    linear-gradient(145deg, #e3f2fd 0%, #ffffff 68%);
   box-shadow: 0 8px 24px rgba(20, 83, 45, 0.045);
 }
 
@@ -49,7 +49,7 @@
 
 .director-anganwadi-eyebrow {
   display: inline-block;
-  color: #15803d;
+  color: #1565c0;
   font-size: 0.82rem;
   font-weight: 800;
   letter-spacing: 0.045em;
@@ -58,7 +58,7 @@
 
 .director-anganwadi-heading h1 {
   margin: 12px 0 0;
-  color: #14532d;
+  color: #0d47a1;
   font-size: clamp(1.3rem, 2.3vw, 1.85rem);
   font-weight: 800;
   line-height: 1.45;
@@ -67,7 +67,7 @@
 
 .director-anganwadi-heading p {
   margin: 12px 0 0;
-  color: #166534;
+  color: #1976d2;
   font-size: 1rem;
   font-weight: 700;
 }
@@ -85,7 +85,7 @@
   border: 1px solid rgba(22, 101, 52, 0.14);
   border-radius: 18px 6px 18px 6px;
   background: rgba(255, 255, 255, 0.72);
-  color: #166534;
+  color: #1976d2;
   text-align: center;
   font-size: 0.78rem;
   font-weight: 800;
@@ -111,7 +111,7 @@
 .director-anganwadi-content {
   min-width: 0;
   padding: clamp(18px, 2.4vw, 26px);
-  border: 1px solid #dcfce7;
+  border: 1px solid #e3f2fd;
   border-radius: 18px;
   background: #ffffff;
   box-shadow: 0 8px 24px rgba(20, 83, 45, 0.04);
@@ -127,7 +127,7 @@
 
 .director-anganwadi-list-heading h2 {
   margin: 0;
-  color: #14532d;
+  color: #0d47a1;
   font-size: clamp(1.05rem, 1.8vw, 1.3rem);
   font-weight: 800;
   line-height: 1.45;
@@ -171,14 +171,14 @@
 .director-anganwadi-search .form-control {
   min-height: 42px;
   padding-left: 38px;
-  border-color: #d1fae5;
+  border-color: #90caf9;
   border-radius: 10px;
   box-shadow: none;
 }
 
 .director-anganwadi-search .form-control:focus,
 .director-anganwadi-status-filter .form-select:focus {
-  border-color: #4ade80;
+  border-color: #42a5f5;
   box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.15);
 }
 
@@ -188,14 +188,14 @@
 
 .director-anganwadi-status-filter .form-label {
   margin-bottom: 6px;
-  color: #166534;
+  color: #1976d2;
   font-size: 0.82rem;
   font-weight: 700;
 }
 
 .director-anganwadi-status-filter .form-select {
   min-height: 42px;
-  border-color: #d1fae5;
+  border-color: #90caf9;
   border-radius: 10px;
   box-shadow: none;
 }
@@ -204,7 +204,7 @@
 .director-anganwadi-detail-table-wrap {
   width: 100%;
   overflow-x: auto;
-  border: 1px solid #dcfce7;
+  border: 1px solid #e3f2fd;
   border-radius: 12px;
   background: #ffffff;
   -webkit-overflow-scrolling: touch;
@@ -225,9 +225,9 @@
 }
 
 .director-anganwadi-table thead th {
-  border-bottom: 1px solid #bbf7d0;
-  background: #f0fdf4;
-  color: #166534;
+  border-bottom: 1px solid #bbdefb;
+  background: #e3f2fd;
+  color: #1976d2;
   font-size: 0.81rem;
   font-weight: 800;
   white-space: nowrap;
@@ -243,7 +243,7 @@
 }
 
 .director-anganwadi-form-id {
-  color: #166534 !important;
+  color: #1976d2 !important;
   font-weight: 800;
   white-space: nowrap;
 }
@@ -272,7 +272,7 @@
 
 .director-anganwadi-empty .spinner-border {
   margin-right: 8px;
-  color: #16a34a;
+  color: #2563eb;
 }
 
 .director-anganwadi-pagination {
@@ -303,7 +303,7 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  background: #166534;
+  background: #1976d2;
   color: #ffffff;
 }
 
@@ -319,7 +319,7 @@
 
 .director-anganwadi-modal-subtitle {
   margin-top: 5px;
-  color: #dcfce7;
+  color: #e3f2fd;
   font-size: 0.85rem;
 }
 
@@ -339,7 +339,7 @@
 .director-anganwadi-preview-section {
   min-width: 0;
   padding: 18px;
-  border: 1px solid #dcfce7;
+  border: 1px solid #e3f2fd;
   border-radius: 14px;
   background: #ffffff;
 }
@@ -347,7 +347,7 @@
 .director-anganwadi-preview-section > h3,
 .director-anganwadi-mark-group > h3 {
   margin: 0 0 14px;
-  color: #166534;
+  color: #1976d2;
   font-size: 1rem;
   font-weight: 800;
   line-height: 1.5;
@@ -360,8 +360,8 @@
 
 .director-anganwadi-detail-table th {
   width: 35%;
-  background: #f0fdf4;
-  color: #166534;
+  background: #e3f2fd;
+  color: #1976d2;
   font-weight: 700;
 }
 
@@ -393,10 +393,10 @@
   gap: 14px;
   margin-top: 16px;
   padding: 16px 18px;
-  border: 1px solid #bbf7d0;
+  border: 1px solid #bbdefb;
   border-radius: 12px;
-  background: #f0fdf4;
-  color: #166534;
+  background: #e3f2fd;
+  color: #1976d2;
 }
 
 .director-anganwadi-merit-total strong {
@@ -412,7 +412,7 @@
 .director-anganwadi-document {
   min-width: 0;
   overflow: hidden;
-  border: 1px solid #dcfce7;
+  border: 1px solid #e3f2fd;
   border-radius: 10px;
   background: #ffffff;
 }
@@ -423,7 +423,7 @@
   gap: 10px;
   min-height: 60px;
   padding: 12px;
-  color: #166534;
+  color: #1976d2;
   font-size: 0.85rem;
   font-weight: 700;
   text-decoration: none;
@@ -431,7 +431,7 @@
 }
 
 .director-anganwadi-document > a:hover {
-  background: #f0fdf4;
+  background: #e3f2fd;
   text-decoration: underline;
 }
 
@@ -686,7 +686,7 @@
   justify-content: space-between;
   gap: 16px;
   padding: 16px 20px;
-  background: #166534;
+  background: #1976d2;
   color: #fff;
 }
 
@@ -826,7 +826,7 @@
 }
 
 .director-preview-file a {
-  color: #166534;
+  color: #1976d2;
   text-decoration: underline;
   overflow-wrap: anywhere;
 }
@@ -852,9 +852,9 @@
 }
 
 .director-anganwadi-document-status.is-approved {
-  border-color: #b7dfc2;
-  background: #eaf6ed;
-  color: #216e36;
+  border-color: #bbdefb;
+  background: #e3f2fd;
+  color: #0d47a1;
 }
 
 .director-anganwadi-document-status-separator {
@@ -1160,7 +1160,7 @@
   gap: 8px;
   margin: 0 0 18px;
   padding-bottom: 12px;
-  border-bottom: 1px solid #dcfce7;
+  border-bottom: 1px solid #e3f2fd;
 }
 
 .director-anganwadi-tabs .btn {
@@ -1170,6 +1170,37 @@
   border-radius: 8px;
   font-size: 0.82rem;
   font-weight: 700;
+  color: #1565c0 !important;
+  border-color: #90caf9 !important;
+}
+.director-anganwadi-tabs .btn.btn-outline-success {
+  color: #1565c0 !important;
+  border-color: #90caf9 !important;
+  background: transparent !important;
+}
+.director-anganwadi-tabs .btn.btn-outline-success:hover {
+  background: #1976d2 !important;
+  color: #ffffff !important;
+  border-color: #1976d2 !important;
+}
+.director-anganwadi-tabs .btn.btn-success {
+  background: #1976d2 !important;
+  color: #ffffff !important;
+  border-color: #1976d2 !important;
+}
+.director-anganwadi-tabs .btn.btn-success:hover {
+  background: #1565c0 !important;
+  color: #ffffff !important;
+  border-color: #1565c0 !important;
+}
+
+/* Approved status badges: blue instead of green within the Director dashboard */
+.director-anganwadi-dashboard .badge.bg-success,
+.director-anganwadi-dashboard .badge.bg-success.bg-success,
+.director-anganwadi-table .badge.bg-success {
+  background-color: #1976d2 !important;
+  color: #ffffff !important;
+  border-color: #1976d2 !important;
 }
 
 .director-anganwadi-tabs .btn span {
@@ -1181,7 +1212,7 @@
   padding: 0 6px;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.75);
-  color: #166534;
+  color: #1976d2;
   font-size: 0.72rem;
 }
 
@@ -1198,6 +1229,73 @@
 
   .director-anganwadi-tabs .btn {
     justify-content: space-between;
+  }
+}
+
+/* District summary table: district names as headings, DPO-approved counts below. */
+.director-anganwadi-district-table {
+  width: 100%;
+  min-width: 700px;
+  table-layout: fixed;
+}
+.director-anganwadi-district-table th {
+  white-space: normal;
+  word-break: keep-all;
+  overflow-wrap: normal;
+  text-align: center;
+  font-size: 10px;
+  line-height: 1.3;
+  padding: 8px 6px;
+}
+.director-anganwadi-district-table th:first-child {
+  text-align: left;
+  min-width: 150px;
+}
+.director-anganwadi-district-table td {
+  text-align: center;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 7px 6px;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.director-anganwadi-district-table td:first-child {
+  text-align: left;
+  font-weight: 600;
+  color: #64748b;
+}
+.director-anganwadi-district-count {
+  color: #1976d2;
+  cursor: pointer;
+}
+.director-anganwadi-district-count:hover {
+  background: #e3f2fd;
+  color: #1565c0;
+}
+.director-anganwadi-district-count.director-anganwadi-district-active {
+  background: #e3f2fd;
+  color: #0d47a1;
+  font-weight: 800;
+}
+.district-count-value {
+  display: inline-block;
+  min-width: 24px;
+  text-align: center;
+}
+.director-anganwadi-active-district {
+  margin-top: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: #0d47a1;
+}
+
+@media (max-width: 768px) {
+  .director-anganwadi-district-table th,
+  .director-anganwadi-district-table td {
+    font-size: 9px;
+    padding: 5px 4px;
   }
 }
 
@@ -1714,7 +1812,7 @@
   border: 0;
   padding: 0;
   background: transparent;
-  color: #166534;
+  color: #1976d2;
   font-weight: 800;
   text-decoration: underline;
   cursor: pointer;
