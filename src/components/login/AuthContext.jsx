@@ -64,10 +64,22 @@ export const getCsrfToken = () => {
   }
 };
 
-const rawCookieFetch = (url, options = {}) => {
+const rawCookieFetch = async (url, options = {}) => {
   const { requireCsrf = false, ...fetchOptions } = options;
   const headers = new Headers(options.headers || {});
-  const csrfToken = getCsrfToken();
+  let csrfToken = getCsrfToken();
+
+  // If CSRF is required but token is missing, attempt to prime it by making a GET request
+  if (requireCsrf && !csrfToken) {
+    try {
+      // Make a GET request to the same URL to trigger CSRF cookie set
+      await fetch(url, { credentials: "include" });
+      csrfToken = getCsrfToken();
+    } catch (error) {
+      console.warn("Failed to prime CSRF token:", error);
+    }
+  }
+
   const requestUrl =
     typeof window !== "undefined" &&
     ["localhost", "127.0.0.1"].includes(window.location.hostname) &&
