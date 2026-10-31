@@ -194,7 +194,7 @@ const getMediaUrl = (file) => {
 const getStatusVariant = (status) => {
   const normalized = String(status || "").toLowerCase();
   if (normalized === "approved" || normalized.includes("approv")) {
-    return "success";
+    return "primary";
   }
   if (normalized.includes("reject")) return "danger";
   if (normalized === "final_submit") return "primary";
@@ -570,7 +570,7 @@ const DPOAnganwadi2026_27 = () => {
       }
 
       setActionMessage({
-        type: "success",
+        type: "primary",
         text: `${formIds.length} application(s) were ${decisionStatus} successfully.`,
       });
       setApprovalApplications([]);
@@ -927,7 +927,7 @@ const DPOAnganwadi2026_27 = () => {
                 </p>
               </div>
               <Button
-                variant="outline-success"
+                variant="outline-primary"
                 onClick={fetchApplications}
                 disabled={loading}
                 className="dpo-anganwadi-refresh"
@@ -941,16 +941,16 @@ const DPOAnganwadi2026_27 = () => {
             </div>
 
             <div className="dpo-anganwadi-tabs" role="tablist" aria-label="Application views">
-              <Button type="button" variant={activeTab === "all" ? "success" : "outline-success"} onClick={() => { setActiveTab("all"); setStatusFilter("all"); }} role="tab" aria-selected={activeTab === "all"}>
+              <Button type="button" variant={activeTab === "all" ? "primary" : "outline-primary"} onClick={() => { setActiveTab("all"); setStatusFilter("all"); }} role="tab" aria-selected={activeTab === "all"}>
                 All Forms <span>{applications.length}</span>
               </Button>
-              <Button type="button" variant={activeTab === "cdpo-approved" ? "success" : "outline-success"} onClick={() => { setActiveTab("cdpo-approved"); setStatusFilter("all"); }} role="tab" aria-selected={activeTab === "cdpo-approved"}>
+              <Button type="button" variant={activeTab === "cdpo-approved" ? "primary" : "outline-primary"} onClick={() => { setActiveTab("cdpo-approved"); setStatusFilter("all"); }} role="tab" aria-selected={activeTab === "cdpo-approved"}>
                 Approved by CDPO <span>{applications.filter((item) => isCdpoApproved(item.status) || isDpoApproved(item.status)).length}</span>
               </Button>
-              <Button type="button" variant={activeTab === "dpo-approved" ? "success" : "outline-success"} onClick={() => { setActiveTab("dpo-approved"); setStatusFilter("all"); }} role="tab" aria-selected={activeTab === "dpo-approved"}>
+              <Button type="button" variant={activeTab === "dpo-approved" ? "primary" : "outline-primary"} onClick={() => { setActiveTab("dpo-approved"); setStatusFilter("all"); }} role="tab" aria-selected={activeTab === "dpo-approved"}>
                 Approved by DPO <span>{applications.filter((item) => isDpoApproved(item.status)).length}</span>
               </Button>
-              <Button type="button" variant={activeTab === "report" ? "success" : "outline-success"} onClick={() => { setActiveTab("report"); setStatusFilter("all"); }} role="tab" aria-selected={activeTab === "report"}>
+              <Button type="button" variant={activeTab === "report" ? "primary" : "outline-primary"} onClick={() => { setActiveTab("report"); setStatusFilter("all"); }} role="tab" aria-selected={activeTab === "report"}>
                 Report (All Forms) <span>{applications.length}</span>
               </Button>
             </div>
@@ -1313,7 +1313,7 @@ const DPOAnganwadi2026_27 = () => {
                   </Button>
                   {!["approved", "rejected"].includes(String(selectedApplication.status || "").toLowerCase()) && (
                     <Button
-                      variant="success"
+                      variant="primary"
                       onClick={() => {
                         const application = selectedApplication;
                         setSelectedApplication(null);
@@ -1383,7 +1383,7 @@ const DPOAnganwadi2026_27 = () => {
             Cancel
           </Button>
           <Button
-            variant={decisionStatus === "approved_by_dpo" ? "success" : "danger"}
+            variant={decisionStatus === "approved_by_dpo" ? "primary" : "danger"}
             disabled={isUpdating || approvalApplications.length === 0}
             onClick={updateApplicationStatus}
           >
