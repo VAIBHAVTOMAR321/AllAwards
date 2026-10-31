@@ -998,9 +998,25 @@ const AnganwadiApplicationForm = ({ account }) => {
   useEffect(() => {
     if (!formData?.district || !formData?.project) return;
     const autoSector = getAccountField(account, "sector");
-    if (formData.sector || autoSector) return;
+    if (formData.sector) {
+      if (!dropdownData.sectors.includes(formData.sector)) {
+        setDropdownData((prev) => ({ ...prev, sectors: [formData.sector, ...prev.sectors] }));
+      }
+      if (!formData.awc_center) {
+        loadAwcsForSector(formData.district, formData.project, formData.sector);
+      }
+      return;
+    }
+    if (autoSector) {
+      setFormData((prev) => ({ ...prev, sector: autoSector }));
+      if (!dropdownData.sectors.includes(autoSector)) {
+        setDropdownData((prev) => ({ ...prev, sectors: [autoSector, ...prev.sectors] }));
+      }
+      loadAwcsForSector(formData.district, formData.project, autoSector);
+      return;
+    }
     loadSectorsForProject(formData.district, formData.project);
-  }, [formData?.district, formData?.project, account]);
+  }, [formData?.district, formData?.project, formData?.sector, account]);
 
   useEffect(() => {
     if (!formData?.district || !formData?.project || !formData?.sector) return;
@@ -1385,7 +1401,7 @@ const AnganwadiApplicationForm = ({ account }) => {
           <Form.Select
             {...commonProps}
             value={value}
-            onChange={(event) => handleSectorChange(event.target.value)}
+            onChange={(event) => handleSectorChange(event.target.value)}  disabled={true}
           >
             <option value="">सेक्टर चुनें</option>
             {value && !dropdownData.sectors.includes(value) && (
