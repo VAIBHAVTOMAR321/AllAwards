@@ -1131,10 +1131,12 @@ const AnganwadiApplicationForm = ({ account }) => {
     if (currentStep === 2 && !isEditing) {
       const missingFields = getMissingAnganwadiStepTwoFields(formData);
       if (missingFields.length) {
+        const nextErrors = {};
         missingFields.forEach((field) => {
-          setFieldErrors((previous) => ({ ...previous, [field]: "यह आवश्यक विवरण भरें।" }));
+          nextErrors[field] = "यह आवश्यक विवरण भरें।";
         });
-        setError("कृपया नीचे हाइलाइट किए गए फ़ील्ड सुधारें।");
+        setFieldErrors(nextErrors);
+        setError("कृपया नीचे हाइलाइट किए गए फ़ील्ड सुधारें: " + missingFields.join(", "));
         return;
       }
       const formatErr = getStepTwoFormatErrors(formData);

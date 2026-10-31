@@ -219,31 +219,31 @@
 .anganwadi-application-field .form-select.is-invalid,
 .anganwadi-application-field .form-control[is-invalid],
 .anganwadi-application-field .form-select[is-invalid] {
-  border-color: #c0392b;
+  border-color: #c0392b !important;
 }
 
 .anganwadi-application-field .form-control.is-invalid:focus,
 .anganwadi-application-field .form-select.is-invalid:focus,
 .anganwadi-application-field .form-control[is-invalid]:focus,
 .anganwadi-application-field .form-select[is-invalid]:focus {
-  border-color: #c0392b;
+  border-color: #c0392b !important;
   box-shadow: 0 0 0 3px rgba(192, 57, 43, 0.13);
 }
 
 .anganwadi-document-row .form-control.is-invalid,
 .anganwadi-document-row .form-control[is-invalid] {
-  border-color: #c0392b;
+  border-color: #c0392b !important;
 }
 
 .anganwadi-document-row .form-control.is-invalid:focus,
 .anganwadi-document-row .form-control[is-invalid]:focus {
-  border-color: #c0392b;
+  border-color: #c0392b !important;
   box-shadow: 0 0 0 3px rgba(192, 57, 43, 0.13);
 }
 
 .anganwadi-declaration-card .form-check.is-invalid,
 .anganwadi-declaration-card .form-check[is-invalid] {
-  border-color: #c0392b;
+  border-color: #c0392b !important;
 }
 
 .anganwadi-assessment-description {
