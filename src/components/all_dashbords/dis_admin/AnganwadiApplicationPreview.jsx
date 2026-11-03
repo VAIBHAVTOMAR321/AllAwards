@@ -1,37 +1,60 @@
 import React from "react";
-import { FaPrint } from "react-icons/fa";
-import ukLogo from "../../../assets/images/uk_logo.jpeg";
+import { FaCheckCircle, FaPrint } from "react-icons/fa";
 import "./AnganwadiApplicationPreview.css";
 
 const MEDIA_BASE_URL =
   "https://mahadevaaya.com/wecdallaward/wecdallaward_backend";
 
-const displayValue = (value) => {
-  if (value === null || value === undefined || String(value).trim() === "") {
-    return "—";
-  }
-  return String(value);
-};
+const ASSESSMENT_ROWS = [
+  { title: "1. प्रधानमंत्री मातृ वंदना योजना की प्रगति", items: [["वर्ष में पात्र लाभार्थी", "pmmvy_tot"], ["लाभार्थी", "pmmvy_obt"]] },
+  { title: "2. मुख्यमंत्री महालक्ष्मी किट योजना की प्रगति", items: [["वर्ष में पात्र लाभार्थी", "cmmk_tot"], ["लाभार्थी", "cmmk_obt"]] },
+  { title: "3. नंदा गौरा योजना", items: [["वर्ष में जन्म वाली पात्र बालिकाओं की संख्या", "nanda1_tot"], ["लाभार्थी", "nanda1_obt"], ["वर्ष में 12वीं उत्तीर्ण वाली लाभार्थियों की संख्या", "nanda2_tot"], ["लाभार्थी", "nanda2_obt"]] },
+  { title: "4. पोषण ट्रैकर ऐप में पूर्व-स्कूली शिक्षा", items: [["स्कूल पूर्व शिक्षा के कुल पंजीकृत बच्चों की संख्या", "pt_tot"], ["वित्तीय वर्ष में पंजीकृत बच्चों की औसत उपस्थिति", "pt_obt"]] },
+  { title: "5. वित्तीय वर्ष में कुल गृह भ्रमण का विवरण", items: [["लक्ष्य", "survey_tot"], ["किए गए गृह भ्रमण की संख्या", "survey_obt"]] },
+  { title: "6. अन्नप्राशन की गतिविधियों का संचालन", items: [["वर्ष में पात्र लाभार्थी", "ann_tot"], ["जिनका अन्नप्राशन किया गया", "ann_obt"]] },
+  { title: "7. पोषण ट्रैकर ऐप में समुदाय आधारित गतिविधियों का विवरण", items: [["वार्षिक लक्ष्य", "pt_group_tot"], ["समुदाय आधारित गतिविधियों (CBE) का विवरण", "pt_group_obt"]], files: [{ key: "pt_group_img", label: "गतिविधियों से संबंधित फोटो" }] },
+  { title: "8. संदर्भ सेवाएं", items: [["अतिकुपोषित / कुपोषित हाई-रिस्क पंजीकृत महिलाओं की कुल संख्या", "sandharbh_tot"], ["वित्तीय वर्ष में संदर्भित महिलाओं की कुल संख्या", "sandharbh_obt"]], files: [{ key: "sandharbh_img", label: "संदर्भण पर्ची (Referral Slip)" }] },
+  { title: "9. कुपोषित एवं अतिकुपोषित लाभार्थियों की जानकारी", items: [["कुल पंजीकृत लाभार्थियों की संख्या", "sam_tot"], ["इस वित्तीय वर्ष में कुपोषण से मुक्त लाभार्थी", "sam_obt"], ["संदर्भण के अतिरिक्त किए गए विशेष प्रयास", "sam_detail"]], files: [{ key: "sam_img", label: "संबंधित फोटो" }] },
+  { title: "10. वित्तीय वर्ष में VHSND (ग्राम स्वच्छता एवं पोषण दिवस)", items: [["कुल लक्ष्य", "vhsnd_tot"], ["आयोजित VHSND की कुल संख्या", "vhsnd_obt"]] },
+  { title: "11. पोषण ट्रैकर ऐप में आधार नामांकन", items: [["कुल पंजीकृत लाभार्थियों की संख्या", "pt_ben_tot"], ["आधार नामांकन किए गए लाभार्थियों की संख्या", "pt_ben_obt"]] },
+  { title: "12. आंगनवाड़ी केंद्र में अभिलेखों / पंजिकाओं का रखरखाव", items: [["कुल अभिलेख / पंजिकाएं", "abhilekh_tot"], ["पूर्ण रूप से भरे अभिलेख / पंजिकाएं", "abhilekh_obt"]] },
+  { title: "13. आंगनवाड़ी केंद्र एवं आसपास की साफ-सफाई", checklist: true },
+  { title: "14. राष्ट्रीय कृमि दिवस के अंतर्गत दवा खिलाने का विवरण", items: [["1–6 वर्ष के बच्चों की कुल संख्या", "krimi_tot"], ["दवा खिलाए गए बच्चों की संख्या", "krimi_obt"]] },
+  { title: "15. राष्ट्रीय पोषण सप्ताह", items: [["आयोजित रैलियों की कुल संख्या", "poshan_week_tot"], ["रैलियों में प्रतिभागियों की कुल संख्या", "poshan_week_obt"]] },
+  { title: "16. कुपोषित बच्चों के स्वास्थ्य के संबंध में की गई कार्यवाही", items: [["अतिकुपोषित श्रेणी के 0–6 वर्ष के बच्चों की कुल संख्या", "sam_6mon_tot"], ["अतिकुपोषित से कुपोषित श्रेणी में आए बच्चों की संख्या", "sam_6yr_tot"], ["कुपोषित से सामान्य श्रेणी में आए बच्चों की संख्या", "mam_6mon_tot"]], files: [{ key: "sam_6mon_img", label: "अतिकुपोषित बच्चों की फोटो" }, { key: "sam_6yr_img", label: "श्रेणी में सुधार वाले बच्चों की फोटो" }, { key: "mam_6mon_img", label: "सामान्य श्रेणी में आए बच्चों की फोटो" }] },
+  { title: "17. गंभीर बीमारी से ग्रसित बच्चों का विवरण", items: [["गंभीर बीमारी से ग्रसित बच्चों की कुल संख्या", "gambhir_tot"], ["उपचार कराए गए लाभार्थियों का विवरण", "gambhir_detail"]], files: [{ key: "gambhir_img", label: "संबंधित बच्चों की फोटो" }] },
+  { title: "18. RBSK टीम द्वारा केंद्र भ्रमण का विवरण", items: [["वार्षिक लक्ष्य", "rbsk_tot"], ["किए गए भ्रमणों की संख्या", "rbsk_obt"], ["स्वास्थ्य जांच किए गए बच्चों की कुल संख्या", "rbsk_surv_obt"]] },
+  { title: "19. अन्य विशिष्ट कार्य (BLO, जनगणना, पल्स पोलियो आदि)", items: [["कार्य का विवरण", "other_work_detail"]], files: [{ key: "other_work_img", label: "आदेश की फोटो" }] },
+  { title: "20. विभागीय सहयोग से किए गए कार्यों का विवरण", items: [["कार्य का विवरण", "dept_work_detail"]] },
+  { title: "21. व्यक्तिगत प्रयासों से केंद्र को सार्वजनिक भवन में स्थानांतरित करना", items: [["कार्य का विवरण", "per_work_detail"]] },
+  { title: "22. अन्य विशिष्ट उपलब्धियां एवं कुपोषण उन्मूलन के प्रयास", items: [["विवरण", "ach_work"]] },
+];
 
-const getApplicationValue = (application, ...fields) => {
-  for (const field of fields) {
-    const value = application[field];
-    if (value !== null && value !== undefined && String(value).trim() !== "") {
-      return value;
-    }
-  }
-  return null;
+const ESSENTIAL_CERTIFICATE_ROWS = [
+  { key: "aharta1", label: "1. आंगनबाड़ी कार्यकर्ती / मिनी कार्यकर्ती के रूप में पांच वर्ष की निरंतर सेवा पूर्ण कर ली हो तथा वर्तमान में कार्यरत हों (CDPO द्वारा प्रदत्त प्रमाण-पत्र)" },
+  { key: "aharta2", label: "2. ऐसे आंगनबाड़ी केंद्र / मिनी आंगनबाड़ी केंद्र का संचालन करती हों जहां सर्वे अनुसार ग्रामीण क्षेत्रों में न्यूनतम 10 एवं शहरी क्षेत्रों में न्यूनतम 20 बच्चे पंजीकृत हों (क्षेत्रीय सुपरवाइजर द्वारा प्रदत्त प्रमाण-पत्र)" },
+  { key: "aharta3", label: "3. संबंधित आंगनबाड़ी केंद्र के समस्त लाभार्थी पोषण ट्रैकर ऐप में पंजीकृत हों (क्षेत्रीय सुपरवाइजर द्वारा प्रदत्त प्रमाण-पत्र)" },
+  { key: "aharta4", label: "4. संबंधित आंगनबाड़ी केंद्र के समस्त बच्चों की प्रतिरक्षण दर राज्य स्तरीय दर से कम न होने का प्रमाण-पत्र" },
+];
+
+const SELECTION_CERTIFICATE_ROWS = [
+  { key: "manak2", label: "1. अन्य विशिष्ट उपलब्धियों, महत्वपूर्ण दिवसों एवं कुपोषण उन्मूलन के प्रयासों के समाचार / अभिलेख" },
+  { key: "manak3a", label: "2(i). विभागीय सहयोग से केंद्र को मॉडल बनाने के कार्यों का विवरण" },
+  { key: "manak3b", label: "2(ii). व्यक्तिगत प्रयास से केंद्र को मॉडल बनाने के कार्यों का विवरण" },
+  { key: "manak4", label: "3. उत्कृष्ट कार्यों हेतु प्राप्त सम्मान, पुरस्कार या प्रमाण-पत्र" },
+];
+
+const displayValue = (value) => {
+  if (value === null || value === undefined || String(value).trim() === "") return "—";
+  return String(value);
 };
 
 const formatDate = (value) => {
   if (!value) return "—";
-  const parsed = new Date(value);
-  if (Number.isNaN(parsed.getTime())) return displayValue(value);
-  return parsed.toLocaleDateString("en-IN", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  });
+  const dateValue = String(value);
+  const date = new Date(/^\d{4}-\d{2}-\d{2}$/.test(dateValue) ? `${dateValue}T00:00:00` : dateValue);
+  if (Number.isNaN(date.getTime())) return dateValue;
+  return new Intl.DateTimeFormat("en-GB", { day: "2-digit", month: "short", year: "numeric" }).format(date);
 };
 
 const getMediaUrl = (file) => {
@@ -41,42 +64,9 @@ const getMediaUrl = (file) => {
   return `${MEDIA_BASE_URL}/${path.replace(/^\/+/, "")}`;
 };
 
-const PREVIEW_DOCUMENTS = [
-  ["1. स्थाई निवास प्रमाण पत्र", ["niwas_img", "aharta1"]],
-  ["2. आरक्षित श्रेणी / जाति प्रमाण पत्र", ["caste_img", "aharta2"]],
-  ["3. वरीयता प्रमाण पत्र", ["variyata_img", "aharta3"]],
-  ["4. अनुभव प्रमाण पत्र", ["workexp_img", "aharta4"]],
-  ["5. उपलब्धियों / समाचार अभिलेख", ["manak2"]],
-  ["6(i). विभागीय सहयोग से मॉडल केंद्र कार्य", ["manak3a"]],
-  ["6(ii). व्यक्तिगत प्रयास से मॉडल केंद्र कार्य", ["manak3b"]],
-  ["7. सम्मान, पुरस्कार या प्रमाण-पत्र", ["manak4"]],
-  ["पोषण ट्रैकर समूह फोटो", ["pt_group_img"]],
-  ["संदर्भण पर्ची", ["sandharbh_img"]],
-  ["सामुदायिक गतिविधि", ["sam_img"]],
-  ["अतिकुपोषित बच्चों का विवरण", ["sam_6mon_img", "sam_6yr_img"]],
-  ["कुपोषित बच्चों का विवरण", ["mam_6mon_img"]],
-  ["गंभीर बीमारी से ग्रसित बच्चों का विवरण", ["gambhir_img"]],
-  ["अन्य विशिष्ट कार्य का दस्तावेज़", ["other_work_img"]],
-];
-
-const EDUCATION_LEVELS = [
-  ["दसवीं कक्षा", "high"],
-  ["इण्टरमीडियट", "int"],
-  ["स्नातक", "grad"],
-  ["स्नातकोत्तर", "pgrad"],
-];
-
-const hasEducationDetails = (application, prefix) =>
-  ["board", "year", "marks", "tot", "per", "img"].some((suffix) => {
-    const value = application[`${prefix}_${suffix}`];
-    return value !== null && value !== undefined && String(value).trim() !== "" && value !== "0.00";
-  });
-
 const AnganwadiApplicationPreview = ({
   application,
   rolePrefix,
-  formatStatus,
-  merit,
   onClose,
   onPrint,
   children,
@@ -85,7 +75,7 @@ const AnganwadiApplicationPreview = ({
 
   const renderFile = (file, label) => {
     if (!file) {
-      return <span className="anganwadi-application-preview-missing">×</span>;
+      return <span className="anganwadi-application-preview-missing">दस्तावेज़ अपलोड नहीं हुआ है / Document Not Uploaded</span>;
     }
     const path = String(file);
     const url = getMediaUrl(path);
@@ -96,71 +86,51 @@ const AnganwadiApplicationPreview = ({
       <div className="anganwadi-application-preview-file">
         {isImage && <img src={url} alt={label} loading="lazy" />}
         {isPdf && <iframe title={label} src={url} loading="lazy" />}
-        {!isImage && !isPdf && <span>{fileName}</span>}
         <a href={url} target="_blank" rel="noreferrer">{fileName}</a>
       </div>
     );
   };
 
   const applicantRows = [
-    ["आवेदन फार्म संख्या :-", application.form_id],
-    ["राजस्व ग्राम का नाम :-", getApplicationValue(application, "rev_vill", "revenue_village", "village")],
-    ["आंगनवाड़ी केंद्र का नाम :-", application.awc_name],
-    ["आवेदक का नाम कु0/श्रीमती :-", application.filer_name],
-    ["आवेदक की पासपोर्ट साइज फोटो :-", application.photo_img, "photo"],
-    ["माता का नाम :-", getApplicationValue(application, "moth_name", "mother_name")],
-    ["पिता का नाम :-", getApplicationValue(application, "fath_name", "father_name", "fath_husb_name")],
-    ["वैवाहिक प्रस्थिति :-", getApplicationValue(application, "marital", "marital_status")],
-    ["पति का नाम :-", getApplicationValue(application, "husb_name", "husband_name")],
-    ["जन्म तिथि (आयु) :-", `${formatDate(application.dob)} (${displayValue(application.age)})`],
-    ["मोबाइल नंबर :-", application.filer_mob],
-    ["ई मेल आई0डी0 :-", application.filer_email],
-    ["आधार नंबर :-", getApplicationValue(application, "filer_adhar", "aadhaar", "adhar")],
-    ["जनपद :-", application.district],
-    ["परियोजना :-", application.project],
-    ["सेक्टर :-", application.sector],
-    ["आंगनवाड़ी केंद्र कोड :-", application.awc_center],
-    ["गांव/क्षेत्र का नाम :-", application.village],
-    ["पता :-", application.address],
-    ["आरक्षित वर्ग :-", application.caste_category],
-    [
-      "योगदान की तिथि :-",
-      formatDate(
-        application.past_date && application.past_date !== "0000-00-00"
-          ? application.past_date
-          : application.joining_date
-      ),
-    ],
-    ["शहर :-", application.city],
-    ["पिन कोड :-", application.pincode],
-    ["खाताधारक का नाम :-", application.acc_holder],
-    ["खाता संख्या :-", application.acc_no],
-    ["IFSC कोड :-", application.acc_ifsc],
-    ["बैंक का नाम :-", application.bank_name],
-    ["पैन कार्ड :-", application.pancard],
+    ["आवेदन फार्म संख्या", application.applicant_id || application.form_id || application.id],
+    ["आवेदक का नाम", application.filer_name],
+    ["पिता / पति का नाम", application.fath_husb_name],
+    ["जन्म तिथि", formatDate(application.dob)],
+    ["आयु", application.age],
+    ["मोबाइल नंबर", application.filer_mob],
+    ["ईमेल आईडी", application.filer_email],
+    ["आधार नंबर", application.filer_adhar],
+    ["शैक्षिक योग्यता", application.edu_qual],
+    ["जनपद", application.district],
+    ["विकासखंड / परियोजना", application.project],
+    ["सेक्टर", application.sector],
+    ["आंगनवाड़ी केंद्र / केंद्र कोड", application.awc_center],
+    ["आंगनवाड़ी केंद्र का नाम", application.awc_name],
+    ["आंगनवाड़ी कार्यकर्त्री के रूप में योगदान तिथि", formatDate(application.joining_date)],
+    ["गांव / क्षेत्र", application.village],
+    ["शहर", application.city],
+    ["पूरा पता", application.address],
+    ["पिन कोड", application.pincode],
+    ["खाताधारक का नाम", application.acc_holder],
+    ["बैंक खाता संख्या", application.acc_no],
+    ["IFSC कोड", application.acc_ifsc],
+    ["बैंक का नाम", application.bank_name],
+    ["PAN कार्ड", application.pancard],
   ];
 
-  const educationLevels = EDUCATION_LEVELS.filter(
-    ([, prefix]) => prefix === "high" || prefix === "int" || hasEducationDetails(application, prefix)
-  );
-  const casteCategory = String(application.caste_category || "").toLowerCase();
-  const variyata = String(application.variyata || "").trim();
-  const normalizedStatus = String(application.status || "").toLowerCase().replace(/[ -]+/g, "_");
-  const isFinal = Boolean(normalizedStatus) &&
-    !["pending", "draft", "in_progress", "edit"].includes(normalizedStatus);
-  const documentRows = PREVIEW_DOCUMENTS.map(([label, fields]) => [
-    label,
-    getApplicationValue(application, ...fields),
-  ]);
-  const pastEmploymentRows =
-    application.past_date && application.past_date !== "0000-00-00"
-      ? [
-          ["जनपद", application.past_district],
-          ["परियोजना", application.past_project],
-          ["आंगनवाड़ी केंद्र", application.past_awc],
-        ]
+  const checklistAnswers = Array.isArray(application.saaf_ans)
+    ? application.saaf_ans
+    : typeof application.saaf_ans === "string" && application.saaf_ans.trim()
+      ? application.saaf_ans.split(",").map((answer) => answer.trim()).filter(Boolean)
       : [];
-  const priorityNumber = applicantRows.length + pastEmploymentRows.length + 1;
+
+  const renderCertificateRows = (rows) =>
+    rows.map(({ key, label }) => (
+      <tr key={key}>
+        <td>{label}</td>
+        <td>{renderFile(application[key], label)}</td>
+      </tr>
+    ));
 
   return (
     <div
@@ -185,153 +155,81 @@ const AnganwadiApplicationPreview = ({
             <button type="button" className="btn btn-outline-light" onClick={onPrint}>
               <FaPrint className="me-2" /> प्रिंट / PDF
             </button>
-            <button type="button" className="btn btn-light" aria-label="Close application preview" onClick={onClose}>
-              ×
-            </button>
+            <button type="button" className="btn btn-light" aria-label="Close application preview" onClick={onClose}>×</button>
           </div>
         </header>
 
         <div className="anganwadi-application-preview-content">
           <article className="anganwadi-application-preview-print-area">
-            <h1 className="anganwadi-application-preview-department">
-              महिला सशक्तिकरण एवं बाल विकास विभाग उत्तराखण्ड
-            </h1>
-            <div className="anganwadi-application-preview-logo-row">
-              <div className="anganwadi-application-preview-icds-logo" aria-label="ICDS">
-                <strong>ICDS</strong>
-                <span>बाल विकास सेवाएं</span>
-              </div>
-              <img src={ukLogo} alt="उत्तराखण्ड राज्य" />
-            </div>
-            <h2 className="anganwadi-application-preview-title">
-              आंगनबाड़ी कार्यकर्त्री पुरस्कार चयन वर्ष 2026–27
-            </h2>
-            <h3 className="anganwadi-application-preview-status">
-              {isFinal ? "Form status : FINAL SUBMIT" : "Form Preview : Form Pending"}
-              <span> · {formatStatus(application.status)}</span>
-              <span> · Merit Marks: {displayValue(merit)}</span>
-            </h3>
+            <h1 className="anganwadi-application-preview-department">महिला सशक्तिकरण एवं बाल विकास विभाग</h1>
+            <h2 className="anganwadi-application-preview-title">आंगनवाड़ी कार्यकर्त्री पुरस्कार 2026–27 आवेदन पत्र</h2>
 
             <div className="anganwadi-application-preview-table-wrap">
               <table className="anganwadi-application-preview-table">
-                <thead>
-                  <tr><th>क्रमांक</th><th>शीर्षक</th><th>जानकारी</th></tr>
-                </thead>
+                <thead><tr><th>जानकारी का शीर्षक</th><th></th></tr></thead>
                 <tbody>
-                  {applicantRows.map(([label, value, type], index) => (
+                  {applicantRows.map(([label, value], index) => (
                     <tr key={label}>
-                      <td>{index + 1}</td>
-                      <td>{label}</td>
+                      <td>{label} :-</td>
                       <td>
-                        {type === "photo"
-                          ? renderFile(value, "आवेदक की पासपोर्ट साइज फोटो")
-                          : displayValue(value)}
+                        {displayValue(value)}
+                        {index === 1 && <div className="anganwadi-application-preview-applicant-photo">{renderFile(application.photo_img, "आवेदक का फोटो")}</div>}
                       </td>
                     </tr>
                   ))}
-                  {pastEmploymentRows.length > 0 && (
-                    <>
-                      <tr className="anganwadi-application-preview-group-row">
-                        <td colSpan="3"><strong>वरीयता श्रेणी 1 : पूर्व में कार्यरत आंगनवाड़ी सहायिका</strong></td>
-                      </tr>
-                      {pastEmploymentRows.map(([label, value], index) => (
-                        <tr key={label}>
-                          <td>{applicantRows.length + index + 1}</td><td>{label}</td><td>{displayValue(value)}</td>
-                        </tr>
-                      ))}
-                    </>
-                  )}
-                  <tr className="anganwadi-application-preview-group-row">
-                    <td colSpan="3">
-                      <strong>वरीयता श्रेणी : {variyata || "NA"}</strong>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>{priorityNumber}</td><td>विधवा :-</td>
-                    <td>{variyata === "विधवा" ? "हाँ" : "नहीं"}</td>
-                  </tr>
-                  <tr>
-                    <td>{priorityNumber + 1}</td><td>तलाकशुदा :-</td>
-                    <td>{variyata.includes("तलाक") || variyata.includes("तलाख") ? "हाँ" : "नहीं"}</td>
-                  </tr>
                 </tbody>
               </table>
             </div>
 
-            <h3 className="anganwadi-application-preview-section-title">
-              शैक्षिक सूचना के बारे में दी जानकारी
-            </h3>
             <div className="anganwadi-application-preview-table-wrap">
               <table className="anganwadi-application-preview-table">
-                <thead>
-                  <tr>
-                    <th>कक्षा</th><th>बोर्ड/विश्वविद्यालय का नाम</th><th>उत्तीर्ण वर्ष</th>
-                    <th>प्राप्तांक</th><th>पूर्णांक</th><th>प्रतिशत अंक</th><th>प्रमाण पत्र</th>
-                  </tr>
-                </thead>
+                <thead><tr><th>मूल्यांकन के लिए प्रश्न</th><th>चुना हुआ उत्तर</th></tr></thead>
                 <tbody>
-                  {application.edu_qual && (
-                    <tr>
-                      <td>शैक्षिक योग्यता</td><td colSpan="6">{displayValue(application.edu_qual)}</td>
-                    </tr>
-                  )}
-                  {educationLevels.map(([label, prefix]) => (
-                    <tr key={prefix}>
-                      <td>{label}</td>
-                      <td>{displayValue(application[`${prefix}_board`])}</td>
-                      <td>{displayValue(application[`${prefix}_year`])}</td>
-                      <td>{displayValue(application[`${prefix}_marks`])}</td>
-                      <td>{displayValue(application[`${prefix}_tot`])}</td>
-                      <td>{displayValue(application[`${prefix}_per`])}</td>
-                      <td>{renderFile(application[`${prefix}_img`], `${label} प्रमाण पत्र`)}</td>
+                  {ASSESSMENT_ROWS.map((row) => (
+                    <tr key={row.title}>
+                      <td>{row.title}</td>
+                      <td>
+                        {row.items?.map(([label, field]) => (
+                          <div className="anganwadi-application-preview-answer" key={field}>
+                            {label} - {displayValue(application[field])}
+                          </div>
+                        ))}
+                        {row.checklist && (checklistAnswers.length
+                          ? checklistAnswers.map((answer) => <div className="anganwadi-application-preview-check" key={answer}><FaCheckCircle aria-hidden="true" /> {answer}</div>)
+                          : <span>—</span>)}
+                        {row.files?.map(({ key, label }) => (
+                          <div className="anganwadi-application-preview-inline-file" key={key}>
+                            <span>{label} - </span>{renderFile(application[key], label)}
+                          </div>
+                        ))}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
 
-            <h3 className="anganwadi-application-preview-section-title">
-              अपलोड किए गए प्रमाण पत्र
-            </h3>
+            <h3 className="anganwadi-application-preview-section-title">Step 3: अपलोड दस्तावेज़ / प्रमाण पत्र का विवरण</h3>
             <div className="anganwadi-application-preview-table-wrap">
               <table className="anganwadi-application-preview-table">
-                <thead>
-                  <tr>
-                    <th>अनिवार्य अहर्ताओं के सापेक्ष प्रमाण पत्र</th>
-                    <th>प्रमाण पत्र</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {documentRows.map(([label, file]) => (
-                    <tr key={label}>
-                      <td>{label}</td>
-                      <td>{label.startsWith("2.") && casteCategory === "un" ? <span className="anganwadi-application-preview-missing">×</span> : renderFile(file, label)}</td>
-                    </tr>
-                  ))}
-                </tbody>
+                <thead><tr><th>अनिवार्य अर्हताओं के सापेक्ष प्रमाण पत्र</th><th>प्रमाण पत्र</th></tr></thead>
+                <tbody>{renderCertificateRows(ESSENTIAL_CERTIFICATE_ROWS)}</tbody>
+              </table>
+            </div>
+
+            <div className="anganwadi-application-preview-table-wrap">
+              <table className="anganwadi-application-preview-table">
+                <thead><tr><th>चयन मानक संबंधित प्रमाण पत्र</th><th>प्रमाण पत्र</th></tr></thead>
+                <tbody>{renderCertificateRows(SELECTION_CERTIFICATE_ROWS)}</tbody>
               </table>
             </div>
 
             <div className="anganwadi-application-preview-signature">
-              <div>{renderFile(application.signature, "आवेदक के हस्ताक्षर")}</div>
-              <p>{displayValue(application.filer_name)}</p>
+              <span>आवेदक के हस्ताक्षर</span>
+              {renderFile(application.signature, "आवेदक के हस्ताक्षर")}
             </div>
           </article>
-
-          <footer className="anganwadi-application-preview-footer">
-            <div>
-              <strong>आवेदन फार्म संख्या:</strong> {displayValue(application.form_id)}
-              <span> · </span>
-              <strong>Merit Marks:</strong> {displayValue(merit)}
-            </div>
-            <div className="anganwadi-application-preview-footer-actions">
-              <button type="button" className="btn btn-secondary" onClick={onClose}>बंद करें</button>
-              {children}
-              <button type="button" className="btn btn-info" onClick={onPrint}>
-                <FaPrint className="me-2" /> Print
-              </button>
-            </div>
-          </footer>
+          {children && <footer className="anganwadi-application-preview-footer-actions">{children}</footer>}
         </div>
       </section>
     </div>

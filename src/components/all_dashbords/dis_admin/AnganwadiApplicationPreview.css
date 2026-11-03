@@ -67,51 +67,6 @@
   box-shadow: 0 3px 14px rgba(38, 50, 72, 0.07);
 }
 
-.anganwadi-application-preview-logo-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  min-height: 105px;
-  margin-bottom: 12px;
-}
-
-.anganwadi-application-preview-logo-row > img {
-  width: 100px;
-  height: 105px;
-  padding: 5px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  object-fit: contain;
-}
-
-.anganwadi-application-preview-icds-logo {
-  display: flex;
-  width: 100px;
-  height: 105px;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 5px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  color: #1d4e89;
-  text-align: center;
-}
-
-.anganwadi-application-preview-icds-logo strong {
-  display: grid;
-  width: 52px;
-  height: 52px;
-  place-items: center;
-  border: 2px solid #1d4e89;
-  border-radius: 50%;
-  font-size: 15px;
-}
-
-.anganwadi-application-preview-icds-logo span {
-  font-size: 10px;
-}
-
 .anganwadi-application-preview-department {
   margin: 0 0 18px;
   color: #202124;
@@ -121,24 +76,11 @@
 }
 
 .anganwadi-application-preview-title {
-  margin: 0 0 18px;
+  margin: 0 0 22px;
   color: #202124;
   font-size: 17px;
   font-weight: 700;
   text-align: center;
-}
-
-.anganwadi-application-preview-status {
-  margin: 0 0 18px;
-  color: #0645ad;
-  font-size: 15px;
-  font-weight: 700;
-  text-align: center;
-}
-
-.anganwadi-application-preview-status span {
-  color: #344054;
-  font-size: 12px;
 }
 
 .anganwadi-application-preview-section-title {
@@ -166,7 +108,7 @@
 
 .anganwadi-application-preview-table th,
 .anganwadi-application-preview-table td {
-  padding: 8px 9px;
+  padding: 9px 10px;
   border: 1px solid #73777d;
   background: #fff;
   color: #202124;
@@ -181,11 +123,12 @@
 }
 
 .anganwadi-application-preview-table > tbody > tr > td:first-child {
+  width: 44%;
   font-weight: 600;
 }
 
-.anganwadi-application-preview-table .anganwadi-application-preview-group-row td {
-  background: #f1f3f5;
+.anganwadi-application-preview-table thead th:empty {
+  width: 56%;
 }
 
 .anganwadi-application-preview-table tbody tr {
@@ -204,7 +147,7 @@
 .anganwadi-application-preview-file img {
   width: auto;
   max-width: 100%;
-  max-height: 180px;
+  max-height: 200px;
   border: 1px solid #d7dce2;
   object-fit: contain;
 }
@@ -223,8 +166,32 @@
 
 .anganwadi-application-preview-missing {
   color: #dc2626;
-  font-size: 20px;
-  font-weight: 700;
+  font-size: 11px;
+}
+
+.anganwadi-application-preview-applicant-photo {
+  margin-top: 8px;
+}
+
+.anganwadi-application-preview-answer {
+  margin-bottom: 5px;
+  line-height: 1.55;
+}
+
+.anganwadi-application-preview-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  margin-bottom: 4px;
+}
+
+.anganwadi-application-preview-check svg {
+  flex: 0 0 auto;
+  margin-top: 3px;
+}
+
+.anganwadi-application-preview-inline-file {
+  margin-top: 8px;
 }
 
 .anganwadi-application-preview-signature {
@@ -236,19 +203,8 @@
   margin-top: 24px;
 }
 
-.anganwadi-application-preview-signature p {
-  margin: 4px 0 0;
-}
-
-.anganwadi-application-preview-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  max-width: 1050px;
-  margin: 16px auto 0;
-  color: #667085;
-  font-size: 12px;
+.anganwadi-application-preview-signature > span {
+  margin-bottom: 8px;
 }
 
 @media (max-width: 767px) {
@@ -283,10 +239,6 @@
     padding: 7px 6px;
   }
 
-  .anganwadi-application-preview-footer {
-    align-items: flex-start;
-    flex-direction: column;
-  }
 }
 
 @media print {
@@ -298,6 +250,13 @@
   body[class$="anganwadi-modal-open"] .anganwadi-application-preview-header,
   body[class$="anganwadi-modal-open"] .anganwadi-application-preview-footer-actions {
     display: none !important;
+  }
+
+  body[class$="anganwadi-modal-open"] .anganwadi-application-preview-overlay {
+    position: static !important;
+    display: block !important;
+    padding: 0 !important;
+    background: none !important;
   }
 
   body[class$="anganwadi-modal-open"] .anganwadi-application-preview-modal {

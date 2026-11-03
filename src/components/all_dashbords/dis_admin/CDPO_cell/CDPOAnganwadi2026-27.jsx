@@ -16,6 +16,10 @@ import {
 } from "react-icons/fa";
 import { cookieFetch } from "../../../login/AuthContext";
 import AnganwadiApplicationPreview from "../AnganwadiApplicationPreview";
+import {
+  getAnganwadiApplicationMerit,
+  normalizeAnganwadiApplication,
+} from "../anganwadiApplicationMetrics";
 import CDPOLeftNav from "./CDPOLeftNav";
 import CDPOTopNav from "./CDPOTopNav";
 import "../DPO_cell/DPODashboard.css";
@@ -103,55 +107,6 @@ const formatStatus = (status) => {
   return labels[normalizeStatus(status)] || displayValue(status);
 };
 
-const getApplicationMerit = (application) => {
-  if (!application) return null;
-
-  // Prefer the criterion marks returned by the API. This is important for the
-  // Completed Forms and Approved by CDPO tabs, which must show the same total
-  // as the marks visible in the application preview.
-  let calculatedTotal = 0;
-  let foundNumericMark = false;
-
-  Object.entries(application).forEach(([field, rawValue]) => {
-    if (!field.endsWith("_marks")) return;
-    if (rawValue === null || rawValue === undefined || String(rawValue).trim() === "") return;
-    const numericValue = Number(rawValue);
-    if (Number.isFinite(numericValue)) {
-      calculatedTotal += numericValue;
-      foundNumericMark = true;
-    }
-  });
-
-  const rawMerit = application.merit;
-  const apiMerit = rawMerit !== null && rawMerit !== undefined && String(rawMerit).trim() !== ""
-    ? Number(rawMerit)
-    : null;
-
-  // If actual criterion marks are available and add up to a positive value,
-  // use that total even when the API's stored merit is stale. If marks are
-  // absent or all zero, preserve a valid API merit as a fallback.
-  if (foundNumericMark && calculatedTotal > 0) return calculatedTotal;
-  if (apiMerit !== null && Number.isFinite(apiMerit)) return apiMerit;
-  return foundNumericMark ? calculatedTotal : null;
-};
-
-// Normalize records returned by the API once so every tab and the preview use
-// the same fields and numeric marks, regardless of whether the backend sends
-// numbers or numeric strings. Preserve all original API fields.
-const normalizeApplication = (record) => {
-  if (!record || typeof record !== "object") return record;
-  const normalized = { ...record };
-  Object.keys(normalized).forEach((key) => {
-    if (key.endsWith("_marks") || key === "merit" || key.endsWith("_tot") || key.endsWith("_obt")) {
-      const value = normalized[key];
-      if (value !== null && value !== undefined && String(value).trim() !== "" && Number.isFinite(Number(value))) {
-        normalized[key] = Number(value);
-      }
-    }
-  });
-  return normalized;
-};
-
 const normalizeStatus = (status) => String(status || "").trim().toLowerCase().replace(/[\s-]+/g, "_");
 const isApprovedStatus = (status) => {
   const value = normalizeStatus(status);
@@ -231,7 +186,7 @@ const CDPOAnganwadi2026_27 = () => {
       if (!Array.isArray(payload.data)) {
         throw new Error("The API response does not contain a valid data array.");
       }
-      setApplications(payload.data.map(normalizeApplication));
+      setApplications(payload.data.map(normalizeAnganwadiApplication));
       setProjectName(payload.project || "");
       setApiCount(Number.isFinite(Number(payload.count)) ? Number(payload.count) : payload.data.length);
     } catch (error) {
@@ -605,7 +560,7 @@ const CDPOAnganwadi2026_27 = () => {
                           </button>
                         </td>
                         <td className="cdpo-anganwadi-remark-cell">{displayValue(application.remark)}</td>
-                        <td><strong>Total Marks: {displayValue(getApplicationMerit(application))}</strong></td>
+                        <td><strong>Total Marks: {displayValue(getAnganwadiApplicationMerit(application))}</strong></td>
                         <td className="cdpo-anganwadi-row-actions-cell">
                           {approved ? (
                             <Badge bg="primary">Forwarded to DPO</Badge>
@@ -655,7 +610,7 @@ const CDPOAnganwadi2026_27 = () => {
                               <td>{displayValue(application.dept_work_detail)}</td>
                               <td>{displayValue(application.ach_work)}</td>
                               <td>{displayValue(application.remark)}</td>
-                              <td>{displayValue(getApplicationMerit(application))}</td>
+                              <td>{displayValue(getAnganwadiApplicationMerit(application))}</td>
                               <td>{(application.aharta4 || application.immunization_certificate) ? "हाँ" : "नहीं"}</td>
                             </>
                           ) : (
@@ -663,7 +618,7 @@ const CDPOAnganwadi2026_27 = () => {
                               <td>{(currentPage - 1) * PAGE_SIZE + index + 1}</td>
                               <td className="cdpo-anganwadi-status-cell"><Badge bg={getStatusVariant(status)}>{formatStatus(status)}</Badge></td>
                               <td className="cdpo-anganwadi-remark-cell">{displayValue(application.remark)}</td>
-                              <td><strong>{displayValue(getApplicationMerit(application))}</strong></td>
+                              <td><strong>{displayValue(getAnganwadiApplicationMerit(application))}</strong></td>
                               <td>{displayValue(application.filer_mob)}</td>
                               <td className="cdpo-anganwadi-form-id">
                                 <button type="button" className="cdpo-form-id-link" onClick={() => setSelectedApplication(application)} aria-label={`View application ${application.form_id}`}>
@@ -726,8 +681,6 @@ const CDPOAnganwadi2026_27 = () => {
       <AnganwadiApplicationPreview
         application={selectedApplication}
         rolePrefix="cdpo"
-        formatStatus={formatStatus}
-        merit={getApplicationMerit(selectedApplication)}
         onClose={() => setSelectedApplication(null)}
         onPrint={handlePrint}
       >

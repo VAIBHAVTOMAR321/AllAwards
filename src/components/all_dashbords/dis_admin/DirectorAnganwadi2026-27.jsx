@@ -18,6 +18,7 @@ import { cookieFetch } from "../../login/AuthContext";
 import DisLeftnav from "./DisLeftnav";
 import DisTopNav from "./DisTopNav";
 import AnganwadiApplicationPreview from "./AnganwadiApplicationPreview";
+import { getAnganwadiApplicationMerit } from "./anganwadiApplicationMetrics";
 import "./DPO_cell/DPODashboard.css";
 import "./DirectorAnganwadi2026-27.css";
 
@@ -758,7 +759,7 @@ const DirectorAnganwadi2026_27 = () => {
                           </button>
                         </td>
                         <td className="director-anganwadi-remark-cell">{displayValue(application.remark)}</td>
-                        <td><strong>Total Marks: {displayValue(application.merit)}</strong></td>
+                        <td><strong>Total Marks: {displayValue(getAnganwadiApplicationMerit(application))}</strong></td>
                         <td className="director-anganwadi-select-cell">
                           <Form.Check
                             type="radio"
@@ -820,7 +821,7 @@ const DirectorAnganwadi2026_27 = () => {
                               <td>{displayValue(application.dept_work_detail)}</td>
                               <td>{displayValue(application.ach_work)}</td>
                               <td>{displayValue(application.remark)}</td>
-                              <td>{displayValue(application.merit)}</td>
+                              <td>{displayValue(getAnganwadiApplicationMerit(application))}</td>
                               <td>{(application.aharta4 || application.immunization_certificate) ? "हाँ" : "नहीं"}</td>
                             </>
                           ) : (
@@ -828,7 +829,7 @@ const DirectorAnganwadi2026_27 = () => {
                               <td>{(currentPage - 1) * PAGE_SIZE + index + 1}</td>
                               <td className="director-anganwadi-status-cell"><Badge bg={getStatusVariant(status)}>{formatStatus(status)}</Badge></td>
                               <td className="director-anganwadi-remark-cell">{displayValue(application.remark)}</td>
-                              <td><strong>{displayValue(application.merit)}</strong></td>
+                              <td><strong>{displayValue(getAnganwadiApplicationMerit(application))}</strong></td>
                               <td>{displayValue(application.filer_mob)}</td>
                               <td className="director-anganwadi-form-id">
                                 <button type="button" className="director-form-id-link" onClick={() => setSelectedApplication(application)} aria-label={`View application ${application.form_id}`}>
@@ -891,8 +892,6 @@ const DirectorAnganwadi2026_27 = () => {
       <AnganwadiApplicationPreview
         application={selectedApplication}
         rolePrefix="director"
-        formatStatus={formatStatus}
-        merit={selectedApplication?.merit}
         onClose={() => setSelectedApplication(null)}
         onPrint={handlePrint}
       />
