@@ -11,14 +11,13 @@ import {
 import {
   FaCheck,
   FaEye,
-  FaFilePdf,
-  FaPrint,
   FaSearch,
   FaTimes,
 } from "react-icons/fa";
 import { cookieFetch } from "../../login/AuthContext";
 import DisLeftnav from "./DisLeftnav";
 import DisTopNav from "./DisTopNav";
+import AnganwadiApplicationPreview from "./AnganwadiApplicationPreview";
 import "./DPO_cell/DPODashboard.css";
 import "./DirectorAnganwadi2026-27.css";
 
@@ -26,104 +25,7 @@ const APPLICATIONS_URL =
   "https://mahadevaaya.com/wecdallaward/wecdallaward_backend/api/ang-puruskar/itcell/director/status/";
 const DISTRICTS_URL =
   "https://mahadevaaya.com/wecdallaward/wecdallaward_backend/api/districts/list/";
-const MEDIA_BASE_URL =
-  "https://mahadevaaya.com/wecdallaward/wecdallaward_backend";
 const PAGE_SIZE = 10;
-
-const APPLICATION_FIELDS = [
-  ["Application ID", "form_id"],
-  ["Applicant Name", "filer_name"],
-  ["Father / Husband Name", "fath_husb_name"],
-  ["Date of Birth", "dob"],
-  ["Age", "age"],
-  ["Mobile Number", "filer_mob"],
-  ["Email", "filer_email"],
-  ["Educational Qualification", "edu_qual"],
-  ["District", "district"],
-  ["Project", "project"],
-  ["Sector", "sector"],
-  ["Anganwadi Center", "awc_name"],
-  ["Center Code", "awc_center"],
-  ["Joining Date", "joining_date"],
-  ["Village", "village"],
-  ["Address", "address"],
-  ["City", "city"],
-  ["PIN Code", "pincode"],
-  ["Bank Account Holder", "acc_holder"],
-  ["Bank Account Number", "acc_no"],
-  ["IFSC Code", "acc_ifsc"],
-  ["Bank Name", "bank_name"],
-  ["PAN Card", "pancard"],
-];
-
-const MARK_GROUPS = [
-  {
-    title: "Schemes and Beneficiaries",
-    fields: [
-      ["Pradhan Mantri Matru Vandana Yojana (PMMVY)", "pmmvy"],
-      ["Chief Minister Mahalakshmi Kit (CMMK)", "cmmk"],
-      ["Nanda Gaura Yojana – First Installment", "nanda1"],
-      ["Nanda Gaura Yojana – Second Installment", "nanda2"],
-    ],
-  },
-  {
-    title: "Center Operations and Services",
-    fields: [
-      ["Poshan Tracker", "pt"],
-      ["Survey", "survey"],
-      ["Annual Report", "ann"],
-      ["Poshan Tracker Group", "pt_group"],
-      ["Referral", "sandharbh"],
-      ["Community Activity", "sam"],
-      ["VHSND", "vhsnd"],
-      ["Beneficiary Details", "pt_ben"],
-      ["Records", "abhilekh"],
-      ["Cleanliness Measures", "saaf"],
-      ["Deworming", "krimi"],
-      ["Nutrition Week", "poshan_week"],
-    ],
-  },
-  {
-    title: "Nutrition and Health",
-    fields: [
-      ["SAM – Up to 6 Months", "sam_6mon"],
-      ["SAM – 6 Months to 6 Years", "sam_6yr"],
-      ["MAM – Up to 6 Months", "mam_6mon"],
-      ["Severe Cases", "gambhir"],
-      ["RBSK", "rbsk"],
-    ],
-  },
-  {
-    title: "Other Work and Achievements",
-    fields: [
-      ["Other Work", "other_work"],
-      ["Departmental Work", "dept_work"],
-      ["Individual Work", "per_work"],
-      ["Achievement Work", "ach_work"],
-    ],
-  },
-];
-
-const DOCUMENT_FIELDS = [
-  ["Applicant Photo", "photo_img", "image"],
-  ["Signature", "signature", "image"],
-  ["Eligibility Document 1", "aharta1", "pdf"],
-  ["Eligibility Document 2", "aharta2", "pdf"],
-  ["Eligibility Document 3", "aharta3", "pdf"],
-  ["Eligibility Document 4", "aharta4", "pdf"],
-  ["Selection Criteria - Achievements / News Records", "manak2", "pdf"],
-  ["Selection Criteria - Departmental Model Center Work", "manak3a", "pdf"],
-  ["Selection Criteria - Individual Model Center Work", "manak3b", "pdf"],
-  ["Awards / Certificates for Excellent Work", "manak4", "pdf"],
-  ["Poshan Tracker Group Photo", "pt_group_img", "image"],
-  ["Referral Document", "sandharbh_img", "image"],
-  ["Community Activity Document", "sam_img", "image"],
-  ["SAM – Up to 6 Months Document", "sam_6mon_img", "image"],
-  ["SAM – Up to 6 Years Document", "sam_6yr_img", "image"],
-  ["MAM – Up to 6 Months Document", "mam_6mon_img", "image"],
-  ["Severe Case Document", "gambhir_img", "image"],
-  ["Other Work Document", "other_work_img", "image"],
-];
 
 const readResponse = async (response) => {
   const body = await response.text();
@@ -147,17 +49,6 @@ const displayValue = (value) => {
     return "—";
   }
   return String(value);
-};
-
-const formatDate = (value) => {
-  if (!value) return "—";
-  const parsed = new Date(value);
-  if (Number.isNaN(parsed.getTime())) return value;
-  return parsed.toLocaleDateString("en-IN", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  });
 };
 
 const calculateAgeFromDob = (value) => {
@@ -184,13 +75,6 @@ const formatTableDate = (value) => {
   const month = parts.find((part) => part.type === "month")?.value;
   const year = parts.find((part) => part.type === "year")?.value;
   return `${day}-${month}-${year}`;
-};
-
-const getMediaUrl = (file) => {
-  if (!file) return "";
-  const path = String(file).trim();
-  if (/^https?:\/\//i.test(path)) return path;
-  return `${MEDIA_BASE_URL}/${path.replace(/^\/+/, "")}`;
 };
 
 const getStatusVariant = (status) => {
@@ -231,57 +115,6 @@ const formatStatus = (status) => {
   if (value.includes("approv")) return "Approved";
   if (value === "pending") return "Pending";
   return displayValue(status);
-};
-
-const getMarkValue = (application, prefix) => {
-  if (prefix === "saaf") {
-    return {
-      obtained: application.saaf_ans,
-      marks: application.saaf_marks,
-      total: null,
-    };
-  }
-  if (prefix === "sam_6mon" || prefix === "sam_6yr" || prefix === "mam_6mon") {
-    return {
-      obtained: null,
-      marks: application[`${prefix}_marks`],
-      total: application[`${prefix}_tot`],
-    };
-  }
-  if (prefix === "other_work" || prefix === "dept_work" ||
-      prefix === "per_work" || prefix === "ach_work") {
-    return {
-      obtained: application[`${prefix}_detail`],
-      marks: application[`${prefix}_marks`],
-      total: null,
-    };
-  }
-  if (prefix === "rbsk") {
-    return {
-      obtained: application.rbsk_obt,
-      marks: application.rbsk_marks,
-      total: application.rbsk_tot,
-    };
-  }
-  if (prefix === "sam") {
-    return {
-      obtained: application.sam_detail || application.sam_obt,
-      marks: application.sam_marks,
-      total: application.sam_tot,
-    };
-  }
-  if (prefix === "gambhir") {
-    return {
-      obtained: application.gambhir_detail,
-      marks: application.gambhir_marks,
-      total: application.gambhir_tot,
-    };
-  }
-  return {
-    obtained: application[`${prefix}_obt`],
-    marks: application[`${prefix}_marks`],
-    total: application[`${prefix}_tot`],
-  };
 };
 
 const DirectorAnganwadi2026_27 = () => {
@@ -635,275 +468,6 @@ const DirectorAnganwadi2026_27 = () => {
 
   const handlePrint = () => window.print();
 
-  const previewValue = (value) => {
-    if (Array.isArray(value)) return value.length ? value.map(String).join(", ") : "—";
-    return displayValue(value);
-  };
-
-  const renderPreviewFile = (application, field, label) => {
-    const filePath = application?.[field];
-    if (!filePath) {
-      return <span className="director-preview-missing">दस्तावेज़ अपलोड नहीं हुआ है / Document Not Uploaded</span>;
-    }
-    const url = getMediaUrl(filePath);
-    const fileName = String(filePath).split(/[\\/]/).pop() || label;
-    const isImage = /\.(png|jpe?g|gif|webp|bmp)(\?.*)?$/i.test(String(filePath));
-    const isPdf = /\.pdf(\?.*)?$/i.test(String(filePath));
-    return (
-      <div className="director-preview-file">
-        {isImage && <img src={url} alt={label} loading="lazy" />}
-        {isPdf && <iframe title={label} src={url} loading="lazy" />}
-        <a href={url} target="_blank" rel="noreferrer">{fileName}</a>
-      </div>
-    );
-  };
-
-  const renderApplicantPreviewRows = (application) => {
-    const rows = [
-      ["आवेदन फार्म संख्या", application.form_id],
-      ["आवेदक का नाम कु0 / श्रीमती", application.filer_name],
-      ["पिता / पति का नाम", application.fath_husb_name],
-      ["जन्म तिथि", formatDate(application.dob)],
-      ["आयु", application.age],
-      ["मोबाइल नंबर", application.filer_mob],
-      ["ईमेल आईडी", application.filer_email],
-      ["शैक्षिक योग्यता", application.edu_qual],
-      ["जनपद", application.district],
-      ["विकासखंड / परियोजना", application.project],
-      ["सेक्टर", application.sector],
-      ["वर्तमान में तैनात आंगनबाड़ी / मिनी आंगनबाड़ी केंद्र का नाम", application.awc_name],
-      ["आंगनबाड़ी केंद्र कोड", application.awc_center],
-      ["योगदान तिथि", formatDate(application.joining_date)],
-      ["गांव / क्षेत्र का नाम", application.village],
-      ["पता", application.address],
-      ["शहर", application.city],
-      ["पिन कोड", application.pincode],
-      ["खाताधारक का नाम", application.acc_holder],
-      ["खाता संख्या", application.acc_no],
-      ["IFSC कोड", application.acc_ifsc],
-      ["बैंक का नाम", application.bank_name],
-      ["पैन कार्ड", application.pancard],
-    ];
-    return rows.map(([label, value], index) => (
-      <tr key={label}>
-        <td>{label}:</td>
-        <td>
-          {previewValue(value)}
-          {index === 1 && (
-            <div className="director-preview-applicant-photo">
-              {renderPreviewFile(application, "photo_img", "Applicant Photo")}
-            </div>
-          )}
-        </td>
-      </tr>
-    ));
-  };
-
-  const PREVIEW_MARK_GROUP_TITLES = {
-    "Schemes and Beneficiaries": "योजनाओं की प्रगति",
-    "Center Operations and Services": "केंद्र संचालन एवं सेवाएं",
-    "Nutrition and Health": "पोषण एवं स्वास्थ्य",
-    "Other Work and Achievements": "अन्य विशिष्ट कार्य एवं उपलब्धियां",
-  };
-
-  const PREVIEW_MARK_LABELS = {
-    pmmvy: "प्रधानमंत्री मातृ वंदना योजना की प्रगति",
-    cmmk: "मुख्यमंत्री महालक्ष्मी किट योजना की प्रगति",
-    nanda1: "नंदा गौरा योजना - प्रथम किश्त",
-    nanda2: "नंदा गौरा योजना - द्वितीय किश्त",
-    pt: "पोषण ट्रैकर ऐप में पूर्व-स्कूली शिक्षा",
-    survey: "वित्तीय वर्ष में गृह भ्रमण",
-    ann: "अन्नप्राशन गतिविधियां",
-    pt_group: "पोषण ट्रैकर ऐप में समुदाय आधारित गतिविधियां",
-    sandharbh: "संदर्भ सेवाएं",
-    sam: "कुपोषित एवं अतिकुपोषित लाभार्थी",
-    vhsnd: "VHSND (ग्राम स्वच्छता एवं पोषण दिवस)",
-    pt_ben: "पोषण ट्रैकर ऐप में आधार नामांकन",
-    abhilekh: "अभिलेखों / पंजिकाओं का रखरखाव",
-    saaf: "आंगनवाड़ी केंद्र एवं आसपास की साफ-सफाई",
-    krimi: "राष्ट्रीय कृमि दिवस",
-    poshan_week: "राष्ट्रीय पोषण सप्ताह",
-    sam_6mon: "अतिकुपोषित श्रेणी के 0–6 वर्ष के बच्चे",
-    sam_6yr: "अतिकुपोषित से कुपोषित श्रेणी में आए 0–6 वर्ष के बच्चे",
-    mam_6mon: "कुपोषित से सामान्य श्रेणी में आए 0–6 वर्ष के बच्चे",
-    gambhir: "गंभीर बीमारी से ग्रसित बच्चों का विवरण",
-    rbsk: "RBSK टीम द्वारा केंद्र भ्रमण",
-    other_work: "अन्य विशिष्ट कार्य (BLO, जनगणना, पल्स पोलियो आदि)",
-    dept_work: "विभागीय सहयोग से किए गए कार्य",
-    per_work: "व्यक्तिगत प्रयास से केंद्र को सार्वजनिक भवन में स्थानांतरित करना",
-    ach_work: "अन्य विशिष्ट उपलब्धियां एवं कुपोषण उन्मूलन के प्रयास",
-  };
-
-  const PREVIEW_DOCUMENT_LABELS = {
-    photo_img: "आवेदक का फोटो",
-    signature: "आवेदक के हस्ताक्षर",
-    pt_group_img: "समुदाय आधारित गतिविधियों से संबंधित फोटो",
-    sandharbh_img: "संदर्भण पर्ची (Referral Slip)",
-    sam_img: "कुपोषित एवं अतिकुपोषित लाभार्थियों से संबंधित फोटो",
-    sam_6mon_img: "अतिकुपोषित बच्चों की फोटो",
-    sam_6yr_img: "श्रेणी में सुधार वाले बच्चों की फोटो",
-    mam_6mon_img: "सामान्य श्रेणी में आए बच्चों की फोटो",
-    gambhir_img: "गंभीर बीमारी से ग्रसित बच्चों की फोटो",
-    other_work_img: "आदेश की फोटो",
-  };
-
-  const renderAssessmentPreviewRows = (application) =>
-    MARK_GROUPS.map((group) => (
-      <React.Fragment key={group.title}>
-        <tr className="director-preview-group-row">
-          <th colSpan={2}>{PREVIEW_MARK_GROUP_TITLES[group.title] || group.title}</th>
-        </tr>
-        {group.fields.map(([label, prefix]) => {
-          const mark = getMarkValue(application, prefix);
-          return (
-            <tr key={prefix}>
-              <td>{PREVIEW_MARK_LABELS[prefix] || label}</td>
-              <td>
-                <div className="director-preview-answer">
-                  <strong>कुल / विवरण:</strong>{" "}
-                  {previewValue(mark.total !== null && mark.total !== undefined ? mark.total : mark.obtained)}
-                </div>
-                <div className="director-preview-answer">
-                  <strong>प्राप्त / रिपोर्ट किए गए:</strong> {previewValue(mark.obtained)}
-                </div>
-                <div className="director-preview-answer">
-                  <strong>प्राप्त अंक:</strong> {previewValue(mark.marks)}
-                </div>
-              </td>
-            </tr>
-          );
-        })}
-      </React.Fragment>
-    ));
-
-  const renderCertificatePreviewRows = (application, fields) =>
-    fields.map(([label, field]) => {
-      const previewLabel = PREVIEW_DOCUMENT_LABELS[field] || label;
-      return (
-        <tr key={field}>
-          <td>{previewLabel}</td>
-          <td>{renderPreviewFile(application, field, previewLabel)}</td>
-        </tr>
-      );
-    });
-
-  const ELIGIBILITY_PREVIEW_FIELDS = [
-    ["1. आंगनबाड़ी कार्यकर्ती / मिनी कार्यकर्ती के रूप में पांच वर्ष की निरंतर सेवा पूर्ण कर ली हो तथा वर्तमान में कार्यरत हों (CDPO द्वारा प्रदत्त प्रमाण-पत्र)", "aharta1"],
-    ["2. ऐसे आंगनबाड़ी केंद्र / मिनी आंगनबाड़ी केंद्र का संचालन करती हों जहां सर्वे अनुसार ग्रामीण क्षेत्रों में न्यूनतम 10 एवं शहरी क्षेत्रों में न्यूनतम 20 बच्चे पंजीकृत हों (क्षेत्रीय सुपरवाइजर द्वारा प्रदत्त प्रमाण-पत्र)", "aharta2"],
-    ["3. संबंधित आंगनबाड़ी केंद्र के समस्त लाभार्थी पोषण ट्रैकर ऐप में पंजीकृत हों (क्षेत्रीय सुपरवाइजर द्वारा प्रदत्त प्रमाण-पत्र)", "aharta3"],
-    ["4. संबंधित आंगनबाड़ी केंद्र के समस्त बच्चों की प्रतिरक्षण दर राज्य स्तरीय दर से कम न होने का प्रमाण-पत्र", "aharta4"],
-  ];
-
-  const SELECTION_PREVIEW_FIELDS = [
-    ["1. अन्य विशिष्ट उपलब्धियों, महत्वपूर्ण दिवसों एवं कुपोषण उन्मूलन के प्रयासों के समाचार / अभिलेख", "manak2"],
-    ["2(i). विभागीय सहयोग से केंद्र को मॉडल बनाने के कार्यों का विवरण", "manak3a"],
-    ["2(ii). व्यक्तिगत प्रयासों से केंद्र को मॉडल बनाने के कार्यों का विवरण", "manak3b"],
-    ["3. उत्कृष्ट कार्यों हेतु प्राप्त सम्मान, पुरस्कार या प्रमाण-पत्र", "manak4"],
-  ];
-
-  const renderApplicationDetails = (application) => (
-    <div className="director-anganwadi-detail-table-wrap">
-      <Table bordered responsive className="director-anganwadi-detail-table">
-        <tbody>
-          {APPLICATION_FIELDS.map(([label, field]) => (
-            <tr key={field}>
-              <th>{label}</th>
-              <td>
-                {field === "dob" || field === "joining_date"
-                  ? formatDate(application[field])
-                  : displayValue(application[field])}
-              </td>
-            </tr>
-          ))}
-          <tr>
-            <th>Merit Marks</th>
-            <td>
-              <strong>{displayValue(application.merit)}</strong>
-            </td>
-          </tr>
-          <tr>
-            <th>Current Status</th>
-            <td>
-              <Badge bg={getStatusVariant(application.status)}>
-                {formatStatus(application.status)}
-              </Badge>
-            </td>
-          </tr>
-          <tr>
-            <th>CDPO Remark</th>
-            <td>{displayValue(application.remark)}</td>
-          </tr>
-        </tbody>
-      </Table>
-    </div>
-  );
-
-  const renderMarkGroups = (application) => (
-    <div className="director-anganwadi-mark-groups">
-      {MARK_GROUPS.map((group) => (
-        <section className="director-anganwadi-mark-group" key={group.title}>
-          <h3>{group.title}</h3>
-          <div className="director-anganwadi-detail-table-wrap">
-            <Table bordered responsive className="director-anganwadi-detail-table">
-              <thead>
-                <tr>
-                  <th>Evaluation Criteria</th>
-                  <th>Total / Details</th>
-                  <th>Marks Obtained</th>
-                </tr>
-              </thead>
-              <tbody>
-                {group.fields.map(([label, prefix]) => {
-                  const mark = getMarkValue(application, prefix);
-                  const totalLabel =
-                    mark.total !== null && mark.total !== undefined
-                      ? displayValue(mark.total)
-                      : displayValue(mark.obtained);
-                  return (
-                    <tr key={prefix}>
-                      <td>{label}</td>
-                      <td>{totalLabel}</td>
-                      <td>{displayValue(mark.marks)}</td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </Table>
-          </div>
-        </section>
-      ))}
-    </div>
-  );
-
-  const renderDocuments = (application) => {
-    const availableDocuments = DOCUMENT_FIELDS.filter(([, field]) => application[field]);
-    if (availableDocuments.length === 0) {
-      return <p className="director-anganwadi-muted">No documents are available.</p>;
-    }
-
-    return (
-      <div className="director-anganwadi-documents">
-        {availableDocuments.map(([label, field, type]) => {
-          const url = getMediaUrl(application[field]);
-          return (
-            <div className="director-anganwadi-document" key={field}>
-              {type === "image" ? (
-                <a href={url} target="_blank" rel="noreferrer">
-                  <img src={url} alt={label} loading="lazy" />
-                  <span>{label}</span>
-                </a>
-              ) : (
-                <a href={url} target="_blank" rel="noreferrer">
-                  <FaFilePdf aria-hidden="true" />
-                  <span>{label} — View / Download</span>
-                </a>
-              )}
-            </div>
-          );
-        })}
-      </div>
-    );
-  };
 
   return (
     <div className="dashboard-container director-anganwadi-dashboard">
@@ -1324,136 +888,14 @@ const DirectorAnganwadi2026_27 = () => {
         </main>
       </div>
 
-      {selectedApplication && (
-        <div
-          className="director-anganwadi-preview-overlay"
-          role="presentation"
-          onMouseDown={(event) => {
-            if (event.target === event.currentTarget) setSelectedApplication(null);
-          }}
-        >
-          <section
-            className="director-anganwadi-preview-modal"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="director-anganwadi-preview-title"
-          >
-            <header className="director-anganwadi-document-header">
-              <div>
-                <h2 id="director-anganwadi-preview-title">आवेदन का पूर्वावलोकन</h2>
-                <p>आंगनवाड़ी कार्यकर्त्री पुरस्कार 2026–27</p>
-              </div>
-              <div className="director-anganwadi-document-actions">
-                <Button variant="outline-light" onClick={handlePrint}>
-                  <FaPrint className="me-2" /> प्रिंट / PDF
-                </Button>
-                <Button
-                  variant="light"
-                  aria-label="Close application preview"
-                  onClick={() => setSelectedApplication(null)}
-                >
-                  ×
-                </Button>
-              </div>
-            </header>
-
-            <div className="director-anganwadi-document-content">
-              <article className="director-anganwadi-print-area">
-                <h1 className="director-anganwadi-document-department">
-                  महिला सशक्तिकरण एवं बाल विकास विभाग
-                </h1>
-                <h2 className="director-anganwadi-document-title">
-                  आंगनवाड़ी कार्यकर्त्री पुरस्कार 2026–27 आवेदन पत्र
-                </h2>
-
-                <div className={`director-anganwadi-document-status ${isDpoApproved(selectedApplication.status) ? "is-approved" : ""}`}>
-                  <strong>आवेदन की स्थिति:</strong> {formatStatus(selectedApplication.status)}
-                  <span className="director-anganwadi-document-status-separator"> | </span>
-                  <strong>Merit Marks:</strong> {displayValue(selectedApplication.merit)}
-                </div>
-
-                <div className="director-anganwadi-document-table-wrap">
-                  <table className="director-anganwadi-document-table">
-                    <thead>
-                      <tr><th>जानकारी का शीर्षक</th><th></th></tr>
-                    </thead>
-                    <tbody>{renderApplicantPreviewRows(selectedApplication)}</tbody>
-                  </table>
-                </div>
-
-                <h3 className="director-anganwadi-document-section-title">मूल्यांकन के लिए प्रश्न</h3>
-                <div className="director-anganwadi-document-table-wrap">
-                  <table className="director-anganwadi-document-table director-anganwadi-assessment-preview-table">
-                    <thead><tr><th>मूल्यांकन के लिए प्रश्न</th><th>चुना हुआ उत्तर / अंक विवरण</th></tr></thead>
-                    <tbody>{renderAssessmentPreviewRows(selectedApplication)}</tbody>
-                  </table>
-                </div>
-
-                <h3 className="director-anganwadi-document-section-title">Step 3: अपलोड दस्तावेज़ / प्रमाण पत्र का विवरण</h3>
-                <div className="director-anganwadi-document-table-wrap">
-                  <table className="director-anganwadi-document-table">
-                    <thead><tr><th>अनिवार्य अर्हताओं के सापेक्ष प्रमाण पत्र</th><th>प्रमाण पत्र</th></tr></thead>
-                    <tbody>{renderCertificatePreviewRows(selectedApplication, ELIGIBILITY_PREVIEW_FIELDS)}</tbody>
-                  </table>
-                </div>
-
-                <h3 className="director-anganwadi-document-section-title">चयन मानक संबंधित प्रमाण पत्र</h3>
-                <div className="director-anganwadi-document-table-wrap">
-                  <table className="director-anganwadi-document-table">
-                    <thead><tr><th>चयन मानक संबंधित प्रमाण पत्र</th><th>प्रमाण पत्र</th></tr></thead>
-                    <tbody>{renderCertificatePreviewRows(selectedApplication, SELECTION_PREVIEW_FIELDS)}</tbody>
-                  </table>
-                </div>
-
-                <h3 className="director-anganwadi-document-section-title">अन्य अपलोड दस्तावेज़ / फोटो</h3>
-                <div className="director-anganwadi-document-table-wrap">
-                  <table className="director-anganwadi-document-table">
-                    <thead><tr><th>दस्तावेज़ का विवरण</th><th>अपलोड की गई फाइल</th></tr></thead>
-                    <tbody>
-                      {renderCertificatePreviewRows(
-                        selectedApplication,
-                        DOCUMENT_FIELDS
-                          .filter(([, field]) => !["photo_img", "signature", "aharta1", "aharta2", "aharta3", "aharta4", "manak2", "manak3a", "manak3b", "manak4"].includes(field))
-                          .map(([label, field]) => [label, field])
-                      )}
-                      <tr>
-                        <td>आवेदक के हस्ताक्षर</td>
-                        <td>{renderPreviewFile(selectedApplication, "signature", "आवेदक के हस्ताक्षर")}</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-
-                <h3 className="director-anganwadi-document-section-title">CDPO समीक्षा</h3>
-                <div className="director-anganwadi-document-table-wrap">
-                  <table className="director-anganwadi-document-table">
-                    <tbody>
-                      <tr><td>आवेदन की स्थिति</td><td>{formatStatus(selectedApplication.status)}</td></tr>
-                      <tr><td>CDPO की टिप्पणी</td><td>{displayValue(selectedApplication.remark)}</td></tr>
-                    </tbody>
-                  </table>
-                </div>
-              </article>
-
-              <div className="director-anganwadi-document-footer">
-                <div>
-                  <strong>आवेदन फार्म संख्या:</strong> {displayValue(selectedApplication.form_id)}
-                  <span> · </span>
-                  <strong>Merit Marks:</strong> {displayValue(selectedApplication.merit)}
-                </div>
-                <div className="director-anganwadi-document-footer-actions">
-                  <Button variant="secondary" onClick={() => setSelectedApplication(null)}>
-                    <FaTimes className="me-2" /> बंद करें
-                  </Button>
-                  <Button variant="info" onClick={handlePrint}>
-                    <FaPrint className="me-2" /> Print
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </section>
-        </div>
-      )}
+      <AnganwadiApplicationPreview
+        application={selectedApplication}
+        rolePrefix="director"
+        formatStatus={formatStatus}
+        merit={selectedApplication?.merit}
+        onClose={() => setSelectedApplication(null)}
+        onPrint={handlePrint}
+      />
 
       <Modal
         show={Boolean(approvalApplication)}

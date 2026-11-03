@@ -1,0 +1,330 @@
+.anganwadi-application-preview-overlay {
+  position: fixed;
+  z-index: 1200;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(15, 23, 42, 0.68);
+}
+
+.anganwadi-application-preview-modal {
+  display: flex;
+  flex-direction: column;
+  width: min(1200px, 100%);
+  max-height: min(94vh, 1100px);
+  overflow: hidden;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 22px 65px rgba(0, 0, 0, 0.3);
+}
+
+.anganwadi-application-preview-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 20px;
+  background: #1976d2;
+  color: #fff;
+}
+
+.anganwadi-application-preview-header h2 {
+  margin: 0 0 4px;
+  color: #fff;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.anganwadi-application-preview-header p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 12px;
+}
+
+.anganwadi-application-preview-actions,
+.anganwadi-application-preview-footer-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.anganwadi-application-preview-content {
+  overflow: auto;
+  padding: 18px;
+}
+
+.anganwadi-application-preview-print-area {
+  width: 100%;
+  max-width: 1050px;
+  margin: 0 auto;
+  padding: 28px 34px;
+  border: 1px solid #dfe3e8;
+  background: #fff;
+  color: #202124;
+  box-shadow: 0 3px 14px rgba(38, 50, 72, 0.07);
+}
+
+.anganwadi-application-preview-logo-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 105px;
+  margin-bottom: 12px;
+}
+
+.anganwadi-application-preview-logo-row > img {
+  width: 100px;
+  height: 105px;
+  padding: 5px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  object-fit: contain;
+}
+
+.anganwadi-application-preview-icds-logo {
+  display: flex;
+  width: 100px;
+  height: 105px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  color: #1d4e89;
+  text-align: center;
+}
+
+.anganwadi-application-preview-icds-logo strong {
+  display: grid;
+  width: 52px;
+  height: 52px;
+  place-items: center;
+  border: 2px solid #1d4e89;
+  border-radius: 50%;
+  font-size: 15px;
+}
+
+.anganwadi-application-preview-icds-logo span {
+  font-size: 10px;
+}
+
+.anganwadi-application-preview-department {
+  margin: 0 0 18px;
+  color: #202124;
+  font-size: 21px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.anganwadi-application-preview-title {
+  margin: 0 0 18px;
+  color: #202124;
+  font-size: 17px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.anganwadi-application-preview-status {
+  margin: 0 0 18px;
+  color: #0645ad;
+  font-size: 15px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.anganwadi-application-preview-status span {
+  color: #344054;
+  font-size: 12px;
+}
+
+.anganwadi-application-preview-section-title {
+  margin: 22px 0 10px;
+  color: #202124;
+  font-size: 15px;
+  font-weight: 700;
+  break-after: avoid;
+}
+
+.anganwadi-application-preview-table-wrap {
+  width: 100%;
+  margin-bottom: 18px;
+  overflow: visible;
+}
+
+.anganwadi-application-preview-table {
+  width: 100%;
+  margin: 0;
+  border-collapse: collapse;
+  color: #202124;
+  font-size: 12px;
+  vertical-align: top;
+}
+
+.anganwadi-application-preview-table th,
+.anganwadi-application-preview-table td {
+  padding: 8px 9px;
+  border: 1px solid #73777d;
+  background: #fff;
+  color: #202124;
+  text-align: left;
+  vertical-align: top;
+  overflow-wrap: anywhere;
+}
+
+.anganwadi-application-preview-table thead th {
+  background: #f1f3f5;
+  font-weight: 700;
+}
+
+.anganwadi-application-preview-table > tbody > tr > td:first-child {
+  font-weight: 600;
+}
+
+.anganwadi-application-preview-table .anganwadi-application-preview-group-row td {
+  background: #f1f3f5;
+}
+
+.anganwadi-application-preview-table tbody tr {
+  break-inside: avoid;
+}
+
+.anganwadi-application-preview-file {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 5px;
+  margin: 4px 0;
+  overflow-wrap: anywhere;
+}
+
+.anganwadi-application-preview-file img {
+  width: auto;
+  max-width: 100%;
+  max-height: 180px;
+  border: 1px solid #d7dce2;
+  object-fit: contain;
+}
+
+.anganwadi-application-preview-file iframe {
+  width: min(500px, 100%);
+  height: 240px;
+  border: 1px solid #d7dce2;
+}
+
+.anganwadi-application-preview-file a {
+  color: #1976d2;
+  text-decoration: underline;
+  overflow-wrap: anywhere;
+}
+
+.anganwadi-application-preview-missing {
+  color: #dc2626;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.anganwadi-application-preview-signature {
+  display: flex;
+  min-height: 100px;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: flex-end;
+  margin-top: 24px;
+}
+
+.anganwadi-application-preview-signature p {
+  margin: 4px 0 0;
+}
+
+.anganwadi-application-preview-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  max-width: 1050px;
+  margin: 16px auto 0;
+  color: #667085;
+  font-size: 12px;
+}
+
+@media (max-width: 767px) {
+  .anganwadi-application-preview-overlay {
+    padding: 8px;
+  }
+
+  .anganwadi-application-preview-header {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 14px;
+  }
+
+  .anganwadi-application-preview-actions {
+    justify-content: flex-start;
+  }
+
+  .anganwadi-application-preview-content {
+    padding: 12px;
+  }
+
+  .anganwadi-application-preview-print-area {
+    padding: 16px 12px;
+  }
+
+  .anganwadi-application-preview-table {
+    font-size: 11px;
+  }
+
+  .anganwadi-application-preview-table th,
+  .anganwadi-application-preview-table td {
+    padding: 7px 6px;
+  }
+
+  .anganwadi-application-preview-footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+@media print {
+  @page {
+    size: A4;
+    margin: 10mm;
+  }
+
+  body[class$="anganwadi-modal-open"] .anganwadi-application-preview-header,
+  body[class$="anganwadi-modal-open"] .anganwadi-application-preview-footer-actions {
+    display: none !important;
+  }
+
+  body[class$="anganwadi-modal-open"] .anganwadi-application-preview-modal {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: none !important;
+    margin: 0 !important;
+    overflow: visible !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+
+  body[class$="anganwadi-modal-open"] .anganwadi-application-preview-content {
+    overflow: visible !important;
+    padding: 0 !important;
+  }
+
+  body[class$="anganwadi-modal-open"] .anganwadi-application-preview-print-area {
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    box-shadow: none !important;
+  }
+
+  body[class$="anganwadi-modal-open"] .anganwadi-application-preview-file img {
+    max-height: 120px;
+  }
+}
