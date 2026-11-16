@@ -116,6 +116,14 @@ const TiluRauteli2026_27 = ({ panel = "dpo" }) => {
   const stateApprovedStatus = "approved by state committee";
   const stateRejectedStatus = "rejected by state committee";
   const districtApprovedStatus = "approved by district committee";
+  const canApproveApplication = (application) => {
+    const status = String(application.status || "").trim().toLowerCase();
+    return (
+      status === "step-4" ||
+      status === "final" ||
+      (isDirectorPanel && status === districtApprovedStatus)
+    );
+  };
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
   const [isTablet, setIsTablet] = useState(false);
@@ -256,6 +264,15 @@ const TiluRauteli2026_27 = ({ panel = "dpo" }) => {
       setActionMessage({
         type: "danger",
         text: "Form ID not available for this application.",
+      });
+      return;
+    }
+    if (status === approvedStatus && !canApproveApplication(application)) {
+      setActionMessage({
+        type: "warning",
+        text: isDirectorPanel
+          ? "Application must be approved by the district committee before state approval."
+          : "Application must be on step-4 or finally submitted before it can be approved.",
       });
       return;
     }
@@ -710,7 +727,8 @@ const TiluRauteli2026_27 = ({ panel = "dpo" }) => {
                                   <FaEye /> View
                                 </Button>
                                 {(!isDirectorPanel ||
-                                  activeTab === "district-approved") && (
+                                  activeTab === "district-approved" ||
+                                  activeTab === "all") && (
                                   <>
                                     {isApproved ? (
                                       <Button
@@ -724,7 +742,12 @@ const TiluRauteli2026_27 = ({ panel = "dpo" }) => {
                                       <Button
                                         size="sm"
                                         variant="success"
-                                        disabled={isUpdating || isApproved || isRejected}
+                                        disabled={
+                                          isUpdating ||
+                                          isApproved ||
+                                          isRejected ||
+                                          !canApproveApplication(application)
+                                        }
                                         onClick={() =>
                                           updateApplicationStatus(
                                             application,
@@ -740,19 +763,24 @@ const TiluRauteli2026_27 = ({ panel = "dpo" }) => {
                                         Approve
                                       </Button>
                                     )}
-                                    <Button
-                                      size="sm"
-                                      variant="outline-danger"
-                                      disabled={isUpdating || isRejected || isApproved}
-                                      onClick={() =>
-                                        updateApplicationStatus(
-                                          application,
-                                          rejectedStatus,
-                                        )
-                                      }
-                                    >
-                                      {isRejected ? "Rejected" : "Reject"}
-                                    </Button>
+                                    {(!isDirectorPanel ||
+                                      activeTab === "district-approved") && (
+                                      <Button
+                                        size="sm"
+                                        variant="outline-danger"
+                                        disabled={
+                                          isUpdating || isRejected || isApproved
+                                        }
+                                        onClick={() =>
+                                          updateApplicationStatus(
+                                            application,
+                                            rejectedStatus,
+                                          )
+                                        }
+                                      >
+                                        {isRejected ? "Rejected" : "Reject"}
+                                      </Button>
+                                    )}
                                   </>
                                 )}
                               </div>
