@@ -361,14 +361,23 @@ const TiluRauteli2026_27 = ({ panel = "dpo" }) => {
               <img src={url} alt={label} />
             </a>
           ) : (
-            <a
-              href={url}
-              target="_blank"
-              rel="noreferrer"
-              className="tilu-dpo-document-link"
-            >
+            <div className="tilu-dpo-pdf-preview-wrap">
+              <div className="tilu-dpo-pdf-preview">
+                <iframe
+                  src={url}
+                  title={label}
+                  className="tilu-dpo-pdf-frame"
+                />
+              </div>
+              <a
+                href={url}
+                target="_blank"
+                rel="noreferrer"
+                className="tilu-dpo-document-link"
+              >
                 <FaFilePdf /> View / Download PDF
-            </a>
+              </a>
+            </div>
           )}
         </td>
       </tr>
@@ -892,16 +901,27 @@ const TiluRauteli2026_27 = ({ panel = "dpo" }) => {
                           <div>{displayValue(selectedApplication.manak1)}</div>
                           <div className="tilu-dpo-inline-document">
                             {getMediaUrl(selectedApplication.appli_pdf1) ? (
-                              <a
-                                href={getMediaUrl(
-                                  selectedApplication.appli_pdf1,
-                                )}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="tilu-dpo-document-link"
-                              >
-                                <FaFilePdf /> PDF देखें / डाउनलोड करें
-                              </a>
+                              <div className="tilu-dpo-pdf-preview-wrap">
+                                <div className="tilu-dpo-pdf-preview">
+                                  <iframe
+                                    src={getMediaUrl(
+                                      selectedApplication.appli_pdf1,
+                                    )}
+                                    title="महिला की उपलब्धि से संबंधित दस्तावेज़ PDF"
+                                    className="tilu-dpo-pdf-frame"
+                                  />
+                                </div>
+                                <a
+                                  href={getMediaUrl(
+                                    selectedApplication.appli_pdf1,
+                                  )}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  className="tilu-dpo-document-link"
+                                >
+                                  <FaFilePdf /> PDF देखें / डाउनलोड करें
+                                </a>
+                              </div>
                             ) : (
                               <span>दस्तावेज़ उपलब्ध नहीं है।</span>
                             )}
@@ -917,16 +937,27 @@ const TiluRauteli2026_27 = ({ panel = "dpo" }) => {
                           <div>{displayValue(selectedApplication.manak3)}</div>
                           <div className="tilu-dpo-inline-document">
                             {getMediaUrl(selectedApplication.appli_pdf2) ? (
-                              <a
-                                href={getMediaUrl(
-                                  selectedApplication.appli_pdf2,
-                                )}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="tilu-dpo-document-link"
-                              >
-                                <FaFilePdf /> PDF देखें / डाउनलोड करें
-                              </a>
+                              <div className="tilu-dpo-pdf-preview-wrap">
+                                <div className="tilu-dpo-pdf-preview">
+                                  <iframe
+                                    src={getMediaUrl(
+                                      selectedApplication.appli_pdf2,
+                                    )}
+                                    title="जीवन-वृत्त / समाचार-पत्र / प्रमाण पत्र PDF"
+                                    className="tilu-dpo-pdf-frame"
+                                  />
+                                </div>
+                                <a
+                                  href={getMediaUrl(
+                                    selectedApplication.appli_pdf2,
+                                  )}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  className="tilu-dpo-document-link"
+                                >
+                                  <FaFilePdf /> PDF देखें / डाउनलोड करें
+                                </a>
+                              </div>
                             ) : (
                               <span>दस्तावेज़ उपलब्ध नहीं है।</span>
                             )}
@@ -942,16 +973,27 @@ const TiluRauteli2026_27 = ({ panel = "dpo" }) => {
                           <div>{displayValue(selectedApplication.manak2)}</div>
                           <div className="tilu-dpo-inline-document">
                             {getMediaUrl(selectedApplication.appli_pdf3) ? (
-                              <a
-                                href={getMediaUrl(
-                                  selectedApplication.appli_pdf3,
-                                )}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="tilu-dpo-document-link"
-                              >
-                                <FaFilePdf /> PDF देखें / डाउनलोड करें
-                              </a>
+                              <div className="tilu-dpo-pdf-preview-wrap">
+                                <div className="tilu-dpo-pdf-preview">
+                                  <iframe
+                                    src={getMediaUrl(
+                                      selectedApplication.appli_pdf3,
+                                    )}
+                                    title="सम्मान / पुरस्कार / अन्य प्रमाण पत्र PDF"
+                                    className="tilu-dpo-pdf-frame"
+                                  />
+                                </div>
+                                <a
+                                  href={getMediaUrl(
+                                    selectedApplication.appli_pdf3,
+                                  )}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  className="tilu-dpo-document-link"
+                                >
+                                  <FaFilePdf /> PDF देखें / डाउनलोड करें
+                                </a>
+                              </div>
                             ) : (
                               <span>दस्तावेज़ उपलब्ध नहीं है।</span>
                             )}
