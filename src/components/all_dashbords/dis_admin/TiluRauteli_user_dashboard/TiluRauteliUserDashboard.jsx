@@ -75,6 +75,36 @@ const DEFAULT_FORM = {
   term1: [],
 };
 
+const normalizeStatus = (status) =>
+  String(status || "").trim().toLowerCase().replace(/[\s-]+/g, " ").replace(/\s+/g, " ");
+
+const APPROVED_BY_COMMITTEE_STATUSES = [
+  "approved by district committee",
+  "approved by dpo",
+  "approved by state committee",
+  "approved by director",
+];
+const REJECTED_STATUSES = [
+  "rejected by district committee",
+  "rejected by dpo",
+  "rejected by state committee",
+  "rejected by director",
+];
+
+const isApprovedByCommitteeStatus = (status) =>
+  APPROVED_BY_COMMITTEE_STATUSES.includes(normalizeStatus(status));
+const isRejectedStatus = (status) =>
+  REJECTED_STATUSES.includes(normalizeStatus(status)) ||
+  normalizeStatus(status).includes("reject");
+const isLockedStatus = (status) => {
+  const value = normalizeStatus(status);
+  return (
+    value === "final" ||
+    isApprovedByCommitteeStatus(value) ||
+    isRejectedStatus(value)
+  );
+};
+
 const IFSC_PATTERN = /^[A-Za-z]{4}0[A-Z0-9a-z]{6}$/;
 const PAN_PATTERN = /^[A-Z]{5}[0-9]{4}[A-Z]$/;
 const BANK_ACCOUNT_PATTERN = /^[0-9]{9,18}$/;
@@ -374,9 +404,7 @@ const TiluRauteliUserDashboard = () => {
           project: normalized.project || prev.project,
         }));
         setCurrentStep(getFirstIncompleteStep(normalized));
-        setApplicationSubmitted(
-          String(normalized.status || "").trim().toLowerCase() === "final",
-        );
+        setApplicationSubmitted(isLockedStatus(normalized.status));
       } catch (error) {
         console.error("Tilu application load failed:", error);
         setStatusMessage({
@@ -1315,7 +1343,7 @@ const TiluRauteliUserDashboard = () => {
               </div>
             )}
 
-            {isApplicationLocked && (
+            {hasAllRequiredDocuments && (
               <button
                 type="button"
                 className="tilu-btn secondary"
@@ -1325,21 +1353,22 @@ const TiluRauteliUserDashboard = () => {
                 आवेदन का पूर्वावलोकन देखें
               </button>
             )}
-            {hasAllRequiredDocuments && !isApplicationLocked && (
-              <div className="tilu-final-submit">
-                <p>
-                  सभी आवश्यक दस्तावेज़ अपलोड हैं। अंतिम सबमिट करने से पहले आप किसी भी चरण में बदलाव कर सकते हैं।
-                </p>
-                <button
-                  type="button"
-                  className="tilu-btn success"
-                  onClick={handleFinalSubmit}
-                  disabled={isSaving || loadingRecord}
-                >
-                  {isSaving ? "सबमिट हो रहा है..." : "अंतिम रूप से सबमिट करें"}
-                </button>
-              </div>
-            )}
+            {hasAllRequiredDocuments &&
+              !isApplicationLocked && (
+                <div className="tilu-final-submit">
+                  <p>
+                    सभी आवश्यक दस्तावेज़ अपलोड हैं। अंतिम सबमिट करने से पहले आप किसी भी चरण में बदलाव कर सकते हैं।
+                  </p>
+                  <button
+                    type="button"
+                    className="tilu-btn success"
+                    onClick={handleFinalSubmit}
+                    disabled={isSaving || loadingRecord}
+                  >
+                    {isSaving ? "सबमिट हो रहा है..." : "अंतिम रूप से सबमिट करें"}
+                  </button>
+                </div>
+              )}
 
             {loadingRecord ? (
               <div className="tilu-status-alert success">लोड हो रहा है...</div>
