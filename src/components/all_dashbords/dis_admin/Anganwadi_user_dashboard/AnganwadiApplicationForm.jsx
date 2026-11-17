@@ -737,6 +737,28 @@ const normalizeSelectedValues = (value) => {
   return [];
 };
 
+const getStepTwoFieldLabel = (fieldName) =>
+  ASSESSMENT_GROUPS.flatMap((group) => group.fields || []).find(
+    (field) => field.name === fieldName,
+  )?.label;
+
+const getStepTwoMissingFieldMessage = (fieldName) =>
+  fieldName === "saaf_ans"
+    ? "कम से कम एक स्वच्छता विकल्प चुनें।"
+    : `कृपया "${getStepTwoFieldLabel(fieldName) || "यह विवरण"}" भरें।`;
+
+const getStepTwoServerFieldMessage = (fieldName, message) => {
+  const comparison = message.match(
+    /^([a-z0-9_]+)\s+cannot exceed\s+([a-z0-9_]+)$/i,
+  );
+  if (!comparison || comparison[1] !== fieldName) return message;
+
+  const totalLabel = getStepTwoFieldLabel(comparison[2]);
+  return totalLabel
+    ? `यह संख्या "${totalLabel}" की संख्या से अधिक नहीं हो सकती।`
+    : message;
+};
+
 const AnganwadiApplicationForm = ({ account }) => {
   const applicationRef = useRef(null);
   const filePreviewUrlsRef = useRef({});
@@ -1109,15 +1131,66 @@ const AnganwadiApplicationForm = ({ account }) => {
   const parseFieldErrors = (message) => {
     const errors = {};
     if (!message) return errors;
-    message.split(" | ").forEach((part) => {
+    const addFieldError = (field, value) => {
+      const fieldMessage = Array.isArray(value)
+        ? value.join(", ")
+        : typeof value === "string"
+          ? value.trim()
+          : "";
+      if (!field || !fieldMessage) return;
+      errors[field] =
+        currentStep === 2
+          ? getStepTwoServerFieldMessage(field, fieldMessage)
+          : fieldMessage;
+    };
+
+    const jsonStart = message.indexOf("{");
+    const jsonEnd = message.lastIndexOf("}");
+    if (jsonStart >= 0 && jsonEnd > jsonStart) {
+      try {
+        const parsed = JSON.parse(message.slice(jsonStart, jsonEnd + 1));
+        const fieldMap =
+          parsed?.errors && typeof parsed.errors === "object"
+            ? parsed.errors
+            : parsed;
+        if (fieldMap && typeof fieldMap === "object" && !Array.isArray(fieldMap)) {
+          Object.entries(fieldMap).forEach(([field, value]) =>
+            addFieldError(field, value),
+          );
+          if (Object.keys(errors).length) return errors;
+        }
+      } catch {
+        // Fall through to the plain "field: message" format.
+      }
+    }
+
+    message.replace(/\s*\(HTTP \d+\)\s*$/, "").split(" | ").forEach((part) => {
       const colon = part.indexOf(":");
       if (colon > 0) {
         const field = part.slice(0, colon).trim();
         const msg = part.slice(colon + 1).trim();
-        if (field && msg) errors[field] = msg;
+        addFieldError(field, msg);
       }
     });
     return errors;
+  };
+
+  const revealFirstStepTwoFieldError = (errors) => {
+    const firstField = Object.keys(errors)[0];
+    if (!firstField) return;
+
+    window.requestAnimationFrame(() => {
+      const control =
+        document.getElementById(`anganwadi-application-${firstField}`) ||
+        (firstField === "saaf_ans"
+          ? document.querySelector(".anganwadi-checklist input")
+          : null);
+      const field = control?.closest(
+        ".anganwadi-application-field, .anganwadi-checklist",
+      );
+      field?.scrollIntoView({ behavior: "smooth", block: "center" });
+      control?.focus({ preventScroll: true });
+    });
   };
 
   const saveStep = async (event) => {
@@ -1144,21 +1217,26 @@ const AnganwadiApplicationForm = ({ account }) => {
       }
     }
 
-    if (currentStep === 2 && !isEditing) {
+    if (currentStep === 2) {
       const missingFields = getMissingAnganwadiStepTwoFields(formData);
       if (missingFields.length) {
         const nextErrors = {};
         missingFields.forEach((field) => {
-          nextErrors[field] = "यह आवश्यक विवरण भरें।";
+          nextErrors[field] = getStepTwoMissingFieldMessage(field);
         });
         setFieldErrors(nextErrors);
-        setError("कृपया नीचे हाइलाइट किए गए फ़ील्ड सुधारें: " + missingFields.join(", "));
+        revealFirstStepTwoFieldError(nextErrors);
         return;
       }
       const formatErr = getStepTwoFormatErrors(formData);
       if (formatErr) {
-        setFieldErrors(parseFieldErrors(formatErr));
-        setError("कृपया नीचे हाइलाइट किए गए फ़ील्ड सुधारें।");
+        const parsed = parseFieldErrors(formatErr);
+        setFieldErrors(parsed);
+        if (Object.keys(parsed).length) {
+          revealFirstStepTwoFieldError(parsed);
+        } else {
+          setError(formatErr);
+        }
         return;
       }
     }
@@ -1222,8 +1300,29 @@ const AnganwadiApplicationForm = ({ account }) => {
       console.error("Anganwadi application save failed:", saveError);
       const serverFieldErrors = parseFieldErrors(saveError.message);
       if (Object.keys(serverFieldErrors).length > 0) {
-        setFieldErrors(serverFieldErrors);
-        setError("कृपया नीचे हाइलाइट किए गए फ़ील्ड सुधारें।");
+        if (currentStep === 2) {
+          const stepTwoFieldNames = new Set([
+            ...ASSESSMENT_GROUPS.flatMap((group) => group.fields || []).map(
+              (field) => field.name,
+            ),
+            "saaf_ans",
+          ]);
+          const stepTwoErrors = Object.fromEntries(
+            Object.entries(serverFieldErrors).filter(([field]) =>
+              stepTwoFieldNames.has(field),
+            ),
+          );
+          if (Object.keys(stepTwoErrors).length > 0) {
+            setFieldErrors(stepTwoErrors);
+            setError("");
+            revealFirstStepTwoFieldError(stepTwoErrors);
+          } else {
+            setError(saveError.message || "जानकारी सेव नहीं हो सकी।");
+          }
+        } else {
+          setFieldErrors(serverFieldErrors);
+          setError("कृपया नीचे हाइलाइट किए गए फ़ील्ड सुधारें।");
+        }
       } else {
         setError(saveError.message || "जानकारी सेव नहीं हो सकी।");
       }
@@ -1337,9 +1436,9 @@ const AnganwadiApplicationForm = ({ account }) => {
           />
           {value && <Form.Text>चयनित फाइल: {value}</Form.Text>}
           {fieldError && (
-            <Form.Text className="anganwadi-field-error" role="alert">
+            <span className="anganwadi-field-error" role="alert">
               {fieldError}
-            </Form.Text>
+            </span>
           )}
           {field.note && <Form.Text>{field.note}</Form.Text>}
         </Form.Group>
@@ -1443,9 +1542,9 @@ const AnganwadiApplicationForm = ({ account }) => {
           />
         )}
         {fieldError && (
-          <Form.Text className="anganwadi-field-error" role="alert">
+          <span className="anganwadi-field-error" role="alert">
             {fieldError}
-          </Form.Text>
+          </span>
         )}
         {field.help && <Form.Text>{field.help}</Form.Text>}
       </Form.Group>
@@ -1518,15 +1617,20 @@ const AnganwadiApplicationForm = ({ account }) => {
                             : selected.filter((item) => item !== value),
                         };
                       });
+                      setFieldErrors((previous) => {
+                        const next = { ...previous };
+                        delete next.saaf_ans;
+                        return next;
+                      });
                       setNotice("");
                     }}
                   />
                 );
               })}
               {fieldErrors.saaf_ans && (
-                <Form.Text className="anganwadi-field-error" role="alert">
+                <span className="anganwadi-field-error" role="alert">
                   {fieldErrors.saaf_ans}
-                </Form.Text>
+                </span>
               )}
             </div>
           )}
@@ -1760,7 +1864,7 @@ const AnganwadiApplicationForm = ({ account }) => {
           <FaFileAlt aria-hidden="true" />
         </Card.Header>
         <Card.Body>
-          <Form onSubmit={saveStep}>
+          <Form noValidate={currentStep === 2} onSubmit={saveStep}>
             {currentStep === 1 && renderStepOne()}
             {currentStep === 2 && ASSESSMENT_GROUPS.map(renderAssessmentGroup)}
             {currentStep === 3 && renderStepThree()}
