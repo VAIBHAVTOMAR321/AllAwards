@@ -18,6 +18,35 @@ const readAnganwadiResponse = async (response, fallbackMessage) => {
   }
 };
 
+const getAnganwadiErrorMessage = (data, fallbackMessage) => {
+  if (!data || typeof data !== "object") return fallbackMessage;
+
+  const direct = [data.detail, data.message, data.error, data.msg].find(
+    (value) => typeof value === "string" && value.trim(),
+  );
+  if (direct) return direct;
+
+  const firstValue = Object.values(data).find(
+    (value) =>
+      value != null &&
+      value !== false &&
+      !(Array.isArray(value) && value.length === 0),
+  );
+  if (Array.isArray(firstValue)) {
+    const text = firstValue.filter(Boolean).join(", ");
+    if (text) return text;
+  }
+  if (typeof firstValue === "string" && firstValue.trim()) return firstValue;
+  if (firstValue && typeof firstValue === "object") {
+    const nested = [firstValue.detail, firstValue.message, firstValue.error].find(
+      (value) => typeof value === "string" && value.trim(),
+    );
+    if (nested) return nested;
+  }
+
+  return fallbackMessage;
+};
+
 export async function fetchDistrictList() {
   const response = await fetch(TILU_DISTRICTS_API, {
     credentials: "omit",
@@ -51,17 +80,27 @@ export async function fetchTiluBlockList(district) {
   ];
 }
 
+const ANGANWADI_NETWORK_ERROR =
+  "सर्वर से संपर्क नहीं हो सका। कृपया इंटरनेट/सर्वर उपलब्धता जांचें।";
+
 export async function fetchAnganwadiDistrictList() {
-  const response = await fetch(ANGANWADI_SECTOR_API, {
-    credentials: "omit",
-  });
+  let response;
+  try {
+    response = await fetch(ANGANWADI_SECTOR_API, {
+      credentials: "omit",
+    });
+  } catch {
+    throw new Error(ANGANWADI_NETWORK_ERROR);
+  }
   const data = await readAnganwadiResponse(
     response,
     "जनपद सूची का उत्तर पढ़ा नहीं जा सका।",
   );
 
   if (!response.ok || data.success === false || !Array.isArray(data.data)) {
-    throw new Error(data.message || data.detail || "जनपद सूची लोड नहीं हो सकी।");
+    throw new Error(
+      getAnganwadiErrorMessage(data, "जनपद सूची लोड नहीं हो सकी।"),
+    );
   }
 
   return [
@@ -72,10 +111,15 @@ export async function fetchAnganwadiDistrictList() {
 export async function fetchAnganwadiProjectSectors(district) {
   if (!district) return [];
 
-  const response = await fetch(
-    `${ANGANWADI_SECTOR_API}?district=${encodeURIComponent(district)}`,
-    { credentials: "omit" },
-  );
+  let response;
+  try {
+    response = await fetch(
+      `${ANGANWADI_SECTOR_API}?district=${encodeURIComponent(district)}`,
+      { credentials: "omit" },
+    );
+  } catch {
+    throw new Error(ANGANWADI_NETWORK_ERROR);
+  }
   const data = await readAnganwadiResponse(
     response,
     "परियोजना और सेक्टर सूची का उत्तर पढ़ा नहीं जा सका।",
@@ -83,14 +127,15 @@ export async function fetchAnganwadiProjectSectors(district) {
 
   if (!response.ok || data.success === false || !Array.isArray(data.data)) {
     throw new Error(
-      data.message || data.detail || "परियोजना और सेक्टर सूची लोड नहीं हो सकी।",
+      getAnganwadiErrorMessage(
+        data,
+        "परियोजना और सेक्टर सूची लोड नहीं हो सकी।",
+      ),
     );
   }
 
   return data.data.filter(
-    (project) =>
-      project.project_name &&
-      Array.isArray(project.sectors),
+    (project) => project.project_name && Array.isArray(project.sectors),
   );
 }
 
@@ -146,7 +191,7 @@ const postAnganwadiApi = async (path, body, fallbackMessage) => {
     "सर्वर से अमान्य उत्तर मिला।",
   );
   if (!response.ok || data.success === false) {
-    throw new Error(data.detail || data.message || fallbackMessage);
+    throw new Error(getAnganwadiErrorMessage(data, fallbackMessage));
   }
   return data;
 };
