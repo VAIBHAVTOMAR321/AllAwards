@@ -760,30 +760,7 @@ const DPOAnganwadi2026_27 = () => {
         rolePrefix="dpo"
         onClose={() => setSelectedApplication(null)}
         onPrint={handlePrint}
-      >
-        {selectedApplication &&
-          !["approved", "rejected"].includes(String(selectedApplication.status || "").toLowerCase()) && (
-            <>
-              <Button
-                variant="primary"
-                onClick={() => {
-                  const application = selectedApplication;
-                  setSelectedApplication(null);
-                  openDecision([application], "approved");
-                }}
-              >
-                <FaCheck className="me-2" /> Approve
-              </Button>
-              <Button variant="outline-danger" onClick={() => {
-                const application = selectedApplication;
-                setSelectedApplication(null);
-                openDecision([application], "rejected");
-              }}>
-                <FaTimes className="me-2" /> Reject
-              </Button>
-            </>
-          )}
-      </AnganwadiApplicationPreview>
+      />
 
       <Modal
         show={approvalApplications.length > 0}
