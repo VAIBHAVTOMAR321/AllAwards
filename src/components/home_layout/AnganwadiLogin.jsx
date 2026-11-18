@@ -402,6 +402,12 @@ export default function AnganwadiLogin() {
             {registrationStep === "details" && (
               <form onSubmit={handleRegistrationSubmit}>
                 <div className="anganwadi-registration-body">
+                  <div className="anganwadi-registration-note">
+                    <p><strong>महत्वपूर्ण सूचना:</strong></p>
+                    <p>उपयोगकर्ता केवल <strong>तीलू रौतेली</strong> <strong>या</strong> <strong>आंगनवाड़ी कार्यकर्त्री</strong> में से किसी एक के लिए पंजीकरण कर सकते हैं, दोनों के लिए नहीं।</p>
+                    <p>पहला भरा गया फॉर्म ही मान्य होगा। उसके बाद उपयोगकर्ता दूसरे फॉर्म के लिए पंजीकरण नहीं कर पाएंगे।</p>
+                    <p><em>बाल वीरता पुरस्कार के लिए अलग से आवेदन किया जा सकता है। यह शर्त केवल तीलू रौतेली और आंगनवाड़ी कार्यकर्त्री पंजीकरण पर लागू होती है।</em></p>
+                  </div>
                   <p className="anganwadi-registration-hint">
                     कृपया अपना नाम, मोबाइल नंबर, आधार और कार्यक्षेत्र की जानकारी दर्ज करें।
                   </p>

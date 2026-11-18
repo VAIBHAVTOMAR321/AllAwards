@@ -191,6 +191,29 @@
   overflow-y: auto;
   padding: 20px 22px;
 }
+.anganwadi-registration-note {
+  margin: 0 0 17px;
+  padding: 14px 16px;
+  border: 1px solid #d4e4d0;
+  border-radius: 6px;
+  background: #f0f8ed;
+  color: #526b58;
+  font-size: 12px;
+  line-height: 1.8;
+}
+.anganwadi-registration-note p {
+  margin: 0 0 8px;
+}
+.anganwadi-registration-note p:last-child {
+  margin-bottom: 0;
+}
+.anganwadi-registration-note strong {
+  color: var(--anganwadi-green);
+}
+.anganwadi-registration-note em {
+  color: #6b8d69;
+  font-style: italic;
+}
 .anganwadi-registration-hint {
   margin: 0 0 17px;
   padding: 11px 13px;
