@@ -10,7 +10,12 @@
   --aw-line: #e5e2d9;
   --aw-white: #fff;
 }
-
+.hero-content h1{
+  font-size: 42px !important;
+}
+.hero-content span{
+  font-size:33px;
+}
 .awards-home,
 .awards-home * {
   box-sizing: border-box;
