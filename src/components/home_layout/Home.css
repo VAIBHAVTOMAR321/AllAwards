@@ -896,6 +896,17 @@
   }
 }
 @media (max-width: 680px) {
+  .awards-home {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: clip;
+  }
+
+  .awards-home .hero-content h1 {
+    font-size: clamp(32px, 9vw, 42px) !important;
+    line-height: 1.2;
+  }
+
   .site-header {
     height: 76px;
     padding: 0 18px;
@@ -1457,6 +1468,9 @@
     font-size: 8px;
     line-height: 1.25;
   }
+    .drc-navbar .navbar-brand-text{
+      font-size: 10px;
+    }
 }
 @media (max-width: 360px) {
   .leadership-section {
@@ -1486,4 +1500,65 @@
 
 .awards-section .award-card:hover .award-photo {
   transform: none;
+}
+
+/* Keep award cards readable and contained on narrow screens. */
+@media (max-width: 680px) {
+  .awards-section .awards-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .awards-section .award-card {
+    display: block !important;
+    min-width: 0;
+    width: 100%;
+    padding: 18px;
+  }
+
+  .awards-section .award-card-top {
+    min-width: 0;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .awards-section .award-number {
+    min-width: 0;
+    max-width: calc(100% - 53px);
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+  }
+
+  .awards-section .award-symbol {
+    flex: 0 0 43px;
+  }
+
+  .awards-section .award-photo {
+    display: block;
+    float: none !important;
+    position: static;
+    width: 100%;
+    max-width: 100%;
+    height: clamp(145px, 48vw, 185px);
+    margin-top: 12px;
+  }
+
+  .awards-section .award-card-body {
+    display: block;
+    width: 100%;
+    clear: both;
+    writing-mode: horizontal-tb;
+  }
+
+  .awards-section .award-card h3,
+  .awards-section .award-card p {
+    width: 100%;
+  }
+
+  .awards-section .award-card-body,
+  .awards-section .award-card h3,
+  .awards-section .award-card p {
+    min-width: 0;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+  }
 }

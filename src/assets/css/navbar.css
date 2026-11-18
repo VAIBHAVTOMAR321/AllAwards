@@ -271,7 +271,7 @@
   }
 
   .drc-navbar.awards-navbar .navbar-actions {
-    align-items: flex-end;
+    align-items: flex-start;
     margin-left: 0;
   }
 
