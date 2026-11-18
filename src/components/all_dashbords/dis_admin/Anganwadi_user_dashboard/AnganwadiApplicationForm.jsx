@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import {
   Alert,
   Badge,
@@ -806,7 +807,6 @@ const AnganwadiApplicationForm = ({ account }) => {
         if (status === "step2" || status === "step3" || status === "final") {
           setCurrentStep(3);
         }
-        if (status === "step3" || status === "final") setShowPreview(true);
         loadDropdowns(application.district, application.project, application.sector);
       })
       .catch((loadError) => {
@@ -1285,7 +1285,6 @@ const AnganwadiApplicationForm = ({ account }) => {
         setFilePreviews({});
         setSelectedFiles({});
         setNotice("चरण 3 के दस्तावेज़ सर्वर पर सेव हुए।");
-        setShowPreview(true);
       } else {
         setCurrentStep((step) => step + 1);
         setNotice(`चरण ${currentStep} सर्वर पर सेव हुआ।`);
@@ -1884,17 +1883,31 @@ const AnganwadiApplicationForm = ({ account }) => {
                     सेव करें और आगे बढ़ें <FaChevronRight className="ms-2" />
                   </Button>
                 ) : (
-                  <Button type="submit" disabled={saving}>
-                    {saving ? <Spinner size="sm" className="me-2" /> : null}
-                    पूर्वावलोकन देखें <FaEye className="ms-2" />
-                  </Button>
+                  <>
+                    <Button type="submit" disabled={saving}>
+                      {saving ? <Spinner size="sm" className="me-2" /> : null}
+                      दस्तावेज़ सेव करें
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline-primary"
+                      disabled={saving}
+                      onClick={() => setShowPreview(true)}
+                    >
+                      <FaEye className="me-2" /> पूर्वावलोकन देखें
+                    </Button>
+                  </>
                 )}
               </div>
             )}
           </Form>
           {submitted && (
             <div className="anganwadi-step-actions">
-              <Button variant="outline-primary" onClick={() => setShowPreview(true)}>
+              <Button
+                type="button"
+                variant="outline-primary"
+                onClick={() => setShowPreview(true)}
+              >
                 <FaEye className="me-2" /> आवेदन का पूर्वावलोकन
               </Button>
             </div>
@@ -1902,7 +1915,8 @@ const AnganwadiApplicationForm = ({ account }) => {
         </Card.Body>
       </Card>
 
-      {showPreview && (
+      {showPreview &&
+        createPortal(
         <div
           className="anganwadi-preview-overlay"
           role="presentation"
@@ -2065,7 +2079,8 @@ const AnganwadiApplicationForm = ({ account }) => {
               )}
             </div>
           </section>
-        </div>
+        </div>,
+        document.body,
       )}
     </section>
   );

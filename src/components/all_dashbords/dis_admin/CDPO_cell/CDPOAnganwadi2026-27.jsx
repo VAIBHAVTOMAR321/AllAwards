@@ -685,7 +685,9 @@ const CDPOAnganwadi2026_27 = () => {
         onPrint={handlePrint}
       >
         {selectedApplication &&
-          !["approved", "rejected"].includes(String(selectedApplication.status || "").toLowerCase()) && (
+          activeTab === "completed" &&
+          !isApprovedStatus(selectedApplication.status) &&
+          !isRejectedStatus(selectedApplication.status) && (
             <>
               <Button
                 variant="primary"

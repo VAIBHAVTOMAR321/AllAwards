@@ -764,6 +764,7 @@
   .anganwadi-preview-header,
   .anganwadi-preview-decision,
   .anganwadi-preview-footer,
+  .anganwadi-preview-print-area .anganwadi-preview-final-status,
   .anganwadi-preview-demo-note {
     display: none !important;
   }

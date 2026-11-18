@@ -774,7 +774,7 @@ export const saveAnganwadiApplicationStep = async (
       applicant_id:
         response.form_id || application.applicant_id,
       status: normalizeStatus(response.status || "step3"),
-      editable: response.editable ?? false,
+      editable: response.editable ?? true,
     };
   }
 
