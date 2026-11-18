@@ -117,6 +117,8 @@ const isCompletedStatus = (status) => {
   const value = normalizeStatus(status);
   return ["final_submit", "submitted", "completed"].includes(value) || isApprovedStatus(value) || isRejectedStatus(value);
 };
+const getDecisionApiStatus = (status) =>
+  status === "approved" ? "approved_by_cdpo" : status;
 
 const CDPOAnganwadi2026_27 = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -273,6 +275,7 @@ const CDPOAnganwadi2026_27 = () => {
 
   const updateApplicationStatus = async () => {
     const formId = String(approvalApplication?.form_id || "").trim();
+    const statusToSend = getDecisionApiStatus(decisionStatus);
     if (!formId) {
       setActionMessage({
         type: "danger",
@@ -289,7 +292,7 @@ const CDPOAnganwadi2026_27 = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           form_id: formId,
-          status: decisionStatus,
+          status: statusToSend,
           remark: remark.trim(),
         }),
       });
@@ -317,7 +320,7 @@ const CDPOAnganwadi2026_27 = () => {
                 ...item,
                 ...(returnedRecord || {}),
                 form_id: formId,
-                status: returnedRecord?.status || payload.status || decisionStatus,
+                status: returnedRecord?.status || payload.status || statusToSend,
                 remark: returnedRecord?.remark ?? payload.remark ?? remark.trim(),
               }
             : item
@@ -328,7 +331,7 @@ const CDPOAnganwadi2026_27 = () => {
           ? {
               ...current,
               ...(returnedRecord || {}),
-              status: returnedRecord?.status || payload.status || decisionStatus,
+              status: returnedRecord?.status || payload.status || statusToSend,
               remark: returnedRecord?.remark ?? payload.remark ?? remark.trim(),
             }
           : current
@@ -738,7 +741,7 @@ const CDPOAnganwadi2026_27 = () => {
             />
           </Form.Group>
           <p className="cdpo-anganwadi-confirm-note">
-            This will send status: {decisionStatus} and the entered remark to the API.
+            This will send status: {getDecisionApiStatus(decisionStatus)} and the entered remark to the API.
           </p>
         </Modal.Body>
         <Modal.Footer>
