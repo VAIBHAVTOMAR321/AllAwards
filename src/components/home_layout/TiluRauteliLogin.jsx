@@ -13,7 +13,7 @@ import {
   FaUserShield,
 } from "react-icons/fa";
 import { useAuth } from "../login/AuthContext";
-import womenImage from "../../assets/images/images-11.jpeg";
+import womenImage from "../../assets/images/tilu_p1.jpg";
 import {
   fetchDistrictList,
   fetchTiluBlockList,

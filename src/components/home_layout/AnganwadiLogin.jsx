@@ -12,7 +12,7 @@ import {
   FaUserShield,
 } from "react-icons/fa";
 import { useAuth } from "../login/AuthContext";
-import anganwadiImage from "../../assets/images/images-5.jpeg";
+import anganwadiImage from "../../assets/images/anganwadi_p1.webp";
 import {
   fetchAnganwadiDistrictList,
   fetchAnganwadiProjectSectors,

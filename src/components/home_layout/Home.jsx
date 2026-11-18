@@ -1,9 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useLanguage } from "../../context/LanguageContext";
-import childAwardImage from "../../assets/images/images-9.jpeg";
-import womenAwardImage from "../../assets/images/images-11.jpeg";
-import anganwadiAwardImage from "../../assets/images/images-5.jpeg";
+import childAwardImage from "../../assets/images/veerta_p1.jpeg";
+import veertaP2 from "../../assets/images/veerta_p2.jpeg";
+import veertaP3 from "../../assets/images/veerta_p3.jpeg";
+import veertaP4 from "../../assets/images/veerta_p4.jpeg";
+import veertaP5 from "../../assets/images/veerta_p5.jpeg";
+import veertaP6 from "../../assets/images/veerta_p6.jpeg";
+import veertaP7 from "../../assets/images/veerta_p7.jpeg";
+import veertaP8 from "../../assets/images/veerta_p8.jpeg";
+import veertaP9 from "../../assets/images/veerta_p9.jpeg";
+import tiluImage from "../../assets/images/tilu_p1.jpg";
+import anganwadiAwardImage from "../../assets/images/anganwadi_p1.webp";
 import outreachImage from "../../assets/images/image-1.jpeg";
 import childrenMealImage from "../../assets/images/images-3.jpeg";
 import anganwadiChildrenImage from "../../assets/images/images-4.jpeg";
@@ -15,10 +23,15 @@ import directorImage from "../../assets/images/director-wecd.png";
 import "./Home.css";
 
 const HERO_IMAGES = [
-  outreachImage,
-  childrenMealImage,
-  anganwadiChildrenImage,
-  communityMealImage,
+  childAwardImage,
+  veertaP2,
+  veertaP3,
+  veertaP4,
+  veertaP5,
+  veertaP6,
+  veertaP7,
+  veertaP8,
+  veertaP9,
 ];
 
 const AWARDS = [
@@ -45,7 +58,7 @@ const AWARDS = [
       hi: "उत्कृष्ट उपलब्धियों और सेवा के लिए प्रेरणादायी महिलाओं का सम्मान।",
     },
     tag: { en: "Women of Excellence", hi: "उत्कृष्ट महिलाएँ" },
-    image: womenAwardImage,
+    image: tiluImage,
     imageAlt: {
       en: "Women gathered at a community event in Uttarakhand",
       hi: "उत्तराखंड में सामुदायिक कार्यक्रम में एकत्रित महिलाएँ",
@@ -374,7 +387,7 @@ export default function Home({ onSelectAward, awardRoutes = {} }) {
         <div className="hero-art" aria-hidden="true">
           <div
             className="hero-slides"
-            style={{ transform: `translateX(-${heroSlide * 25}%)` }}
+            style={{ transform: `translateX(-${heroSlide * (100 / HERO_IMAGES.length)}%)` }}
           >
             {HERO_IMAGES.map((image, index) => (
               <div className="hero-slide" key={image}>
