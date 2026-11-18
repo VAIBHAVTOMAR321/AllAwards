@@ -1472,3 +1472,13 @@
 .awards-home.lang-hi * {
   letter-spacing: normal;
 }
+
+.awards-section .award-photo {
+  object-fit: contain;
+  object-position: center;
+  background-color: #f4f1e8;
+}
+
+.awards-section .award-card:hover .award-photo {
+  transform: none;
+}
