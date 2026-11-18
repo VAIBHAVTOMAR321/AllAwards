@@ -316,10 +316,19 @@ const TiluRauteliUserDashboard = () => {
   const [loadingRecord, setLoadingRecord] = useState(true);
   const [applicationSubmitted, setApplicationSubmitted] = useState(false);
   const [showApplicationPreview, setShowApplicationPreview] = useState(false);
+  const [confirmFinalSubmission, setConfirmFinalSubmission] = useState(false);
   const hasAllRequiredDocuments = STEP_FOUR_REQUIRED_DOCUMENTS.every((field) =>
     Boolean(formData[field]),
   );
   const isApplicationLocked = applicationSubmitted;
+  const openApplicationPreview = () => {
+    setConfirmFinalSubmission(false);
+    setShowApplicationPreview(true);
+  };
+  const closeApplicationPreview = () => {
+    setConfirmFinalSubmission(false);
+    setShowApplicationPreview(false);
+  };
   const [documentPreviews, setDocumentPreviews] = useState({
     appli_img: "",
     appli_sign: "",
@@ -618,6 +627,7 @@ const TiluRauteliUserDashboard = () => {
     for (const stepNumber of [1, 2, 3, 4]) {
       if (!validateStep(stepNumber)) {
         setCurrentStep(stepNumber);
+        closeApplicationPreview();
         return;
       }
     }
@@ -674,6 +684,7 @@ const TiluRauteliUserDashboard = () => {
         status: "final",
       }));
       setApplicationSubmitted(true);
+      setConfirmFinalSubmission(false);
       setShowApplicationPreview(true);
       setStatusMessage({
         type: "success",
@@ -1347,28 +1358,12 @@ const TiluRauteliUserDashboard = () => {
               <button
                 type="button"
                 className="tilu-btn secondary"
-                onClick={() => setShowApplicationPreview(true)}
+                onClick={openApplicationPreview}
                 disabled={isSaving}
               >
                 आवेदन का पूर्वावलोकन देखें
               </button>
             )}
-            {hasAllRequiredDocuments &&
-              !isApplicationLocked && (
-                <div className="tilu-final-submit">
-                  <p>
-                    सभी आवश्यक दस्तावेज़ अपलोड हैं। अंतिम सबमिट करने से पहले आप किसी भी चरण में बदलाव कर सकते हैं।
-                  </p>
-                  <button
-                    type="button"
-                    className="tilu-btn success"
-                    onClick={handleFinalSubmit}
-                    disabled={isSaving || loadingRecord}
-                  >
-                    {isSaving ? "सबमिट हो रहा है..." : "अंतिम रूप से सबमिट करें"}
-                  </button>
-                </div>
-              )}
 
             {loadingRecord ? (
               <div className="tilu-status-alert success">लोड हो रहा है...</div>
@@ -1413,7 +1408,7 @@ const TiluRauteliUserDashboard = () => {
               className="tilu-preview-overlay"
               onMouseDown={(event) => {
                 if (event.target === event.currentTarget) {
-                  setShowApplicationPreview(false);
+                  closeApplicationPreview();
                 }
               }}
             >
@@ -1440,7 +1435,7 @@ const TiluRauteliUserDashboard = () => {
                     <button
                       type="button"
                       className="tilu-preview-close"
-                      onClick={() => setShowApplicationPreview(false)}
+                      onClick={closeApplicationPreview}
                       aria-label="पूर्वावलोकन बंद करें"
                     >
                       ×
@@ -1614,6 +1609,43 @@ const TiluRauteliUserDashboard = () => {
                     </div>
                   </article>
                 </div>
+                {isApplicationLocked ? (
+                  <div className="tilu-preview-submitted" role="status">
+                    आवेदन सफलतापूर्वक अंतिम रूप से सबमिट हो चुका है।
+                  </div>
+                ) : (
+                  <footer className="tilu-preview-confirmation">
+                    {statusMessage.type === "error" && (
+                      <div className="tilu-status-alert error" role="alert">
+                        {statusMessage.text}
+                      </div>
+                    )}
+                    <label className="tilu-preview-confirm-check">
+                      <input
+                        type="checkbox"
+                        checked={confirmFinalSubmission}
+                        onChange={(event) =>
+                          setConfirmFinalSubmission(event.target.checked)
+                        }
+                        disabled={isSaving || loadingRecord}
+                      />
+                      <span>
+                        मैंने आवेदन का पूर्वावलोकन जाँच लिया है और अंतिम सबमिशन की
+                        पुष्टि करता/करती हूँ।
+                      </span>
+                    </label>
+                    <button
+                      type="button"
+                      className="tilu-btn success"
+                      onClick={handleFinalSubmit}
+                      disabled={
+                        !confirmFinalSubmission || isSaving || loadingRecord
+                      }
+                    >
+                      {isSaving ? "सबमिट हो रहा है..." : "अंतिम रूप से सबमिट करें"}
+                    </button>
+                  </footer>
+                )}
               </section>
             </div>
           )}

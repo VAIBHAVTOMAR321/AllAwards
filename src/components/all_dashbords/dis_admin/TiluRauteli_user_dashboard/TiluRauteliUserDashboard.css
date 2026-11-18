@@ -265,25 +265,6 @@
   color: var(--tilu-success);
 }
 
-.tilu-final-submit {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  margin: 14px 0;
-  padding: 14px 16px;
-  border: 1px solid rgba(31, 163, 106, 0.24);
-  border-radius: 12px;
-  background: #f0faf4;
-}
-
-.tilu-final-submit p {
-  margin: 0;
-  color: #176b44;
-  font-size: 0.84rem;
-  line-height: 1.5;
-}
-
 .tilu-form-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -919,11 +900,6 @@
     align-items: stretch;
   }
 
-  .tilu-final-submit {
-    align-items: stretch;
-    flex-direction: column;
-  }
-
   .tilu-actions {
     width: 100%;
   }
@@ -1003,6 +979,46 @@
   overflow: auto;
   padding: 26px;
   background: #eef2f6;
+}
+
+.tilu-preview-confirmation {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px 20px;
+  padding: 14px 24px;
+  border-top: 1px solid var(--tilu-line);
+  background: #fff;
+}
+
+.tilu-preview-confirmation .tilu-status-alert {
+  grid-column: 1 / -1;
+  margin: 0;
+}
+
+.tilu-preview-confirm-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 0;
+  color: var(--tilu-text);
+  font-size: 0.84rem;
+  line-height: 1.5;
+}
+
+.tilu-preview-confirm-check input {
+  flex: 0 0 auto;
+  margin-top: 4px;
+  accent-color: var(--tilu-success);
+}
+
+.tilu-preview-submitted {
+  padding: 14px 24px;
+  border-top: 1px solid rgba(31, 163, 106, 0.24);
+  background: #f0faf4;
+  color: #176b44;
+  font-weight: 700;
+  text-align: center;
 }
 
 .tilu-preview-document {
@@ -1138,6 +1154,13 @@
   .tilu-preview-content {
     padding: 10px;
   }
+  .tilu-preview-confirmation {
+    grid-template-columns: 1fr;
+    padding: 14px;
+  }
+  .tilu-preview-confirmation .tilu-btn {
+    width: 100%;
+  }
   .tilu-preview-document {
     padding: 16px 10px;
   }
@@ -1190,6 +1213,11 @@
     box-shadow: none !important;
   }
   .tilu-preview-header {
+    display: none !important;
+  }
+
+  body.tilu-printing-preview .tilu-preview-confirmation,
+  body.tilu-printing-preview .tilu-preview-submitted {
     display: none !important;
   }
   .tilu-preview-content {
