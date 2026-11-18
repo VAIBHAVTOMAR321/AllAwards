@@ -49,7 +49,12 @@ function NavBar() {
             className="d-inline-block align-top me-2"
             alt="Child Development Logo"
           />
-          Women Empowerment<br />&amp; Child Development
+          <span className="navbar-brand-text">
+           
+            Women Empowerment &amp; Child Development
+             <span className="navbar-brand-uttarakhand">Uttarakhand</span>
+        
+          </span>
         </Navbar.Brand>
 
         <Navbar.Toggle aria-controls="basic-navbar-nav" />

@@ -9,6 +9,10 @@
   padding: 0.6rem 0;
   transition: all 0.3s ease;
 }
+.navbar-brand-uttarakhand{
+  text-align: justify;
+  font-size: 12px !important;
+}
 
 /* ---------- Scrolled State (Darker Blue + Shadow) ---------- */
 .drc-navbar.navbar-scrolled {
@@ -30,6 +34,19 @@
 .main-container-style img{
   width: 40px;
   height: 40px;
+}
+.drc-navbar .navbar-brand-text {
+  display: inline-flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+.drc-navbar .navbar-brand-uttarakhand {
+  color: #e99b43;
+  font-size: 14px;
+  letter-spacing: 0.6px;
+}
+.drc-navbar.awards-navbar .navbar-brand-uttarakhand {
+  color: #e07b1f;
 }
 .drc-navbar .navbar-brand:hover,
 .drc-navbar .navbar-brand:focus {
