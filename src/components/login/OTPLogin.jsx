@@ -4,7 +4,9 @@ import { useAuth } from "./AuthContext";
 import { sendOtpLoginApi, verifyOtpLoginApi } from "../otpsendverify/api";
 import { FaMobileAlt, FaShieldAlt } from "react-icons/fa";
 import ukLogo from "../../assets/images/uk_logo.jpeg";
-import loginImage from "../../assets/images/images-9.jpeg";
+import loginImage from "../../assets/images/veerta_p1.jpeg";
+import tiluLoginImage from "../../assets/images/tilu_p1.jpg";
+import anganwadiLoginImage from "../../assets/images/anganwadi_p1.webp";
 import "../otpsendverify/otp.css";
 
 const roleConfig = {
@@ -264,13 +266,31 @@ const VerifyOTPForm = ({
   );
 };
 
+const ROLE_IMAGES = {
+  director: [loginImage, tiluLoginImage, anganwadiLoginImage],
+  dpo: [loginImage, tiluLoginImage, anganwadiLoginImage],
+  cdpo: [loginImage, tiluLoginImage],
+  it_cell: [loginImage, tiluLoginImage, anganwadiLoginImage],
+};
+
 function OTPLogin({ fixedRole }) {
   const [phone, setPhone] = useState("");
   const [selectedRole, setSelectedRole] = useState(fixedRole || "director");
   const [step, setStep] = useState("send");
+  const [imageIndex, setImageIndex] = useState(0);
 
   const navigate = useNavigate();
   const { login } = useAuth();
+
+  const roleImages = ROLE_IMAGES[selectedRole] || [loginImage];
+
+  useEffect(() => {
+    if (roleImages.length <= 1) return undefined;
+    const timer = window.setInterval(() => {
+      setImageIndex((i) => (i + 1) % roleImages.length);
+    }, 3000);
+    return () => window.clearInterval(timer);
+  }, [selectedRole, roleImages.length]);
 
   const currentRole = roleConfig[selectedRole];
 
@@ -307,7 +327,7 @@ function OTPLogin({ fixedRole }) {
         <aside className="otp-login-brand">
           <img
             className="otp-login-hero-image"
-            src={loginImage}
+            src={roleImages[imageIndex]}
             alt=""
             aria-hidden="true"
           />

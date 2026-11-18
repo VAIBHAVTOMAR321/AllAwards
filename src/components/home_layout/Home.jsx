@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useLanguage } from "../../context/LanguageContext";
 import childAwardImage from "../../assets/images/veerta_p1.jpeg";
 import veertaP2 from "../../assets/images/veerta_p2.jpeg";
 import veertaP3 from "../../assets/images/veerta_p3.jpeg";
@@ -32,6 +31,8 @@ const HERO_IMAGES = [
   veertaP7,
   veertaP8,
   veertaP9,
+  tiluImage,
+  anganwadiAwardImage,
 ];
 
 const AWARDS = [
@@ -266,15 +267,15 @@ const AWARD_REGISTER_ROUTES = {
 };
 
 export default function Home({ onSelectAward, awardRoutes = {} }) {
-  const { language } = useLanguage();
+  const language = "hi";
   const navigate = useNavigate();
   const location = useLocation();
   const [dialogAction, setDialogAction] = useState(null);
   const [selectedAward, setSelectedAward] = useState(AWARDS[0].id);
   const [heroSlide, setHeroSlide] = useState(0);
 
-  const t = COPY[language];
-  const isHindi = language === "hi";
+  const t = COPY.hi;
+  const isHindi = true;
   const isSelectedAwardAvailable =
     Boolean(onSelectAward) ||
     Boolean(awardRoutes?.[selectedAward]?.[dialogAction]) ||
