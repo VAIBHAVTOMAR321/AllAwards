@@ -201,7 +201,7 @@
 }
 .lang-hi .hero h1 {
   font-family: "Noto Sans Devanagari", sans-serif;
-  letter-spacing: -0.025em;
+  letter-spacing: normal;
   line-height: 1.35;
 }
 .hero h1 span {
@@ -412,7 +412,7 @@
 }
 .lang-hi .section-heading h2 {
   font-family: "Noto Sans Devanagari", sans-serif;
-  letter-spacing: -0.015em;
+  letter-spacing: normal;
 }
 .section-heading > p {
   max-width: 350px;
@@ -530,7 +530,7 @@
 .lang-hi .award-card h3 {
   font-family: "Noto Sans Devanagari", sans-serif;
   font-size: 19px;
-  letter-spacing: -0.015em;
+  letter-spacing: normal;
 }
 .award-card p {
   max-width: 310px;
@@ -589,7 +589,7 @@
 }
 .lang-hi .recognition-copy h2 {
   font-family: "Noto Sans Devanagari", sans-serif;
-  letter-spacing: -0.015em;
+  letter-spacing: normal;
 }
 .recognition-copy > p {
   max-width: 480px;
@@ -789,7 +789,7 @@
 .lang-hi .award-dialog h2 {
   font-family: "Noto Sans Devanagari", sans-serif;
   font-size: 23px;
-  letter-spacing: -0.015em;
+  letter-spacing: normal;
 }
 .dialog-description {
   margin: 0 0 23px;
@@ -1466,4 +1466,9 @@
   .leader-card h3 {
     font-size: 7px;
   }
+}
+
+.awards-home.lang-hi,
+.awards-home.lang-hi * {
+  letter-spacing: normal;
 }
